@@ -22,6 +22,9 @@
     },
     "destroy": {
       "cache": false
+    },
+    "preflight:cloudflare": {
+      "cache": false
     }
   }
 }

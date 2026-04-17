@@ -2,8 +2,8 @@ import alchemy from "alchemy";
 import { Astro } from "alchemy/cloudflare";
 import { config } from "dotenv";
 
-config({ path: "./.env" });
-config({ path: "../../apps/web/.env" });
+config({ path: "./.env", override: true });
+config({ path: "../../apps/web/.env", override: true });
 
 const app = await alchemy("tredyffrin-aerial-photos");
 

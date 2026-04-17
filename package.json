@@ -21,6 +21,7 @@
     "check-types": "turbo check-types",
     "dev:web": "turbo -F web dev",
     "deploy": "turbo -F @tredyffrin-aerial-photos/infra deploy",
+    "deploy:preflight": "turbo -F @tredyffrin-aerial-photos/infra preflight:cloudflare",
     "destroy": "turbo -F @tredyffrin-aerial-photos/infra destroy"
   },
   "dependencies": {
