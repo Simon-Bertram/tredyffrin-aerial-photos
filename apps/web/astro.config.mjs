@@ -17,6 +17,19 @@ export default defineConfig({
         context: "client",
         default: "http://localhost:3000",
       }),
+      PUBLIC_SANITY_PROJECT_ID: envField.string({
+        access: "public",
+        context: "server",
+      }),
+      PUBLIC_SANITY_DATASET: envField.string({
+        access: "public",
+        context: "server",
+      }),
+      SANITY_API_READ_TOKEN: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
     },
   },
 

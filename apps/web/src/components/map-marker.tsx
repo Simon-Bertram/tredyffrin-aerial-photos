@@ -9,7 +9,6 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { Card } from "@/components/ui/card";
 
 interface MapLocationMarkerProps {
   location: LocationRecord;
@@ -64,7 +63,7 @@ export function MapLocationMarker({
               <Carousel>
                 <CarouselContent>
                   {location.photos.map((photo) => (
-                    <CarouselItem key={photo.src}>
+                    <CarouselItem key={photo.id}>
                       <img
                         src={photo.src}
                         alt={photo.alt}
