@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 import type MapLibreGL from "maplibre-gl";
 
 import type { MapTerrainConfig } from "@/components/map-types";
@@ -7,6 +7,13 @@ type UseMapTerrainArgs = {
   map: MapLibreGL.Map | null;
   isStyleLoaded: boolean;
   terrain3d?: MapTerrainConfig;
+  /**
+   * Synchronous flag indicating a setStyle transition is in flight.
+   * Prevents applying terrain on a map that is mid-swap, which would
+   * leave MapLibre's painter without the terrain-depth program and
+   * crash on the next render frame.
+   */
+  pendingStyleChangeRef?: MutableRefObject<boolean>;
 };
 
 const DEFAULT_SOURCE_ID = "terrain-dem";
@@ -120,7 +127,12 @@ function ensureTerrainLayers(map: MapLibreGL.Map, terrain3d: MapTerrainConfig) {
   return true;
 }
 
-function useMapTerrain({ map, isStyleLoaded, terrain3d }: UseMapTerrainArgs) {
+function useMapTerrain({
+  map,
+  isStyleLoaded,
+  terrain3d,
+  pendingStyleChangeRef,
+}: UseMapTerrainArgs) {
   const hasAppliedInitialCameraRef = useRef(false);
 
   useEffect(() => {
@@ -129,6 +141,14 @@ function useMapTerrain({ map, isStyleLoaded, terrain3d }: UseMapTerrainArgs) {
 
   useEffect(() => {
     if (!map) {
+      return;
+    }
+
+    // A setStyle transition is in flight; don't touch terrain until the new
+    // style finishes loading. Otherwise we call setTerrain on a map whose
+    // painter is about to swap styles, leaving the terrain-depth program
+    // unregistered and crashing the next render frame.
+    if (pendingStyleChangeRef?.current) {
       return;
     }
 
@@ -172,7 +192,7 @@ function useMapTerrain({ map, isStyleLoaded, terrain3d }: UseMapTerrainArgs) {
       duration,
     });
     hasAppliedInitialCameraRef.current = true;
-  }, [map, isStyleLoaded, terrain3d]);
+  }, [map, isStyleLoaded, terrain3d, pendingStyleChangeRef]);
 }
 
 export { useMapTerrain };

@@ -209,6 +209,12 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
   const currentStyleRef = useRef<MapStyleOption | null>(null);
   const styleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const internalUpdateRef = useRef(false);
+  // Synchronous flag set true while a setStyle transition is in flight.
+  // Needed because setIsStyleLoaded(false) in the style-change effect does
+  // not take effect until the next render, so effects running later in the
+  // same render (e.g. useMapTerrain) would otherwise see stale state and
+  // mutate the map during the swap, leaving the painter in a broken state.
+  const pendingStyleChangeRef = useRef(false);
   const resolvedTheme = useResolvedTheme(themeProp);
 
   const isControlled = viewport !== undefined && onViewportChange !== undefined;
@@ -260,6 +266,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
       // else we have to force update every layer on setStyle change
       styleTimeoutRef.current = setTimeout(() => {
         collapseAttributionControl(map)
+        pendingStyleChangeRef.current = false;
         setIsStyleLoaded(true);
         if (projection) {
           map.setProjection(projection);
@@ -334,6 +341,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
     clearStyleTimeout();
     currentStyleRef.current = newStyle;
+    pendingStyleChangeRef.current = true;
     setIsStyleLoaded(false);
 
     if (!terrain3d?.enabled && mapInstance.isStyleLoaded()) {
@@ -343,7 +351,12 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     mapInstance.setStyle(newStyle, { diff: true });
   }, [mapInstance, resolvedTheme, mapStyles, clearStyleTimeout, terrain3d]);
 
-  useMapTerrain({ map: mapInstance, isStyleLoaded, terrain3d });
+  useMapTerrain({
+    map: mapInstance,
+    isStyleLoaded,
+    terrain3d,
+    pendingStyleChangeRef,
+  });
 
   const contextValue = useMemo(
     () => ({

@@ -4,21 +4,32 @@ import Header from "../components/Header.astro";
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = "tredyffrin-aerial-photos" } = Astro.props;
+const {
+  title = "Tredyffrin, from above — The Aerial Archive",
+  description = "A curated dossier of aerial photographs of Tredyffrin Township, Pennsylvania.",
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-neutral-950 text-white">
+  <body class="min-h-screen bg-background text-foreground antialiased">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-[11px] focus:uppercase focus:tracking-[0.18em] focus:text-primary-foreground"
+    >
+      Skip to the archive
+    </a>
     <Header />
     <slot />
   </body>

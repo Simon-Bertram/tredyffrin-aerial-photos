@@ -46,6 +46,7 @@ export function TredyffrinMap({ locations }: MapProps) {
           <MapLocationMarker
             key={location.slug}
             location={location}
+            mapVisualStyle={selectedStyle}
             activeTab={activeTab}
             onActiveTabChange={(nextTab) => {
               setActivePhotoTabs((prev) => ({

@@ -33,10 +33,15 @@ function MapStyleControls({
   return (
     <div
       className={cn(
-        "bg-surface/85 absolute z-20 flex items-center gap-1 p-1.5 backdrop-blur-xl",
+        "absolute z-20 flex items-center gap-1 p-1.5",
+        "bg-surface/80 backdrop-blur-xl",
+        "ring-1 ring-inset ring-[color-mix(in_srgb,var(--outline-variant)_20%,transparent)]",
+        "shadow-[0_18px_36px_color-mix(in_srgb,var(--on-surface)_6%,transparent)]",
         positionClasses[position],
         className,
       )}
+      role="group"
+      aria-label="Map visual style"
     >
       {options.map((option) => {
         const isActive = selectedStyle === option.id;
@@ -46,10 +51,14 @@ function MapStyleControls({
             type="button"
             onClick={() => onStyleChange(option.id)}
             className={cn(
-              "px-2.5 py-1 text-xs font-semibold tracking-[0.08em] uppercase transition-colors",
+              "px-2.5 py-1 font-sans text-[11px] font-semibold uppercase tracking-[0.14em]",
+              "transition-colors duration-150",
               isActive
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-surface-container hover:text-foreground",
+                : cn(
+                    "text-on-surface-variant",
+                    "hover:bg-surface-container hover:text-on-surface",
+                  ),
             )}
             aria-pressed={isActive}
           >
@@ -57,13 +66,21 @@ function MapStyleControls({
           </button>
         );
       })}
+      <span
+        aria-hidden
+        className="mx-0.5 h-4 w-px bg-[color-mix(in_srgb,var(--outline-variant)_35%,transparent)]"
+      />
       <button
         type="button"
         onClick={handleResetView}
-        className="text-muted-foreground hover:bg-surface-container p-1.5 transition-colors hover:text-foreground"
+        className={cn(
+          "p-1.5 transition-colors duration-150",
+          "text-on-surface-variant",
+          "hover:bg-surface-container hover:text-on-surface",
+        )}
         aria-label="Reset map view"
       >
-        <RotateCcw className="size-3.5" />
+        <RotateCcw className="size-3.5" strokeWidth={1.75} />
       </button>
     </div>
   );
