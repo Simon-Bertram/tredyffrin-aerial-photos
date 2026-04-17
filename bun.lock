@@ -27,7 +27,7 @@
         "@tredyffrin-aerial-photos/env": "workspace:*",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "astro": "^6.0.1",
+        "astro": "6.1.7",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dotenv": "catalog:",
@@ -43,7 +43,7 @@
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@astrojs/cloudflare": "^13.0.1",
+        "@astrojs/cloudflare": "13.1.10",
         "@cloudflare/workers-types": "catalog:",
         "@tailwindcss/vite": "^4.1.18",
         "@tredyffrin-aerial-photos/config": "workspace:*",

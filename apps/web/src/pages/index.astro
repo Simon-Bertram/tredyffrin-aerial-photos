@@ -14,7 +14,7 @@ const locations = await fetchLocationsForMap();
       <div class="p-12">
         {
           locations.length > 0 ? (
-            <TredyffrinMap client:load locations={locations} />
+            <TredyffrinMap client:only="react" locations={locations} />
           ) : (
             <p class="text-sm text-muted-foreground">
               No locations to show yet. Add locations in Sanity Studio.
