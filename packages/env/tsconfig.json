@@ -1,0 +1,3 @@
+{
+  "extends": "@tredyffrin-aerial-photos/config/tsconfig.base.json"
+}

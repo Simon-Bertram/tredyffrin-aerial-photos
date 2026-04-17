@@ -1,0 +1,38 @@
+{
+  "name": "tredyffrin-aerial-photos",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "typescript": "^5",
+      "@cloudflare/workers-types": "^4.20251213.0",
+      "alchemy": "^0.90.0"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "deploy": "turbo -F @tredyffrin-aerial-photos/infra deploy",
+    "destroy": "turbo -F @tredyffrin-aerial-photos/infra destroy"
+  },
+  "dependencies": {
+    "@tredyffrin-aerial-photos/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@tredyffrin-aerial-photos/config": "workspace:*",
+    "turbo": "^2.8.12",
+    "typescript": "catalog:"
+  },
+  "packageManager": "bun@1.3.12"
+}
