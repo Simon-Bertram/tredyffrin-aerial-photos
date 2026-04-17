@@ -128,7 +128,18 @@ function useMapTerrain({ map, isStyleLoaded, terrain3d }: UseMapTerrainArgs) {
   }, [map, isStyleLoaded]);
 
   useEffect(() => {
-    if (!map || !isStyleLoaded || !terrain3d) {
+    if (!map) {
+      return;
+    }
+
+    if (!terrain3d) {
+      if (map.isStyleLoaded()) {
+        removeTerrainArtifacts(map, {});
+      }
+      return;
+    }
+
+    if (!isStyleLoaded) {
       return;
     }
     if (!map.isStyleLoaded()) {

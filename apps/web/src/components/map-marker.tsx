@@ -4,18 +4,24 @@ import { Camera } from "lucide-react";
 
 import { MapMarker, MarkerContent, MarkerTooltip } from "@/components/ui/map";
 import type { LocationRecord } from "@/lib/locations";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { Card } from "@/components/ui/card";
 
-interface AerialMapMarkerProps {
+interface MapLocationMarkerProps {
   location: LocationRecord;
   activeTab: string;
   onActiveTabChange: (nextTab: string) => void;
 }
 
-export function AerialMapMarker({
+export function MapLocationMarker({
   location,
   activeTab,
   onActiveTabChange,
-}: AerialMapMarkerProps) {
+}: MapLocationMarkerProps) {
   const detailPath = `/locations/${location.slug}`;
   const hasPhotos = location.photos.length > 0;
   const firstPhoto = location.photos[0];
@@ -55,15 +61,20 @@ export function AerialMapMarker({
         <article className="bg-surface-container-lowest overflow-hidden border border-outline-variant/15 shadow-[0_24px_32px_color-mix(in_srgb,var(--foreground)_4%,transparent)]">
           <div className="relative h-40">
             {multiplePhotos ? (
-              <Phototab
-                tabs={phototabItems}
-                value={activeTab}
-                onValueChange={onActiveTabChange}
-                height={160}
-                className="h-40 w-full rounded-none"
-                imageClassName="rounded-none"
-                tabListClassName="bottom-0 w-28 translate-y-0 py-1"
-              />
+              <Carousel>
+                <CarouselContent>
+                  {location.photos.map((photo) => (
+                    <CarouselItem key={photo.src}>
+                      <img
+                        src={photo.src}
+                        alt={photo.alt}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             ) : hasPhotos ? (
               <img
                 src={firstPhoto.src}

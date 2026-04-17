@@ -19,6 +19,11 @@ import { createPortal } from "react-dom";
 import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { MapTerrainConfig } from "@/components/map-types";
+import {
+  removeTerrainArtifacts,
+  useMapTerrain,
+} from "@/components/use-map-terrain";
 
 const defaultStyles = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
@@ -142,6 +147,8 @@ type MapProps = {
   onViewportChange?: (viewport: MapViewport) => void;
   /** Show a loading indicator on the map */
   loading?: boolean;
+  /** Optional 3D terrain (DEM source, hillshade, sky) when the style is ready. */
+  terrain3d?: MapTerrainConfig;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 function DefaultLoader() {
@@ -166,6 +173,20 @@ function getViewport(map: MapLibreGL.Map): MapViewport {
   };
 }
 
+function collapseAttributionControl(map: MapLibreGL.Map) {
+  const mapContainer = map.getContainer()
+  const attributionControl = mapContainer.querySelector(
+    '.maplibregl-ctrl-attrib',
+  )
+
+  if (!(attributionControl instanceof HTMLElement)) {
+    return
+  }
+
+  // Keep attribution collapsed until a user explicitly expands it.
+  attributionControl.classList.remove('maplibregl-compact-show')
+}
+
 const Map = forwardRef<MapRef, MapProps>(function Map(
   {
     children,
@@ -176,6 +197,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     viewport,
     onViewportChange,
     loading = false,
+    terrain3d,
     ...props
   },
   ref,
@@ -237,13 +259,17 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
       // This is a workaround to avoid race conditions with the style loading
       // else we have to force update every layer on setStyle change
       styleTimeoutRef.current = setTimeout(() => {
+        collapseAttributionControl(map)
         setIsStyleLoaded(true);
         if (projection) {
           map.setProjection(projection);
         }
       }, 100);
     };
-    const loadHandler = () => setIsLoaded(true);
+    const loadHandler = () => {
+      collapseAttributionControl(map)
+      setIsLoaded(true)
+    }
 
     // Viewport change handler - skip if triggered by internal update
     const handleMove = () => {
@@ -310,8 +336,14 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     currentStyleRef.current = newStyle;
     setIsStyleLoaded(false);
 
+    if (!terrain3d?.enabled && mapInstance.isStyleLoaded()) {
+      removeTerrainArtifacts(mapInstance, {});
+    }
+
     mapInstance.setStyle(newStyle, { diff: true });
-  }, [mapInstance, resolvedTheme, mapStyles, clearStyleTimeout]);
+  }, [mapInstance, resolvedTheme, mapStyles, clearStyleTimeout, terrain3d]);
+
+  useMapTerrain({ map: mapInstance, isStyleLoaded, terrain3d });
 
   const contextValue = useMemo(
     () => ({

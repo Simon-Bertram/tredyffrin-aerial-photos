@@ -1,29 +1,23 @@
 import { useState } from "react";
 
-// import { AerialMapControls } from "@/components/aerial-map-controls";
-// import { AerialMapMarker } from "@/components/aerial-map-marker";
-import { Map, MapMarker } from "@/components/ui/map";
+import { MapVisualStyleControls } from "@/components/map-controls";
+import { MapLocationMarker } from "@/components/map-marker";
+import { Map, MapControls } from "@/components/ui/map";
 import {
   getMapStylesForVisualStyle,
   getTerrainForVisualStyle,
 } from "@/components/map-style-config";
-import type {
-  MapTerrainConfig,
-  MapVisualStyleId,
-} from "@/components/map-types";
+import type { MapVisualStyleId } from "@/components/map-types";
 import type { LocationRecord } from "@/lib/locations";
-import { MapStyleControls } from "@/components/map-style-controls";
-import { useMapTerrain } from "@/components/use-map-terrain";
-import { MapControls } from "@/components/map-controls";
 
 /** Tredyffrin area — MapLibre uses [longitude, latitude] (GeoJSON order). */
 const TREDDYFFRIN_CENTER: [number, number] = [-75.4368, 40.0902];
 
-interface AerialMapProps {
+interface MapProps {
   locations: LocationRecord[];
 }
 
-export function TredyffrinMap({ locations }: AerialMapProps) {
+export function TredyffrinMap({ locations }: MapProps) {
   const [activePhotoTabs, setActivePhotoTabs] = useState<
     Record<string, string>
   >({});
@@ -34,12 +28,14 @@ export function TredyffrinMap({ locations }: AerialMapProps) {
 
   return (
     <Map
+      className="min-h-[320px] h-[75vh]"
       center={TREDDYFFRIN_CENTER}
-      zoom={11}
+      zoom={12}
       styles={mapStyles}
       terrain3d={terrain3d}
     >
-      <MapControls
+      <MapControls />
+      <MapVisualStyleControls
         selectedStyle={selectedStyle}
         onStyleChange={setSelectedStyle}
       />
@@ -47,7 +43,7 @@ export function TredyffrinMap({ locations }: AerialMapProps) {
         const activeTab = activePhotoTabs[location.slug] ?? "1";
 
         return (
-          <MapMarker
+          <MapLocationMarker
             key={location.slug}
             location={location}
             activeTab={activeTab}

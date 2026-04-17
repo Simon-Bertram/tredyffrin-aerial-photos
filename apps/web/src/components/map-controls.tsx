@@ -4,15 +4,15 @@ import { MapStyleControls } from "@/components/map-style-controls";
 import { MAP_STYLE_OPTIONS } from "@/components/map-style-config";
 import type { MapVisualStyleId } from "@/components/map-types";
 
-interface MapControlsProps {
+interface MapVisualStyleControlsProps {
   selectedStyle: MapVisualStyleId;
   onStyleChange: (nextStyle: MapVisualStyleId) => void;
 }
 
-export function MapControls({
+export function MapVisualStyleControls({
   selectedStyle,
   onStyleChange,
-}: MapControlsProps) {
+}: MapVisualStyleControlsProps) {
   return (
     <>
       <MapStyleControls
