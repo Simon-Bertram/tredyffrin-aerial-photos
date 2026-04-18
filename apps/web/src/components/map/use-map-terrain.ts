@@ -1,7 +1,7 @@
 import { useEffect, useRef, type MutableRefObject } from "react";
 import type MapLibreGL from "maplibre-gl";
 
-import type { MapTerrainConfig } from "@/components/map-types";
+import type { MapTerrainConfig } from "@/components/map/map-types";
 
 type UseMapTerrainArgs = {
   map: MapLibreGL.Map | null;
@@ -114,7 +114,7 @@ function ensureTerrainLayers(map: MapLibreGL.Map, terrain3d: MapTerrainConfig) {
         const skyLayer = {
           id: skyLayerId,
           type: "sky",
-        } as unknown as MapLibreGL.LayerSpecification
+        } as unknown as MapLibreGL.LayerSpecification;
         map.addLayer(skyLayer);
       } catch {
         // Some styles/runtimes do not support "sky" layers. Terrain still works without it.
@@ -141,6 +141,26 @@ function useMapTerrain({
 
   useEffect(() => {
     if (!map) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "223fd5",
+          },
+          body: JSON.stringify({
+            sessionId: "223fd5",
+            location: "use-map-terrain.ts:no-map",
+            message: "terrain effect skip: no map",
+            data: {},
+            timestamp: Date.now(),
+            hypothesisId: "H5",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       return;
     }
 
@@ -149,6 +169,29 @@ function useMapTerrain({
     // painter is about to swap styles, leaving the terrain-depth program
     // unregistered and crashing the next render frame.
     if (pendingStyleChangeRef?.current) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "223fd5",
+          },
+          body: JSON.stringify({
+            sessionId: "223fd5",
+            location: "use-map-terrain.ts:pending-style",
+            message: "terrain effect skip: pending style change",
+            data: {
+              reactIsStyleLoaded: isStyleLoaded,
+              mapIsStyleLoaded: map.isStyleLoaded(),
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H4",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       return;
     }
 
@@ -160,9 +203,53 @@ function useMapTerrain({
     }
 
     if (!isStyleLoaded) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "223fd5",
+          },
+          body: JSON.stringify({
+            sessionId: "223fd5",
+            location: "use-map-terrain.ts:react-not-loaded",
+            message: "terrain effect skip: react isStyleLoaded false",
+            data: {
+              mapIsStyleLoaded: map.isStyleLoaded(),
+              terrainEnabled: terrain3d.enabled,
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H3",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       return;
     }
     if (!map.isStyleLoaded()) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "223fd5",
+          },
+          body: JSON.stringify({
+            sessionId: "223fd5",
+            location: "use-map-terrain.ts:map-not-style-loaded",
+            message:
+              "terrain effect skip: map.isStyleLoaded false while react true",
+            data: { reactIsStyleLoaded: isStyleLoaded },
+            timestamp: Date.now(),
+            hypothesisId: "H1",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       return;
     }
 
@@ -171,7 +258,51 @@ function useMapTerrain({
       return;
     }
 
+    // #region agent log
+    fetch("http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "223fd5",
+      },
+      body: JSON.stringify({
+        sessionId: "223fd5",
+        location: "use-map-terrain.ts:before-ensure",
+        message: "terrain effect applying layers",
+        data: {
+          reactIsStyleLoaded: isStyleLoaded,
+          mapIsStyleLoaded: map.isStyleLoaded(),
+          hasDemBefore: Boolean(map.getSource("terrain-dem")),
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H2",
+      }),
+    }).catch(() => {});
+    // #endregion
+
     const hasTerrain = ensureTerrainLayers(map, terrain3d);
+
+    // #region agent log
+    fetch("http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "223fd5",
+      },
+      body: JSON.stringify({
+        sessionId: "223fd5",
+        location: "use-map-terrain.ts:after-ensure",
+        message: "ensureTerrainLayers result",
+        data: {
+          hasTerrain,
+          hasDemAfter: Boolean(map.getSource("terrain-dem")),
+          terrainSpec: Boolean(map.getTerrain()),
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H2",
+      }),
+    }).catch(() => {});
+    // #endregion
     if (!hasTerrain || hasAppliedInitialCameraRef.current) {
       return;
     }

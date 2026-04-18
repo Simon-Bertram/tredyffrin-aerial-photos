@@ -7,7 +7,11 @@ import type { LocationRecord } from '@/lib/locations'
 import { getSanityClient } from '@/lib/sanity/client'
 import { createSanityImageBuilder } from '@/lib/sanity/image'
 import { mapSanityLocationToRecord } from '@/lib/sanity/map-location'
-import { locationBySlugQuery, locationsForMapQuery } from '@/lib/sanity/queries'
+import {
+	locationBySlugQuery,
+	locationSlugsQuery,
+	locationsForMapQuery,
+} from '@/lib/sanity/queries'
 
 const MAP_IMAGE_WIDTH = 1200
 const DETAIL_IMAGE_WIDTH = 1600
@@ -56,6 +60,27 @@ export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
 			continue
 		}
 		out.push(mapped)
+	}
+	return out
+}
+
+export async function fetchPublishedLocationSlugs(): Promise<string[]> {
+	const client = getSanityClient()
+	const rows = await client.fetch<unknown>(locationSlugsQuery)
+	if (!Array.isArray(rows)) {
+		console.warn('[sanity:fetchPublishedLocationSlugs] expected array', rows)
+		return []
+	}
+	const out: string[] = []
+	for (const row of rows) {
+		if (
+			typeof row === 'object' &&
+			row !== null &&
+			'slug' in row &&
+			typeof (row as { slug?: unknown }).slug === 'string'
+		) {
+			out.push((row as { slug: string }).slug)
+		}
 	}
 	return out
 }

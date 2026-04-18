@@ -1,8 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { TredyffrinMap } from "../components/tredyffrinMap";
+import { TredyffrinMap } from "../components/map/tredyffrinMap";
 import { SelectedPhotos } from "../components/selected-photos";
 import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
+import { getSiteOrigin } from "@/lib/site-url";
 
 const locations = await fetchLocationsForMap();
 
@@ -15,9 +16,35 @@ const updated = new Date().toLocaleDateString("en-US", {
   month: "long",
   year: "numeric",
 });
+
+const homeTitle = "Tredyffrin, from above — The Aerial Archive";
+const homeDescription =
+  "A collection of aerial photographs documenting the landscape of Tredyffrin Township, Pennsylvania.";
+const firstPreview = locations[0]?.photos[0];
+const siteOrigin = getSiteOrigin();
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: homeTitle,
+    url: `${siteOrigin}/`,
+    description: homeDescription,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Tredyffrin Easttown Historical Society",
+  },
+];
 ---
 
-<Layout title="Tredyffrin, from above — The Aerial Archive">
+<Layout
+  title={homeTitle}
+  description={homeDescription}
+  image={firstPreview?.src}
+  imageAlt={firstPreview?.alt}
+  jsonLd={jsonLd}
+>
   <main id="main-content" class="relative">
     {/* ------------------------------------------------------------------ */}
     {/* Hero / masthead                                                     */}
@@ -36,7 +63,7 @@ const updated = new Date().toLocaleDateString("en-US", {
         <p
           class="text-base leading-[1.75] text-on-surface-variant md:col-span-7 md:col-start-6 md:text-[1.05rem]"
         >
-          A collection of aerial photographs documenting the lanscape of
+          A collection of aerial photographs documenting the landscape of
           Tredyffrin Township, Pennsylvania
         </p>
       </div>
@@ -45,15 +72,20 @@ const updated = new Date().toLocaleDateString("en-US", {
     {/* ------------------------------------------------------------------ */}
     {/* § I. The Map                                                      */}
     {/* ------------------------------------------------------------------ */}
-    <section class="relative mx-auto max-w-7xl px-6 pb-20 md:px-10 md:pb-28">
+    <section class="relative mx-auto max-w-7xl px-6 pb-16 md:px-10 md:pb-24">
       <div
         class="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between"
       >
+        <h2
+          class="font-display text-[clamp(1.75rem,4vw,2.25rem)] font-light tracking-[-0.01em] text-foreground md:max-w-md"
+        >
+          The <span class="italic text-primary">map.</span>
+        </h2>
         <p
           class="max-w-sm font-display italic leading-snug text-on-surface-variant md:text-right"
         >
           &ldquo;Hover a marker to preview the photographs. Select one to view
-          the full image and location details.&rdquo;
+          the full images and location details.&rdquo;
         </p>
       </div>
 
@@ -124,16 +156,15 @@ const updated = new Date().toLocaleDateString("en-US", {
         <SelectedPhotos client:visible locations={locations} />
       </div>
     </section>
-
-    {/* ------------------------------------------------------------------ */}
-    {/* Colophon                                                            */}
-    {/* ------------------------------------------------------------------ */}
-    <footer class="mx-auto max-w-7xl px-6 pb-16 md:px-10">
-      <div
-        class="flex flex-wrap items-baseline justify-between gap-2 bg-[linear-gradient(to_right,transparent,color-mix(in_srgb,var(--outline-variant)_30%,transparent),transparent)] bg-size-[100%_1px] bg-no-repeat bg-top pt-10 font-sans text-[11px] uppercase tracking-[0.28em] text-on-surface-variant"
-      >
-        <span>Tredyffrin Aerial Photos</span>
-      </div>
-    </footer>
   </main>
+  {/* ------------------------------------------------------------------ */}
+  {/* Colophon                                                            */}
+  {/* ------------------------------------------------------------------ */}
+  <footer class="mx-auto max-w-7xl px-6 pb-16 md:px-10">
+    <div
+      class="flex flex-wrap items-baseline justify-between gap-2 bg-[linear-gradient(to_right,transparent,color-mix(in_srgb,var(--outline-variant)_30%,transparent),transparent)] bg-size-[100%_1px] bg-no-repeat bg-top pt-10 font-sans text-[11px] uppercase tracking-[0.28em] text-on-surface-variant"
+    >
+      <span>Tredyffrin Aerial Photos</span>
+    </div>
+  </footer>
 </Layout>

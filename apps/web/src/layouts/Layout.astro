@@ -1,16 +1,51 @@
 ---
 import "../styles/global.css";
 import Header from "../components/Header.astro";
+import { getSiteOrigin, toAbsoluteUrl } from "@/lib/site-url";
 
 interface Props {
   title?: string;
   description?: string;
+  /** Preview image URL (absolute or site-relative). */
+  image?: string;
+  imageAlt?: string;
+  ogType?: "website" | "article";
+  robots?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
+const SITE_NAME = "Tredyffrin Aerial Photos";
+
 const {
-  title = "Tredyffrin, from above — The Aerial Archive",
-  description = "A curated dossier of aerial photographs of Tredyffrin Township, Pennsylvania.",
+  title: titleProp,
+  description: descriptionProp,
+  image,
+  imageAlt,
+  ogType = "website",
+  robots,
+  jsonLd,
 } = Astro.props;
+
+const title =
+  titleProp ?? "Tredyffrin, from above — The Aerial Archive";
+const description =
+  descriptionProp ??
+  "A curated dossier of aerial photographs of Tredyffrin Township, Pennsylvania.";
+
+const siteOrigin = getSiteOrigin();
+const canonicalUrl = new URL(Astro.url.pathname, `${siteOrigin}/`).href;
+const ogImage = image ? toAbsoluteUrl(image) : undefined;
+const twitterCard = ogImage ? "summary_large_image" : "summary";
+
+const jsonLdBlocks = jsonLd
+  ? Array.isArray(jsonLd)
+    ? jsonLd
+    : [jsonLd]
+  : [];
+
+function safeJsonLd(value: Record<string, unknown>): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
 ---
 
 <!doctype html>
@@ -19,16 +54,47 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {robots ? <meta name="robots" content={robots} /> : null}
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="en_US" />
+    {ogImage ? <meta property="og:image" content={ogImage} /> : null}
+    {
+      ogImage && imageAlt ? (
+        <meta property="og:image:alt" content={imageAlt} />
+      ) : null
+    }
+
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
+    {
+      ogImage && imageAlt ? (
+        <meta name="twitter:image:alt" content={imageAlt} />
+      ) : null
+    }
+
+    {
+      jsonLdBlocks.map((block) => (
+        <script type="application/ld+json" set:html={safeJsonLd(block)} />
+      ))
+    }
   </head>
   <body class="min-h-screen bg-background text-foreground antialiased">
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-[11px] focus:uppercase focus:tracking-[0.18em] focus:text-primary-foreground"
     >
-      Skip to the archive
+      Skip to content
     </a>
     <Header />
     <slot />

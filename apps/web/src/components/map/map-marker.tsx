@@ -3,7 +3,7 @@
 import { Camera } from "lucide-react";
 
 import { MapMarker, MarkerContent, MarkerTooltip } from "@/components/ui/map";
-import type { MapVisualStyleId } from "@/components/map-types";
+import type { MapVisualStyleId } from "@/components/map/map-types";
 import type { LocationRecord } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import {
@@ -140,9 +140,9 @@ export function MapLocationMarker({
           </div>
 
           <div className="space-y-2 px-4 pt-4 pb-4">
-            <p className="font-display text-[1.05rem] font-normal leading-tight text-on-surface">
+            <h3 className="font-display text-[1.05rem] font-normal leading-tight text-on-surface">
               {location.name}
-            </p>
+            </h3>
             <p className="text-xs leading-relaxed text-on-surface-variant">
               {location.shortDescription}
             </p>
@@ -161,13 +161,18 @@ export function MapLocationMarker({
             >
               <Camera className="size-3.5 shrink-0" strokeWidth={1.75} />
               <span>{activePhotoDirection}</span>
-              <span aria-hidden="true" className="opacity-60">&middot;</span>
+              <span aria-hidden="true" className="opacity-60">
+                &middot;
+              </span>
               <span>{activePhotoDate}</span>
               {multiplePhotos && (
                 <>
-                  <span aria-hidden="true" className="opacity-60">&middot;</span>
+                  <span aria-hidden="true" className="opacity-60">
+                    &middot;
+                  </span>
                   <span className="tabular-nums">
-                    {activePhotoIndex + 1}&thinsp;/&thinsp;{location.photos.length}
+                    {activePhotoIndex + 1}&thinsp;/&thinsp;
+                    {location.photos.length}
                   </span>
                 </>
               )}

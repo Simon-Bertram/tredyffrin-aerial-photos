@@ -135,6 +135,7 @@ export function SelectedPhotos({ locations }: SelectedPhotosProps) {
 					"mask-[linear-gradient(to_right,transparent,black_2%,black_98%,transparent)]",
 				)}
 				role="list"
+				aria-label="Selected photograph folios"
 			>
 				{folios.map((folio, index) => (
 					<FolioThumb

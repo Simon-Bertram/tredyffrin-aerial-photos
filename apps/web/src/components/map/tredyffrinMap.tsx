@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import { MapVisualStyleControls } from "@/components/map-controls";
-import { MapLocationMarker } from "@/components/map-marker";
+import { MapVisualStyleControls } from "@/components/map/map-controls";
+import { MapLocationMarker } from "@/components/map/map-marker";
 import { Map, MapControls } from "@/components/ui/map";
 import {
   getMapStylesForVisualStyle,
   getTerrainForVisualStyle,
-} from "@/components/map-style-config";
-import type { MapVisualStyleId } from "@/components/map-types";
+} from "@/components/map/map-style-config";
+import type { MapVisualStyleId } from "@/components/map/map-types";
 import type { LocationRecord } from "@/lib/locations";
 
 /** Tredyffrin area — MapLibre uses [longitude, latitude] (GeoJSON order). */

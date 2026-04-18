@@ -1,0 +1,354 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
+import { getSiteOrigin } from "@/lib/site-url";
+import type { LocationRecord } from "@/lib/locations";
+
+interface FeaturePhoto {
+  src: string;
+  alt: string;
+  slug: string;
+  locationName: string;
+  photoDate?: string;
+}
+
+function pickFeaturePhotos(
+  locations: LocationRecord[],
+  max: number,
+): FeaturePhoto[] {
+  const flat: FeaturePhoto[] = [];
+  for (const loc of locations) {
+    for (const photo of loc.photos) {
+      flat.push({
+        src: photo.src,
+        alt: photo.alt,
+        slug: loc.slug,
+        locationName: loc.name,
+        photoDate: photo.photoDate,
+      });
+    }
+  }
+  if (flat.length === 0) return [];
+  if (flat.length <= max) return flat;
+
+  const picks: FeaturePhoto[] = [];
+  const usedSrc = new Set<string>();
+  for (let i = 0; i < max; i++) {
+    const t = max === 1 ? 0 : i / (max - 1);
+    const idx = Math.min(flat.length - 1, Math.round(t * (flat.length - 1)));
+    const candidate = flat[idx];
+    if (!usedSrc.has(candidate.src)) {
+      usedSrc.add(candidate.src);
+      picks.push(candidate);
+    }
+  }
+  for (const p of flat) {
+    if (picks.length >= max) break;
+    if (!usedSrc.has(p.src)) {
+      usedSrc.add(p.src);
+      picks.push(p);
+    }
+  }
+  return picks;
+}
+
+const locations = await fetchLocationsForMap();
+const features = pickFeaturePhotos(locations, 5);
+const [hero, sideTop, sideBottom, spreadLeft, spreadRight] = features;
+
+const aboutTitle = "About — Tredyffrin Aerial Photos";
+const aboutDescription =
+  "A reader's note on the angled aerial photographs in this catalog, how they differ from vertical imagery, and how the collection is stewarded.";
+const siteOrigin = getSiteOrigin();
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "About the archive",
+    description: aboutDescription,
+    url: `${siteOrigin}/about`,
+    author: {
+      "@type": "Organization",
+      name: "Tredyffrin Easttown Historical Society",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Tredyffrin Easttown Historical Society",
+    },
+  },
+];
+---
+
+<Layout
+  title={aboutTitle}
+  description={aboutDescription}
+  ogType="article"
+  image={hero?.src}
+  imageAlt={hero?.alt}
+  jsonLd={jsonLd}
+>
+  <main id="main-content">
+    <article
+      class="mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20"
+    >
+      <header class="mb-12 md:mb-16">
+        <p
+          class="mb-8 font-sans text-[11px] uppercase tracking-[0.28em] text-on-surface-variant"
+        >
+          Tredyffrin Easttown Historical Society
+        </p>
+        <h1
+          class="font-display font-light leading-[1.05] tracking-[-0.02em] text-[clamp(2.25rem,5vw,3.25rem)]"
+        >
+          About <span class="text-primary italic">the archive.</span>
+        </h1>
+        <p
+          class="mt-6 max-w-2xl text-base leading-[1.75] text-on-surface-variant md:text-[1.05rem]"
+        >
+          A reader&rsquo;s note on the angled aerial photographs in this
+          catalog, how they differ from vertical imagery, and how the collection
+          is stewarded.
+        </p>
+      </header>
+
+      {
+        hero && (
+          <div class="mb-14 grid gap-10 md:mb-20 md:grid-cols-12 md:gap-12">
+            <figure class="md:col-span-7">
+              <a
+                href={`/locations/${hero.slug}`}
+                class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <div class="relative overflow-hidden bg-surface-dim shadow-[0_28px_48px_color-mix(in_srgb,var(--on-surface)_7%,transparent)] transition-[transform,box-shadow] duration-500 ease-out group-hover:-translate-y-0.5 group-hover:shadow-[0_36px_56px_color-mix(in_srgb,var(--on-surface)_9%,transparent)]">
+                  <img
+                    src={hero.src}
+                    alt={hero.alt}
+                    width={1200}
+                    height={900}
+                    class="aspect-4/3 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </div>
+              </a>
+              <figcaption class="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <span class="font-display text-sm italic text-on-surface-variant">
+                  {hero.locationName}
+                  {hero.photoDate && (
+                    <span class="ml-2 font-sans not-italic text-[11px] uppercase tracking-[0.14em] text-on-surface-variant">
+                      {hero.photoDate}
+                    </span>
+                  )}
+                </span>
+                <a
+                  href={`/locations/${hero.slug}`}
+                  class="font-sans text-[11px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline"
+                >
+                  Open folio
+                </a>
+              </figcaption>
+            </figure>
+
+            <div class="md:col-span-5 md:pt-2">
+              <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+                The contents of this catalog are aerial photographs held by the
+                Tredyffrin Easttown Historical Society. These photographs have
+                been taken at an angle, rather than looking straight down. The
+                altitude at which these photos have been taken varies as does
+                the angle of the photo, so the area covered by the images varies
+                considerably and may cover a much greater area than shown on the
+                map symbol.
+              </p>
+            </div>
+          </div>
+        )
+      }
+
+      {
+        !hero && (
+          <div class="mb-14 md:mb-20">
+            <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+              The contents of this catalog are aerial photographs held by the
+              Tredyffrin Easttown Historical Society. These photographs have
+              been taken at an angle, rather than looking straight down. The
+              altitude at which these photos have been taken varies as does the
+              angle of the photo, so the area covered by the images varies
+              considerably and may cover a much greater area than shown on the
+              map symbol.
+            </p>
+          </div>
+        )
+      }
+
+      <div
+        class="mb-14 grid gap-10 md:mb-20 md:grid-cols-12 md:gap-x-12 md:gap-y-10"
+      >
+        <div
+          class={`space-y-6 ${sideTop || sideBottom ? "md:col-span-7" : "md:col-span-12"}`}
+        >
+          <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+            Historical photographs of the area taken looking straight down can
+            be found at <a
+              href="http://maps.psiee.psu.edu/ImageryNavigator/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Pennsylvania Imagery Navigator from Penn State</a
+            >; more recent photographs in this mode can be found at <a
+              href="https://www.google.com/maps/@40.0277188,-75.5118668,12z"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Google Maps.</a
+            >
+          </p>
+          <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+            These photographs have been purchased by the Tredyffrin Easttown
+            Historical Society from other organizations. Researchers from the
+            TEHS can view higher resolution copies of the photographs under the
+            terms and conditions of the purchase agreements.
+          </p>
+        </div>
+
+        {
+          (sideTop || sideBottom) && (
+            <aside class="flex flex-col gap-8 md:col-span-5">
+              {sideTop && (
+                <figure>
+                  <a
+                    href={`/locations/${sideTop.slug}`}
+                    class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <div class="relative overflow-hidden bg-surface-dim shadow-[0_20px_36px_color-mix(in_srgb,var(--on-surface)_6%,transparent)] transition-transform duration-500 ease-out group-hover:-translate-y-0.5">
+                      <img
+                        src={sideTop.src}
+                        alt={sideTop.alt}
+                        width={800}
+                        height={640}
+                        class="aspect-5/4 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  </a>
+                  <figcaption class="mt-3 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant">
+                    {sideTop.locationName}
+                  </figcaption>
+                </figure>
+              )}
+              {sideBottom && sideBottom.src !== sideTop?.src && (
+                <figure>
+                  <a
+                    href={`/locations/${sideBottom.slug}`}
+                    class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <div class="relative overflow-hidden bg-surface-dim shadow-[0_20px_36px_color-mix(in_srgb,var(--on-surface)_6%,transparent)] transition-transform duration-500 ease-out group-hover:-translate-y-0.5">
+                      <img
+                        src={sideBottom.src}
+                        alt={sideBottom.alt}
+                        width={800}
+                        height={640}
+                        class="aspect-5/4 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  </a>
+                  <figcaption class="mt-3 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant">
+                    {sideBottom.locationName}
+                  </figcaption>
+                </figure>
+              )}
+            </aside>
+          )
+        }
+      </div>
+
+      <blockquote
+        class="relative mb-14 border-y border-outline-variant/40 py-10 md:mb-20 md:py-14"
+      >
+        <p
+          class="mx-auto max-w-3xl text-center font-display text-xl font-light italic leading-snug text-on-surface md:text-2xl"
+        >
+          &ldquo;Most photographs are from the Society&rsquo;s local area; a
+          smaller set reaches beyond it. Unidentified views remain an open
+          invitation to readers who recognize a ridge, a road, or a
+          roofline.&rdquo;
+        </p>
+      </blockquote>
+
+      <div class="mb-14 grid gap-10 md:mb-20 md:grid-cols-12 md:gap-12">
+        <div class="md:col-span-6">
+          <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+            Most of the photographs in the Tredyffrin Easttown Historical
+            Society collection are from the Society&rsquo;s local area. There is
+            also a set from <a
+              href="https://www.the2nomads.site/AerialPhotosCatalog/OutsideLocalArea.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >outside the local area.</a
+            >
+          </p>
+        </div>
+        <div class="md:col-span-6">
+          <p class="prose prose-neutral max-w-none text-foreground lg:prose-lg">
+            Unidentified photos: there is             also a set of <a
+              href="https://www.the2nomads.site/AerialPhotosCatalog/Mysteries.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              >photos of unidentified location.</a
+            > Any help in identifying the location of these photos would be gratefully
+            received.
+          </p>
+        </div>
+      </div>
+
+      {
+        spreadLeft && spreadRight && spreadLeft.src !== spreadRight.src && (
+          <div class="grid gap-6 md:grid-cols-2 md:gap-8">
+            <figure>
+              <a
+                href={`/locations/${spreadLeft.slug}`}
+                class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <div class="relative overflow-hidden bg-surface-dim shadow-[0_24px_40px_color-mix(in_srgb,var(--on-surface)_6%,transparent)] transition-transform duration-500 ease-out group-hover:-translate-y-0.5">
+                  <img
+                    src={spreadLeft.src}
+                    alt={spreadLeft.alt}
+                    width={900}
+                    height={675}
+                    class="aspect-4/3 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </a>
+              <figcaption class="mt-3 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant">
+                {spreadLeft.locationName}
+              </figcaption>
+            </figure>
+            <figure>
+              <a
+                href={`/locations/${spreadRight.slug}`}
+                class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <div class="relative overflow-hidden bg-surface-dim shadow-[0_24px_40px_color-mix(in_srgb,var(--on-surface)_6%,transparent)] transition-transform duration-500 ease-out group-hover:-translate-y-0.5">
+                  <img
+                    src={spreadRight.src}
+                    alt={spreadRight.alt}
+                    width={900}
+                    height={675}
+                    class="aspect-4/3 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </a>
+              <figcaption class="mt-3 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant">
+                {spreadRight.locationName}
+              </figcaption>
+            </figure>
+          </div>
+        )
+      }
+    </article>
+  </main>
+</Layout>

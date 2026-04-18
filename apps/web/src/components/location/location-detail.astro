@@ -1,0 +1,41 @@
+---
+import BackToMapLink from "@/components/location/back-to-map-link.astro";
+import LocationPhotoCard from "@/components/location/location-photo-card.astro";
+import type { LocationRecord } from "@/lib/locations";
+
+interface Props {
+  location: LocationRecord;
+}
+
+const { location } = Astro.props;
+---
+
+<BackToMapLink />
+
+<header class="space-y-2">
+  <h1 class="text-3xl font-bold">{location.name}</h1>
+  {
+    location.shortDescription ? (
+      <p class="max-w-4xl text-sm text-muted-foreground">
+        {location.shortDescription}
+      </p>
+    ) : null
+  }
+  <p class="max-w-4xl text-sm text-muted-foreground">
+    {location.fullDescription}
+  </p>
+</header>
+
+{
+  location.photos.length > 0 ? (
+    <section class="grid gap-4 md:grid-cols-2">
+      {location.photos.map((photo) => (
+        <LocationPhotoCard photo={photo} />
+      ))}
+    </section>
+  ) : (
+    <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
+      No photos are available for this location yet.
+    </section>
+  )
+}

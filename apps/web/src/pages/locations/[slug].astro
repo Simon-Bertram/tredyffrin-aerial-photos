@@ -1,6 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import LocationDetail from "@/components/location/location-detail.astro";
+import LocationNotFound from "@/components/location/location-not-found.astro";
+import { buildLocationPageLayoutMeta } from "@/lib/location-page-seo";
 import { getSanityLocationRecordBySlug } from "@/lib/sanity-location-repository";
+import { getSiteOrigin } from "@/lib/site-url";
 
 const { slug } = Astro.params;
 const location = slug ? await getSanityLocationRecordBySlug(slug) : undefined;
@@ -8,119 +12,29 @@ const location = slug ? await getSanityLocationRecordBySlug(slug) : undefined;
 if (!location) {
   Astro.response.status = 404;
 }
+
+const siteOrigin = getSiteOrigin();
+const { pageTitle, pageDescription, previewSrc, previewAlt, jsonLd } =
+  buildLocationPageLayoutMeta(location, siteOrigin);
 ---
 
-<Layout title={location ? `${location.name} | tehs-aerial-images` : "Not found"}>
-  <main class="container mx-auto max-w-6xl space-y-6 px-4 py-6">
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  image={previewSrc}
+  imageAlt={previewAlt}
+  jsonLd={jsonLd ? [jsonLd] : undefined}
+  robots={location ? undefined : "noindex, nofollow"}
+>
+  <main
+    id="main-content"
+    class="container mx-auto max-w-6xl space-y-6 px-4 py-6"
+  >
     {
       location ? (
-        <>
-          <a
-            href="/"
-            class="inline-flex items-center rounded border border-border px-3 py-1 text-sm text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
-          >
-            Back to map
-          </a>
-
-          <header class="space-y-2">
-            <h1 class="text-3xl font-bold">{location.name}</h1>
-            {location.shortDescription ? (
-              <p class="max-w-4xl text-sm text-muted-foreground">
-                {location.shortDescription}
-              </p>
-            ) : null}
-            <p class="max-w-4xl text-sm text-muted-foreground">
-              {location.fullDescription}
-            </p>
-          </header>
-
-          {location.photos.length > 0 ? (
-            <section class="grid gap-4 md:grid-cols-2">
-              {location.photos.map((photo) => (
-                <article class="overflow-hidden rounded-lg border bg-card">
-                  {photo.title ? (
-                    <p class="border-b bg-muted/50 px-4 py-2 text-sm font-medium text-card-foreground">
-                      {photo.title}
-                    </p>
-                  ) : null}
-                  <img
-                    src={photo.src}
-                    alt={photo.alt}
-                    loading="lazy"
-                    class="h-56 w-full object-cover"
-                  />
-                  <div class="space-y-2 p-4 text-sm">
-                    {photo.caption ? (
-                      <p class="font-medium text-card-foreground">
-                        {photo.caption}
-                      </p>
-                    ) : null}
-                    {photo.photographer ||
-                    photo.photoDate ||
-                    photo.direction ||
-                    photo.comments ? (
-                      <dl class="grid gap-1 text-muted-foreground">
-                        {photo.photographer ? (
-                          <div class="flex items-center gap-2">
-                            <dt class="font-medium text-card-foreground">
-                              Photographer:
-                            </dt>
-                            <dd>{photo.photographer}</dd>
-                          </div>
-                        ) : null}
-                        {photo.photoDate ? (
-                          <div class="flex items-center gap-2">
-                            <dt class="font-medium text-card-foreground">
-                              Date:
-                            </dt>
-                            <dd>{photo.photoDate}</dd>
-                          </div>
-                        ) : null}
-                        {photo.direction ? (
-                          <div class="flex items-center gap-2">
-                            <dt class="font-medium text-card-foreground">
-                              Direction:
-                            </dt>
-                            <dd>{photo.direction}</dd>
-                          </div>
-                        ) : null}
-                        {photo.comments ? (
-                          <div class="flex items-start gap-2">
-                            <dt class="font-medium text-card-foreground">
-                              Comments:
-                            </dt>
-                            <dd>{photo.comments}</dd>
-                          </div>
-                        ) : null}
-                      </dl>
-                    ) : (
-                      <p class="text-muted-foreground">
-                        No photo metadata available.
-                      </p>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </section>
-          ) : (
-            <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
-              No photos are available for this location yet.
-            </section>
-          )}
-        </>
+        <LocationDetail location={location} />
       ) : (
-        <>
-          <a
-            href="/"
-            class="inline-flex items-center rounded border border-border px-3 py-1 text-sm text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
-          >
-            Back to map
-          </a>
-          <h1 class="text-2xl font-bold">Location not found</h1>
-          <p class="text-sm text-muted-foreground">
-            This slug does not match a published location.
-          </p>
-        </>
+        <LocationNotFound />
       )
     }
   </main>

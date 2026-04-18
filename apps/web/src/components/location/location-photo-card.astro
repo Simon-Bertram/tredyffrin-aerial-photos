@@ -1,0 +1,78 @@
+---
+import type { LocationPhoto } from "@/lib/locations";
+
+interface Props {
+  photo: LocationPhoto;
+}
+
+const { photo } = Astro.props;
+---
+
+<article class="overflow-hidden rounded-lg border bg-card">
+  {
+    photo.title ? (
+      <h2 class="border-b bg-muted/50 px-4 py-2 text-sm font-medium text-card-foreground">
+        {photo.title}
+      </h2>
+    ) : null
+  }
+  <img
+    src={photo.src}
+    alt={photo.alt}
+    width={1200}
+    height={900}
+    loading="lazy"
+    decoding="async"
+    class="h-56 w-full object-cover"
+  />
+  <div class="space-y-2 p-4 text-sm">
+    {
+      photo.caption ? (
+        <p class="font-medium text-card-foreground">{photo.caption}</p>
+      ) : null
+    }
+    {
+      photo.photographer ||
+      photo.photoDate ||
+      photo.direction ||
+      photo.comments ? (
+        <dl class="grid gap-1 text-muted-foreground">
+          {
+            photo.photographer ? (
+              <div class="flex items-center gap-2">
+                <dt class="font-medium text-card-foreground">Photographer:</dt>
+                <dd>{photo.photographer}</dd>
+              </div>
+            ) : null
+          }
+          {
+            photo.photoDate ? (
+              <div class="flex items-center gap-2">
+                <dt class="font-medium text-card-foreground">Date:</dt>
+                <dd>{photo.photoDate}</dd>
+              </div>
+            ) : null
+          }
+          {
+            photo.direction ? (
+              <div class="flex items-center gap-2">
+                <dt class="font-medium text-card-foreground">Direction:</dt>
+                <dd>{photo.direction}</dd>
+              </div>
+            ) : null
+          }
+          {
+            photo.comments ? (
+              <div class="flex items-start gap-2">
+                <dt class="font-medium text-card-foreground">Comments:</dt>
+                <dd>{photo.comments}</dd>
+              </div>
+            ) : null
+          }
+        </dl>
+      ) : (
+        <p class="text-muted-foreground">No photo metadata available.</p>
+      )
+    }
+  </div>
+</article>

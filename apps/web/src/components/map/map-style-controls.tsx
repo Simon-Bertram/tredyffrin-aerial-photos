@@ -5,7 +5,7 @@ import { useCallback } from "react";
 
 import { cn } from "@/lib/utils";
 
-import type { MapStyleControlProps } from "@/components/map-types";
+import type { MapStyleControlProps } from "@/components/map/map-types";
 import { useMap } from "@/components/ui/map";
 
 const positionClasses = {

@@ -29,3 +29,9 @@ export const locationBySlugQuery = /* groq */ `
   *[_type == "location" && slug.current == $slug][0]
   ${locationProjection}
 `
+
+/** Slugs only — for sitemap and discovery endpoints. */
+export const locationSlugsQuery = /* groq */ `
+  *[_type == "location" && defined(slug.current)]
+    | order(name asc) {"slug": slug.current}
+`

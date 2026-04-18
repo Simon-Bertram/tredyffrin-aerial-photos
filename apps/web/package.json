@@ -35,6 +35,7 @@
   "devDependencies": {
     "@astrojs/cloudflare": "13.1.10",
     "@cloudflare/workers-types": "catalog:",
+    "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "@tredyffrin-aerial-photos/config": "workspace:*",
     "alchemy": "catalog:",

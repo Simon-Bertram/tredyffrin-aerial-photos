@@ -19,11 +19,11 @@ import { createPortal } from "react-dom";
 import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { MapTerrainConfig } from "@/components/map-types";
+import type { MapTerrainConfig } from "@/components/map/map-types";
 import {
   removeTerrainArtifacts,
   useMapTerrain,
-} from "@/components/use-map-terrain";
+} from "@/components/map/use-map-terrain";
 
 const defaultStyles = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
@@ -174,17 +174,17 @@ function getViewport(map: MapLibreGL.Map): MapViewport {
 }
 
 function collapseAttributionControl(map: MapLibreGL.Map) {
-  const mapContainer = map.getContainer()
+  const mapContainer = map.getContainer();
   const attributionControl = mapContainer.querySelector(
-    '.maplibregl-ctrl-attrib',
-  )
+    ".maplibregl-ctrl-attrib",
+  );
 
   if (!(attributionControl instanceof HTMLElement)) {
-    return
+    return;
   }
 
   // Keep attribution collapsed until a user explicitly expands it.
-  attributionControl.classList.remove('maplibregl-compact-show')
+  attributionControl.classList.remove("maplibregl-compact-show");
 }
 
 const Map = forwardRef<MapRef, MapProps>(function Map(
@@ -215,6 +215,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
   // same render (e.g. useMapTerrain) would otherwise see stale state and
   // mutate the map during the swap, leaving the painter in a broken state.
   const pendingStyleChangeRef = useRef(false);
+  const styleIdleHandlerRef = useRef<(() => void) | null>(null);
   const resolvedTheme = useResolvedTheme(themeProp);
 
   const isControlled = viewport !== undefined && onViewportChange !== undefined;
@@ -259,24 +260,98 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
       ...viewport,
     });
 
+    const removeStyleIdleListener = () => {
+      const handler = styleIdleHandlerRef.current;
+      if (handler) {
+        map.off("idle", handler);
+        styleIdleHandlerRef.current = null;
+      }
+    };
+
+    const finishStyleReady = () => {
+      if (!map.isStyleLoaded()) {
+        return false;
+      }
+      collapseAttributionControl(map);
+      pendingStyleChangeRef.current = false;
+      setIsStyleLoaded(true);
+      if (projection) {
+        map.setProjection(projection);
+      }
+      return true;
+    };
+
     const styleDataHandler = () => {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "223fd5",
+          },
+          body: JSON.stringify({
+            sessionId: "223fd5",
+            location: "map.tsx:styledata",
+            message: "styledata event",
+            data: {
+              mapIsStyleLoaded: map.isStyleLoaded(),
+              pendingStyle: pendingStyleChangeRef.current,
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H3",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       clearStyleTimeout();
+      removeStyleIdleListener();
       // Delay to ensure style is fully processed before allowing layer operations
       // This is a workaround to avoid race conditions with the style loading
       // else we have to force update every layer on setStyle change
       styleTimeoutRef.current = setTimeout(() => {
-        collapseAttributionControl(map)
-        pendingStyleChangeRef.current = false;
-        setIsStyleLoaded(true);
-        if (projection) {
-          map.setProjection(projection);
+        const mapReady = map.isStyleLoaded();
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Debug-Session-Id": "223fd5",
+            },
+            body: JSON.stringify({
+              sessionId: "223fd5",
+              location: "map.tsx:style-timeout",
+              message: "style timeout after debounce",
+              data: {
+                mapIsStyleLoaded: mapReady,
+                pendingStyle: pendingStyleChangeRef.current,
+                runId: "post-fix",
+              },
+              timestamp: Date.now(),
+              hypothesisId: "H3",
+            }),
+          },
+        ).catch(() => {});
+        // #endregion
+        if (finishStyleReady()) {
+          return;
         }
+        const onIdle = () => {
+          if (finishStyleReady()) {
+            removeStyleIdleListener();
+          }
+        };
+        styleIdleHandlerRef.current = onIdle;
+        map.on("idle", onIdle);
       }, 100);
     };
     const loadHandler = () => {
-      collapseAttributionControl(map)
-      setIsLoaded(true)
-    }
+      collapseAttributionControl(map);
+      setIsLoaded(true);
+    };
 
     // Viewport change handler - skip if triggered by internal update
     const handleMove = () => {
@@ -291,6 +366,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
     return () => {
       clearStyleTimeout();
+      removeStyleIdleListener();
       map.off("load", loadHandler);
       map.off("styledata", styleDataHandler);
       map.off("move", handleMove);

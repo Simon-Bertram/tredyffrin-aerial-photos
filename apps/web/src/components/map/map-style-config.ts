@@ -3,7 +3,7 @@ import type {
   MapTerrainConfig,
   MapVisualStyleId,
   MapVisualStyleOption,
-} from "@/components/map-types";
+} from "@/components/map/map-types";
 
 type ResolvedMapStyles = {
   light: MapStyleOption;

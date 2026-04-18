@@ -1,8 +1,8 @@
 "use client";
 
-import { MapStyleControls } from "@/components/map-style-controls";
-import { MAP_STYLE_OPTIONS } from "@/components/map-style-config";
-import type { MapVisualStyleId } from "@/components/map-types";
+import { MapStyleControls } from "@/components/map/map-style-controls";
+import { MAP_STYLE_OPTIONS } from "@/components/map/map-style-config";
+import type { MapVisualStyleId } from "@/components/map/map-types";
 
 interface MapVisualStyleControlsProps {
   selectedStyle: MapVisualStyleId;
