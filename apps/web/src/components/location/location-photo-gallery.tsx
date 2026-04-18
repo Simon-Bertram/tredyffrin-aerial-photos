@@ -1,25 +1,25 @@
-import * as React from "react"
+import * as React from "react";
 
-import type { LocationPhoto } from "@/lib/locations"
+import type { LocationPhoto } from "@/lib/locations";
 
 const LocationPhotoLightbox = React.lazy(
-  () => import("@/components/location/location-photo-lightbox")
-)
+  () => import("@/components/location/location-photo-lightbox"),
+);
 
 export interface LocationPhotoGalleryProps {
-  photos: LocationPhoto[]
+  photos: LocationPhoto[];
 }
 
 export function LocationPhotoGallery({ photos }: LocationPhotoGalleryProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [activeIndex, setActiveIndex] = React.useState(0)
-  const [lightboxMounted, setLightboxMounted] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [lightboxMounted, setLightboxMounted] = React.useState(false);
 
   const handleOpenAt = React.useCallback((index: number) => {
-    setActiveIndex(index)
-    setIsOpen(true)
-    setLightboxMounted(true)
-  }, [])
+    setActiveIndex(index);
+    setIsOpen(true);
+    setLightboxMounted(true);
+  }, []);
 
   return (
     <>
@@ -34,8 +34,8 @@ export function LocationPhotoGallery({ photos }: LocationPhotoGalleryProps) {
             onClick={() => handleOpenAt(index)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault()
-                handleOpenAt(index)
+                event.preventDefault();
+                handleOpenAt(index);
               }
             }}
           >
@@ -53,7 +53,7 @@ export function LocationPhotoGallery({ photos }: LocationPhotoGalleryProps) {
               decoding="async"
               className="h-56 w-full object-cover"
             />
-            <div className="space-y-2 p-4 text-sm">
+            <div className="space-y-2 p-8 text-sm">
               {photo.caption ? (
                 <p className="font-medium text-card-foreground">
                   {photo.caption}
@@ -75,7 +75,7 @@ export function LocationPhotoGallery({ photos }: LocationPhotoGalleryProps) {
                   {photo.photoDate ? (
                     <div className="flex items-center gap-2">
                       <dt className="font-medium text-card-foreground">
-                        Date:
+                        Year:
                       </dt>
                       <dd>{photo.photoDate}</dd>
                     </div>
@@ -124,5 +124,5 @@ export function LocationPhotoGallery({ photos }: LocationPhotoGalleryProps) {
         </React.Suspense>
       ) : null}
     </>
-  )
+  );
 }
