@@ -1,24 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { useHorizontalSnapScroller } from "@/hooks/use-horizontal-snap-scroller";
 import type { LocationRecord } from "@/lib/locations";
+import { buildSelectedPhotos, type SelectedPhoto } from "@/lib/selected-photos-data";
 import { cn } from "@/lib/utils";
 
 interface SelectedPhotosProps {
 	locations: LocationRecord[];
-}
-
-interface Folio {
-	key: string;
-	plateNumber: number;
-	locationName: string;
-	locationSlug: string;
-	src: string;
-	alt: string;
-	photoDate?: string;
-	direction?: string;
 }
 
 /**
@@ -26,79 +16,34 @@ interface Folio {
  * paged by editorial nav arrows. Styled to "The Curated Manuscript."
  */
 export function SelectedPhotos({ locations }: SelectedPhotosProps) {
-	const folios = buildFolios(locations);
-	const scrollerRef = useRef<HTMLDivElement | null>(null);
-	const [canScrollPrev, setCanScrollPrev] = useState(false);
-	const [canScrollNext, setCanScrollNext] = useState(false);
-	/** Avoid SSR/client hydration mismatch: scroll metrics exist only after mount. */
-	const [hasMeasuredScroll, setHasMeasuredScroll] = useState(false);
-	const [activeIndex, setActiveIndex] = useState(0);
+	const photos = buildSelectedPhotos(locations);
+	const {
+		scrollerRef,
+		canScrollPrev,
+		canScrollNext,
+		hasMeasuredScroll,
+		activeIndex,
+		handleScrollBy,
+	} = useHorizontalSnapScroller();
 
-	const updateScrollState = useCallback(() => {
-		const el = scrollerRef.current;
-		if (!el) return;
-		const max = el.scrollWidth - el.clientWidth;
-		setCanScrollPrev(el.scrollLeft > 2);
-		setCanScrollNext(el.scrollLeft < max - 2);
-
-		const children = Array.from(el.children) as HTMLElement[];
-		if (children.length === 0) return;
-		const viewportMid = el.scrollLeft + el.clientWidth / 2;
-		let nearest = 0;
-		let nearestDelta = Number.POSITIVE_INFINITY;
-		children.forEach((child, idx) => {
-			const childMid = child.offsetLeft + child.offsetWidth / 2;
-			const delta = Math.abs(childMid - viewportMid)
-			if (delta < nearestDelta) {
-				nearestDelta = delta;
-				nearest = idx;
-			}
-		});
-		setActiveIndex(nearest);
-	}, []);
-
-	useEffect(() => {
-		const el = scrollerRef.current;
-		if (!el) return;
-		updateScrollState();
-		setHasMeasuredScroll(true);
-		el.addEventListener("scroll", updateScrollState, { passive: true });
-		const resize = new ResizeObserver(updateScrollState);
-		resize.observe(el);
-		return () => {
-			el.removeEventListener("scroll", updateScrollState);
-			resize.disconnect();
-		};
-	}, [updateScrollState]);
-
-	const handleScrollBy = useCallback((direction: 1 | -1) => {
-		const el = scrollerRef.current;
-		if (!el) return;
-		const firstChild = el.firstElementChild as HTMLElement | null;
-		const step = firstChild
-			? firstChild.offsetWidth + 24
-			: el.clientWidth * 0.8;
-		el.scrollBy({ left: step * direction * 2, behavior: "smooth" });
-	}, []);
-
-	if (folios.length === 0) {
+	if (photos.length === 0) {
 		return (
 			<div className="md:col-span-8 md:col-start-5">
 				<p className="font-display italic text-on-surface-variant">
-					The plate drawers await their first folio.
+					The plate drawers await their first photograph.
 				</p>
 			</div>
 		);
 	}
 
-	const totalLabel = folios.length.toString().padStart(2, "0");
+	const totalLabel = photos.length.toString().padStart(2, "0");
 	const activeLabel = (activeIndex + 1).toString().padStart(2, "0");
 
 	return (
 		<div className="md:col-span-8 md:col-start-5">
 			<div className="mb-6 flex items-end justify-between gap-6">
 				<div className="flex items-baseline gap-3 font-sans text-[11px] uppercase tracking-[0.22em] text-on-surface-variant">
-					<span>Folio</span>
+					<span>Photo</span>
 					<span className="tabular-nums text-on-surface">
 						{activeLabel}
 					</span>
@@ -135,12 +80,12 @@ export function SelectedPhotos({ locations }: SelectedPhotosProps) {
 					"mask-[linear-gradient(to_right,transparent,black_2%,black_98%,transparent)]",
 				)}
 				role="list"
-				aria-label="Selected photograph folios"
+				aria-label="Selected photographs"
 			>
-				{folios.map((folio, index) => (
-					<FolioThumb
-						key={folio.key}
-						folio={folio}
+				{photos.map((photo, index) => (
+					<SelectedPhotoCard
+						key={photo.key}
+						photo={photo}
 						isActive={index === activeIndex}
 					/>
 				))}
@@ -157,7 +102,8 @@ interface ArrowButtonProps {
 
 function ArrowButton({ direction, disabled, onClick }: ArrowButtonProps) {
 	const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
-	const label = direction === "prev" ? "Previous folios" : "Next folios";
+	const label =
+		direction === "prev" ? "Previous photographs" : "Next photographs";
 	return (
 		<button
 			type="button"
@@ -180,16 +126,16 @@ function ArrowButton({ direction, disabled, onClick }: ArrowButtonProps) {
 	);
 }
 
-interface FolioThumbProps {
-	folio: Folio;
+interface SelectedPhotoCardProps {
+	photo: SelectedPhoto;
 	isActive: boolean;
 }
 
-function FolioThumb({ folio, isActive }: FolioThumbProps) {
+function SelectedPhotoCard({ photo, isActive }: SelectedPhotoCardProps) {
 	return (
 		<a
 			role="listitem"
-			href={`/locations/${folio.locationSlug}`}
+			href={`/locations/${photo.locationSlug}`}
 			className={cn(
 				"group relative block shrink-0 snap-start",
 				"w-[16rem] md:w-[18rem]",
@@ -209,8 +155,8 @@ function FolioThumb({ folio, isActive }: FolioThumbProps) {
 					)}
 				>
 					<img
-						src={folio.src}
-						alt={folio.alt}
+						src={photo.src}
+						alt={photo.alt}
 						loading="lazy"
 						className={cn(
 							"h-full w-full object-cover",
@@ -226,46 +172,25 @@ function FolioThumb({ folio, isActive }: FolioThumbProps) {
 							"px-2 py-1 font-sans text-[10px] uppercase tracking-[0.18em]",
 						)}
 					>
-						Pl. {folio.plateNumber.toString().padStart(2, "0")}
+						Pl. {photo.plateNumber.toString().padStart(2, "0")}
 					</span>
 				</div>
 				<figcaption className="mt-4 flex items-baseline justify-between gap-4">
 					<div className="min-w-0">
 						<p className="truncate font-display text-[1.05rem] leading-snug text-on-surface">
-							{folio.locationName}
+							{photo.locationName}
 						</p>
 						<p className="mt-1 truncate font-sans text-[11px] uppercase tracking-[0.18em] text-on-surface-variant">
-							{folio.direction ?? "Direction unknown"}
+							{photo.direction ?? "Direction unknown"}
 						</p>
 					</div>
-					{folio.photoDate && (
+					{photo.photoDate && (
 						<span className="shrink-0 font-display text-sm italic text-on-surface-variant tabular-nums">
-							{folio.photoDate}
+							{photo.photoDate}
 						</span>
 					)}
 				</figcaption>
 			</figure>
 		</a>
 	);
-}
-
-function buildFolios(locations: LocationRecord[]): Folio[] {
-	const folios: Folio[] = [];
-	let plateNumber = 0;
-	for (const location of locations) {
-		for (const photo of location.photos) {
-			plateNumber += 1;
-			folios.push({
-				key: `${location.slug}-${photo.id}`,
-				plateNumber,
-				locationName: location.name,
-				locationSlug: location.slug,
-				src: photo.src,
-				alt: photo.alt,
-				photoDate: photo.photoDate,
-				direction: photo.direction,
-			});
-		}
-	}
-	return folios;
 }

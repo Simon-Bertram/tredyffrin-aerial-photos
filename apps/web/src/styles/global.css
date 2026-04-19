@@ -262,7 +262,7 @@
   }
 
   /* Hide scrollbar chrome while preserving scroll behavior.
-	   Used by the Folio thumbnail rail — chrome would disrupt the
+	   Used by the selected-photos thumbnail rail — chrome would disrupt the
 	   parchment aesthetic. */
   .no-scrollbar {
     scrollbar-width: none;

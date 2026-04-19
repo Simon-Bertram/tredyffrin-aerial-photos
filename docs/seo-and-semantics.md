@@ -83,7 +83,7 @@ GROQ for slugs only: `locationSlugsQuery` in `apps/web/src/lib/sanity/queries.ts
 | Area | File | Change |
 |------|------|--------|
 | Map tooltip card | `apps/web/src/components/map-marker.tsx` | Location name is an **`<h3>`** inside the tooltip `article`. |
-| Selected folios strip | `apps/web/src/components/selected-photos.tsx` | Horizontal list has **`role="list"`** and **`aria-label="Selected photograph folios"`** (items remain `role="listitem"` on links). |
+| Selected photographs strip | `apps/web/src/components/selected-photos.tsx` | Horizontal list has **`role="list"`** and **`aria-label="Selected photographs"`** (items remain `role="listitem"` on links). |
 
 ---
 
