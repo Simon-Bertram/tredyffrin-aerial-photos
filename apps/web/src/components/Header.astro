@@ -1,5 +1,8 @@
 ---
 const links = [{ to: "/about", label: "About" }];
+const rawPath = Astro.url.pathname;
+const pathname =
+  rawPath.length > 1 && rawPath.endsWith("/") ? rawPath.slice(0, -1) : rawPath;
 ---
 
 <header
@@ -8,7 +11,11 @@ const links = [{ to: "/about", label: "About" }];
   <div
     class="mx-auto flex max-w-7xl items-baseline justify-between gap-6 px-6 pt-8 pb-6 md:px-10 md:pt-10"
   >
-    <a href="/" class="group flex items-baseline gap-3">
+    <a
+      href="/"
+      class="group flex items-baseline gap-3"
+      aria-current={pathname === "/" ? "page" : undefined}
+    >
       <span
         class="font-display text-xl font-light tracking-[-0.01em] md:text-[1.65rem]"
       >
@@ -20,6 +27,7 @@ const links = [{ to: "/about", label: "About" }];
     </a>
 
     <nav
+      aria-label="Primary"
       class="flex items-baseline gap-6 text-[11px] uppercase tracking-[0.22em]"
     >
       {
@@ -27,6 +35,7 @@ const links = [{ to: "/about", label: "About" }];
           <a
             href={link.to}
             class="text-on-surface-variant hover:text-primary transition-colors"
+            aria-current={pathname === link.to ? "page" : undefined}
           >
             {link.label}
           </a>

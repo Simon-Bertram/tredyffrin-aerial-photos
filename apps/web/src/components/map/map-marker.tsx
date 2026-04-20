@@ -35,28 +35,32 @@ export function MapLocationMarker({
 
   const isOnImagery = mapVisualStyle === "terrain";
 
+  const markerLinkLabel = multiplePhotos
+    ? `View details for ${location.name}, ${location.photos.length} photos`
+    : `View details for ${location.name}`;
+
   return (
     <MapMarker
       longitude={location.coordinates.longitude}
       latitude={location.coordinates.latitude}
-      onClick={() => {
-        window.location.href = detailPath;
-      }}
     >
       <MarkerContent>
-        <button
-          type="button"
-          aria-label={
-            multiplePhotos
-              ? `View details for ${location.name}, ${location.photos.length} photos`
-              : `View details for ${location.name}`
-          }
-          className="group relative cursor-pointer rounded-none"
+        <a
+          href={detailPath}
+          aria-label={markerLinkLabel}
+          className={cn(
+            "group relative rounded-none outline-none",
+            "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+          )}
         >
           {/* Gentle beacon: a soft pulse in primary ink. */}
           <span
             aria-hidden
-            className="absolute inset-0 animate-ping rounded-none bg-primary/20"
+            className={cn(
+              "absolute inset-0 animate-ping motion-reduce:animate-none",
+              "rounded-none bg-primary/20",
+            )}
           />
           {/* The pin: a clipped, burgundy plate of ink. */}
           <span
@@ -83,9 +87,9 @@ export function MapLocationMarker({
                 {location.photos.length}
               </span>
             )}
-            <Camera className="size-4" strokeWidth={1.75} />
+            <Camera className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
-        </button>
+        </a>
       </MarkerContent>
 
       <MarkerTooltip className="w-72 p-0">
@@ -99,7 +103,7 @@ export function MapLocationMarker({
         >
           <div className="relative h-40 bg-surface-dim">
             {multiplePhotos ? (
-              <Carousel>
+              <Carousel tabIndex={-1} aria-label="Preview photograph slides">
                 <CarouselContent>
                   {location.photos.map((photo) => (
                     <CarouselItem key={photo.id}>

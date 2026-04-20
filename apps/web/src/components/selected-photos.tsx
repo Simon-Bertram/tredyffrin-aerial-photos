@@ -76,7 +76,7 @@ export function SelectedPhotos({ locations }: SelectedPhotosProps) {
 				ref={scrollerRef}
 				className={cn(
 					"no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto",
-					"scroll-smooth pb-2",
+					"scroll-smooth motion-reduce:scroll-auto pb-2",
 					"mask-[linear-gradient(to_right,transparent,black_2%,black_98%,transparent)]",
 				)}
 				role="list"

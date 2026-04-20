@@ -47,6 +47,8 @@ function Carousel({
   plugins,
   className,
   children,
+  "aria-label": ariaLabel = "Image carousel",
+  tabIndex = 0,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
@@ -118,9 +120,16 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
+        className={cn(
+          "relative rounded-md outline-none",
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-background",
+          className,
+        )}
         role="region"
         aria-roledescription="carousel"
+        aria-label={ariaLabel}
+        tabIndex={tabIndex}
         data-slot="carousel"
         {...props}
       >

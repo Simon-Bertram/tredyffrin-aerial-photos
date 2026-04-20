@@ -8,20 +8,17 @@ export const sanityGeopointSchema = z.object({
 });
 
 /** Image field: require asset reference for CDN URLs. */
-export const sanityImageForUrlSchema = z
-  .object({
-    _type: z.literal("image").optional(),
-    asset: z
-      .object({
-        _ref: z.string().optional(),
-        _type: z.string().optional(),
-      })
-      .passthrough()
-      .refine((a) => typeof a._ref === "string" && a._ref.length > 0, {
-        message: "image.asset._ref required",
-      }),
-  })
-  .passthrough();
+export const sanityImageForUrlSchema = z.looseObject({
+  _type: z.literal("image").optional(),
+  asset: z
+    .looseObject({
+      _ref: z.string().optional(),
+      _type: z.string().optional(),
+    })
+    .refine((a) => typeof a._ref === "string" && a._ref.length > 0, {
+      message: "image.asset._ref required",
+    }),
+});
 
 export const sanityLocationPhotoRawSchema = z.object({
   _key: z.string().optional(),

@@ -119,6 +119,7 @@ export function LocationPhotoCarousel({ photos }: LocationPhotoCarouselProps) {
 				setApi={setApi}
 				opts={{ loop: hasMultiple }}
 				className="w-full"
+				aria-label={`Photograph slides, ${total} ${total === 1 ? 'image' : 'images'}`}
 			>
 				<CarouselContent>
 					{photos.map((photo) => (

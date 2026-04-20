@@ -755,17 +755,48 @@ function MarkerTooltip({
 
     tooltip.setDOMContent(container);
 
-    const handleMouseEnter = () => {
+    let focusOutTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearFocusOutTimer = () => {
+      if (focusOutTimer) {
+        clearTimeout(focusOutTimer);
+        focusOutTimer = null;
+      }
+    };
+
+    const showTooltip = () => {
+      clearFocusOutTimer();
       tooltip.setLngLat(marker.getLngLat()).addTo(map);
+    };
+
+    const handleMouseEnter = () => {
+      showTooltip();
     };
     const handleMouseLeave = () => tooltip.remove();
 
-    marker.getElement()?.addEventListener("mouseenter", handleMouseEnter);
-    marker.getElement()?.addEventListener("mouseleave", handleMouseLeave);
+    const handleFocusIn = () => {
+      showTooltip();
+    };
+    const handleFocusOut = () => {
+      clearFocusOutTimer();
+      focusOutTimer = setTimeout(() => {
+        tooltip.remove();
+        focusOutTimer = null;
+      }, 100);
+    };
+
+    const el = marker.getElement();
+    el?.addEventListener("mouseenter", handleMouseEnter);
+    el?.addEventListener("mouseleave", handleMouseLeave);
+    el?.addEventListener("focusin", handleFocusIn);
+    el?.addEventListener("focusout", handleFocusOut);
 
     return () => {
-      marker.getElement()?.removeEventListener("mouseenter", handleMouseEnter);
-      marker.getElement()?.removeEventListener("mouseleave", handleMouseLeave);
+      clearFocusOutTimer();
+      el?.removeEventListener("mouseenter", handleMouseEnter);
+      el?.removeEventListener("mouseleave", handleMouseLeave);
+      el?.removeEventListener("focusin", handleFocusIn);
+      el?.removeEventListener("focusout", handleFocusOut);
       tooltip.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
