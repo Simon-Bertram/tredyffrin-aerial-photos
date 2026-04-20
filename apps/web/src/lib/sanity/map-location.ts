@@ -69,6 +69,9 @@ export function mapSanityLocationToRecord(
 		}
 
 		const p = photoParsed.data
+		if (p.photo == null) {
+			continue
+		}
 		const imgParsed = sanityImageForUrlSchema.safeParse(p.photo)
 		if (!imgParsed.success) {
 			options.onPhotoSkipped?.(
