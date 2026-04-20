@@ -4,9 +4,11 @@ export interface LocationPhoto {
 	src: string
 	alt: string
 	caption?: string
+	addToSelectedPhotosCollection?: boolean
 	photographer?: string
 	photoDate?: string
 	direction?: string
+	references?: string
 	comments?: string
 }
 

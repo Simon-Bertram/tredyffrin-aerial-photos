@@ -282,60 +282,12 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     };
 
     const styleDataHandler = () => {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "223fd5",
-          },
-          body: JSON.stringify({
-            sessionId: "223fd5",
-            location: "map.tsx:styledata",
-            message: "styledata event",
-            data: {
-              mapIsStyleLoaded: map.isStyleLoaded(),
-              pendingStyle: pendingStyleChangeRef.current,
-            },
-            timestamp: Date.now(),
-            hypothesisId: "H3",
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       clearStyleTimeout();
       removeStyleIdleListener();
       // Delay to ensure style is fully processed before allowing layer operations
       // This is a workaround to avoid race conditions with the style loading
       // else we have to force update every layer on setStyle change
       styleTimeoutRef.current = setTimeout(() => {
-        const mapReady = map.isStyleLoaded();
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Debug-Session-Id": "223fd5",
-            },
-            body: JSON.stringify({
-              sessionId: "223fd5",
-              location: "map.tsx:style-timeout",
-              message: "style timeout after debounce",
-              data: {
-                mapIsStyleLoaded: mapReady,
-                pendingStyle: pendingStyleChangeRef.current,
-                runId: "post-fix",
-              },
-              timestamp: Date.now(),
-              hypothesisId: "H3",
-            }),
-          },
-        ).catch(() => {});
-        // #endregion
         if (finishStyleReady()) {
           return;
         }

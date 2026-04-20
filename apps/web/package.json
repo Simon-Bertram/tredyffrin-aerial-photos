@@ -10,6 +10,7 @@
     "dev:bare": "astro dev"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.8",
     "@astrojs/react": "^5.0.3",
     "@fontsource-variable/geist": "^5.2.8",
     "@sanity/client": "^7.21.0",
@@ -40,6 +41,6 @@
     "@tredyffrin-aerial-photos/config": "workspace:*",
     "alchemy": "catalog:",
     "tailwindcss": "^4.1.18",
-    "typescript": "catalog:"
+    "typescript": "^6.0.3"
   }
 }

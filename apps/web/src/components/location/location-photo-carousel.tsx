@@ -34,6 +34,9 @@ function getMetadataRows(photo: LocationPhoto): MetadataRow[] {
 	if (photo.direction) {
 		rows.push({ label: 'Direction', value: photo.direction })
 	}
+	if (photo.references) {
+		rows.push({ label: 'References', value: photo.references })
+	}
 	if (photo.comments) {
 		rows.push({ label: 'Comments', value: photo.comments })
 	}

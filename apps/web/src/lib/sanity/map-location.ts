@@ -21,6 +21,16 @@ function emptyToUndefined(s: string | null | undefined): string | undefined {
 	return s
 }
 
+function referencesToUndefined(
+	references: string[] | null | undefined,
+): string | undefined {
+	if (references == null || references.length === 0) {
+		return undefined
+	}
+	const value = references.join(', ').trim()
+	return value === '' ? undefined : value
+}
+
 function formatPhotoDate(
 	year: number | null | undefined,
 ): string | undefined {
@@ -39,7 +49,7 @@ export function mapSanityLocationToRecord(
 ): LocationRecord | undefined {
 	const parsed = sanityLocationRawSchema.safeParse(raw)
 	if (!parsed.success) {
-		options.onPhotoSkipped?.('location validation failed', parsed.error.flatten())
+		options.onPhotoSkipped?.('location validation failed', parsed.error.issues)
 		return undefined
 	}
 
@@ -53,7 +63,7 @@ export function mapSanityLocationToRecord(
 		if (!photoParsed.success) {
 			options.onPhotoSkipped?.(
 				`photo[${i}] validation failed`,
-				photoParsed.error.flatten(),
+				photoParsed.error.issues,
 			)
 			continue
 		}
@@ -63,7 +73,7 @@ export function mapSanityLocationToRecord(
 		if (!imgParsed.success) {
 			options.onPhotoSkipped?.(
 				`photo[${i}] image invalid`,
-				imgParsed.error.flatten(),
+				imgParsed.error.issues,
 			)
 			continue
 		}
@@ -87,9 +97,12 @@ export function mapSanityLocationToRecord(
 			src,
 			alt: p.alt ?? '',
 			caption: emptyToUndefined(p.caption),
+			addToSelectedPhotosCollection:
+				p.addToSelectedPhotosCollection === true,
 			photographer: emptyToUndefined(p.photographer),
 			photoDate: formatPhotoDate(p.photoDate ?? undefined),
 			direction: emptyToUndefined(p.direction),
+			references: referencesToUndefined(p.references),
 			comments: emptyToUndefined(p.comments),
 		})
 	}
