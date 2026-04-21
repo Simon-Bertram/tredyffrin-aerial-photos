@@ -1,6 +1,6 @@
 ---
 import BackToMapLink from "@/components/location/back-to-map-link.astro";
-import { LocationPhotoCarousel } from "@/components/location/location-photo-carousel";
+import { LocationPhotoGalleryLauncher } from "@/components/location/location-photo-gallery-launcher";
 import type { LocationRecord } from "@/lib/locations";
 
 interface Props {
@@ -26,9 +26,14 @@ const { location } = Astro.props;
   </p>
 </header>
 
+<section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
+  <h2 class="text-lg font-bold">Location Details</h2>
+  
+</section>
+
 {
   location.photos.length > 0 ? (
-    <LocationPhotoCarousel client:idle photos={location.photos} />
+    <LocationPhotoGalleryLauncher client:idle photos={location.photos} />
   ) : (
     <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
       No photos are available for this location yet.

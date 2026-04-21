@@ -15,6 +15,7 @@ import type { LocationPhoto } from '@/lib/locations'
 
 export interface LocationPhotoCarouselProps {
 	photos: LocationPhoto[]
+	initialPhotoIndex?: number
 }
 
 /** Non-empty metadata rows for definition list (label + value). */
@@ -102,7 +103,10 @@ function PhotoCarouselMetadata({ photo }: { photo: LocationPhoto }) {
 const carouselNavButtonClassName =
 	'h-10 w-10 rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-40 [&_svg]:size-5!'
 
-export function LocationPhotoCarousel({ photos }: LocationPhotoCarouselProps) {
+export function LocationPhotoCarousel({
+	photos,
+	initialPhotoIndex = 0,
+}: LocationPhotoCarouselProps) {
 	const [api, setApi] = React.useState<CarouselApi | undefined>()
 	const { canScrollPrev, canScrollNext, selectedIndex } =
 		useCarouselSlideState(api)
@@ -111,7 +115,13 @@ export function LocationPhotoCarousel({ photos }: LocationPhotoCarouselProps) {
 
 	const total = photos.length
 	const hasMultiple = total > 1
+	const initialIndex = Math.max(0, Math.min(initialPhotoIndex, total - 1))
 	const currentPhoto = photos[selectedIndex] ?? photos[0]
+
+	React.useEffect(() => {
+		if (!api) return
+		api.scrollTo(initialIndex, true)
+	}, [api, initialIndex])
 
 	return (
 		<section
