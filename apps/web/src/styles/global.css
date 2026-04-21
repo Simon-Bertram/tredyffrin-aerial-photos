@@ -4,6 +4,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/newsreader";
 @import "@fontsource-variable/public-sans";
+@plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
 
