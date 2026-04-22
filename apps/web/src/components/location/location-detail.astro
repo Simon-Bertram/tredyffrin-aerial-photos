@@ -1,39 +1,28 @@
 ---
 import BackToMapLink from "@/components/location/back-to-map-link.astro";
-import { LocationPhotoGalleryLauncher } from "@/components/location/location-photo-gallery-launcher";
 import type { LocationRecord } from "@/lib/locations";
+import LocationPhotoCard from "@/components/location/location-photo-card.astro";
 
 interface Props {
   location: LocationRecord;
 }
 
 const { location } = Astro.props;
+const photoCount = location.photos.length;
 ---
 
 <BackToMapLink />
 
-<header class="space-y-2">
-  <h1 class="text-3xl font-bold">{location.name}</h1>
-  {
-    location.shortDescription ? (
-      <p class="max-w-4xl text-sm text-muted-foreground">
-        {location.shortDescription}
-      </p>
-    ) : null
-  }
-  <p class="max-w-4xl text-sm text-muted-foreground">
-    {location.fullDescription}
-  </p>
-</header>
-
-<section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
-  <h2 class="text-lg font-bold">Location Details</h2>
-  
-</section>
-
 {
-  location.photos.length > 0 ? (
-    <LocationPhotoGalleryLauncher client:idle photos={location.photos} />
+  photoCount > 0 ? (
+    <section class="space-y-4">
+      <h2 class="text-lg font-bold">Location Photos ({photoCount})</h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {location.photos.map((photo) => (
+          <LocationPhotoCard photo={photo} />
+        ))}
+      </div>
+    </section>
   ) : (
     <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
       No photos are available for this location yet.

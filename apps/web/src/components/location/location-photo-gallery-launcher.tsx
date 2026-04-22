@@ -58,10 +58,10 @@ export function LocationPhotoGalleryLauncher({
           key={photo.id}
           type="button"
           onClick={() => handleOpenCarousel(index)}
-          className="overflow-hidden rounded-lg border bg-card text-left transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="card overflow-hidden border bg-card text-left shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`Open photo ${index + 1}: ${photo.title || photo.alt}`}
         >
-          <div className="aspect-4/3 bg-muted/40">
+          <figure className="aspect-4/3 bg-muted/40">
             <img
               src={photo.src}
               alt={photo.alt}
@@ -69,11 +69,11 @@ export function LocationPhotoGalleryLauncher({
               decoding="async"
               className="h-full w-full object-cover"
             />
-          </div>
-          <header>
-            <div>
+          </figure>
+          <div className="card-body gap-2 p-4">
+            <header>
               {photo.title ? (
-                <h3 className="border-t px-3 py-2 text-lg font-medium text-card-foreground">
+                <h3 className="text-lg font-medium text-card-foreground">
                   {photo.title}
                 </h3>
               ) : null}
@@ -82,35 +82,35 @@ export function LocationPhotoGalleryLauncher({
                   Caption: {photo.caption}
                 </p>
               ) : null}
-            </div>
-          </header>
+            </header>
 
-          <div>
-            {photo.photographer ? (
-              <p className="text-sm text-muted-foreground">
-                Photographer: {photo.photographer}
-              </p>
-            ) : null}
-            {photo.photoDate ? (
-              <p className="text-sm text-muted-foreground">
-                Year: {photo.photoDate}
-              </p>
-            ) : null}
-            {photo.direction ? (
-              <p className="text-sm text-muted-foreground">
-                Direction: {photo.direction}
-              </p>
-            ) : null}
-            {photo.references ? (
-              <p className="text-sm text-muted-foreground">
-                References: {photo.references}
-              </p>
-            ) : null}
-            {photo.comments ? (
-              <p className="text-sm text-muted-foreground">
-                Comments: {photo.comments}
-              </p>
-            ) : null}
+            <div className="space-y-1">
+              {photo.photographer ? (
+                <p className="text-sm text-muted-foreground">
+                  Photographer: {photo.photographer}
+                </p>
+              ) : null}
+              {photo.photoDate ? (
+                <p className="text-sm text-muted-foreground">
+                  Year: {photo.photoDate}
+                </p>
+              ) : null}
+              {photo.direction ? (
+                <p className="text-sm text-muted-foreground">
+                  Direction: {photo.direction}
+                </p>
+              ) : null}
+              {photo.references ? (
+                <p className="text-sm text-muted-foreground">
+                  References: {photo.references}
+                </p>
+              ) : null}
+              {photo.comments ? (
+                <p className="text-sm text-muted-foreground">
+                  Comments: {photo.comments}
+                </p>
+              ) : null}
+            </div>
           </div>
         </button>
       ))}
