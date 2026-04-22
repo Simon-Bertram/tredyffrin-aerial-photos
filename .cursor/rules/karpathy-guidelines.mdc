@@ -50,6 +50,17 @@ When your changes create orphans:
 
 The test: Every changed line should trace directly to the user's request.
 
+## 3.1 Style Preservation And Approval
+
+**Do not silently change existing visual styling.**
+
+When implementation requires replacing or rerendering existing UI:
+
+- Preserve existing visual styles and semantics (for example, emphasis like italics) unless the user explicitly asked to change them.
+- If style parity is uncertain, stop and ask before proceeding.
+- If there is a design/styling tradeoff, present options and ask the user to choose.
+- Never remove or alter styles as a "cleanup" side effect of functional changes.
+
 ## 4. Goal-Driven Execution
 
 **Define success criteria. Loop until verified.**

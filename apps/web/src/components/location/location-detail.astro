@@ -1,7 +1,7 @@
 ---
 import BackToMapLink from "@/components/location/back-to-map-link.astro";
 import type { LocationRecord } from "@/lib/locations";
-import LocationPhotoCard from "@/components/location/location-photo-card.astro";
+import { LocationPhotoGalleryLauncher } from "@/components/location/location-photo-gallery-launcher";
 
 interface Props {
   location: LocationRecord;
@@ -15,13 +15,9 @@ const photoCount = location.photos.length;
 
 {
   photoCount > 0 ? (
-    <section class="space-y-4">
-      <h2 class="text-lg font-bold">Location Photos ({photoCount})</h2>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {location.photos.map((photo) => (
-          <LocationPhotoCard photo={photo} />
-        ))}
-      </div>
+    <section>
+      <h2 class="text-lg font-bold mb-8">Location Photos ({photoCount})</h2>
+      <LocationPhotoGalleryLauncher client:load photos={location.photos} />
     </section>
   ) : (
     <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">

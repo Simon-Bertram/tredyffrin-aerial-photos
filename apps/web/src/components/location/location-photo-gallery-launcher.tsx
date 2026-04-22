@@ -32,6 +32,7 @@ export function LocationPhotoGalleryLauncher({
       <section className="space-y-4">
         <div className="flex justify-end">
           <Button
+            className="bg-[color-mix(in_srgb,var(--secondary-container)_55%,var(--surface))] dark:bg-[color-mix(in_srgb,var(--secondary-fixed)_50%,var(--surface))]"
             type="button"
             variant="outline"
             onClick={handleCloseCarousel}
@@ -50,7 +51,7 @@ export function LocationPhotoGalleryLauncher({
 
   return (
     <section
-      className="grid gap-8 grid-cols-2"
+      className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
       aria-label={`Photo gallery (${photos.length})`}
     >
       {photos.map((photo, index) => (
@@ -58,7 +59,7 @@ export function LocationPhotoGalleryLauncher({
           key={photo.id}
           type="button"
           onClick={() => handleOpenCarousel(index)}
-          className="card overflow-hidden border bg-card text-left shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="card overflow-hidden border border-border bg-card text-left shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label={`Open photo ${index + 1}: ${photo.title || photo.alt}`}
         >
           <figure className="aspect-4/3 bg-muted/40">
@@ -70,16 +71,14 @@ export function LocationPhotoGalleryLauncher({
               className="h-full w-full object-cover"
             />
           </figure>
-          <div className="card-body gap-2 p-4">
-            <header>
+          <div className="card-body">
+            <header className="space-y-1">
               {photo.title ? (
-                <h3 className="text-lg font-medium text-card-foreground">
-                  {photo.title}
-                </h3>
+                <h3 className="card-title">{photo.title}</h3>
               ) : null}
               {photo.caption ? (
                 <p className="text-sm text-muted-foreground">
-                  Caption: {photo.caption}
+                  <span className="italic">Caption:</span> {photo.caption}
                 </p>
               ) : null}
             </header>
@@ -87,27 +86,28 @@ export function LocationPhotoGalleryLauncher({
             <div className="space-y-1">
               {photo.photographer ? (
                 <p className="text-sm text-muted-foreground">
-                  Photographer: {photo.photographer}
+                  <span className="italic">Photographer:</span>{" "}
+                  {photo.photographer}
                 </p>
               ) : null}
               {photo.photoDate ? (
                 <p className="text-sm text-muted-foreground">
-                  Year: {photo.photoDate}
+                  <span className="italic">Year:</span> {photo.photoDate}
                 </p>
               ) : null}
               {photo.direction ? (
                 <p className="text-sm text-muted-foreground">
-                  Direction: {photo.direction}
+                  <span className="italic">Direction:</span> {photo.direction}
                 </p>
               ) : null}
               {photo.references ? (
                 <p className="text-sm text-muted-foreground">
-                  References: {photo.references}
+                  <span className="italic">References:</span> {photo.references}
                 </p>
               ) : null}
               {photo.comments ? (
                 <p className="text-sm text-muted-foreground">
-                  Comments: {photo.comments}
+                  <span className="italic">Comments:</span> {photo.comments}
                 </p>
               ) : null}
             </div>

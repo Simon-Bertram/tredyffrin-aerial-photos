@@ -1,11 +1,12 @@
 ---
-import type { LocationPhoto } from "@/lib/locations";
+import { getPhotoMetadataItems, type LocationPhoto } from "@/lib/locations";
 
 interface Props {
   photo: LocationPhoto;
 }
 
 const { photo } = Astro.props;
+const metadataItems = getPhotoMetadataItems(photo);
 ---
 
 <article class="card border border-border bg-card shadow-sm">
@@ -26,39 +27,11 @@ const { photo } = Astro.props;
       ) : null
     }
     {
-      photo.photographer ? (
+      metadataItems.map((item) => (
         <p class="text-sm text-muted-foreground">
-          <span class="italic">Photographer:</span> {photo.photographer}
+          <span class="italic">{item.label}:</span> {item.value}
         </p>
-      ) : null
-    }
-    {
-      photo.photoDate ? (
-        <p class="text-sm text-muted-foreground">
-          <span class="italic">Year:</span> {photo.photoDate}
-        </p>
-      ) : null
-    }
-    {
-      photo.direction ? (
-        <p class="text-sm text-muted-foreground">
-          <span class="italic">Direction:</span> {photo.direction}
-        </p>
-      ) : null
-    }
-    {
-      photo.references ? (
-        <p class="text-sm text-muted-foreground">
-          <span class="italic">References:</span> {photo.references}
-        </p>
-      ) : null
-    }
-    {
-      photo.comments ? (
-        <p class="text-sm text-muted-foreground">
-          <span class="italic">Comments:</span> {photo.comments}
-        </p>
-      ) : null
+      ))
     }
   </div>
 </article>
