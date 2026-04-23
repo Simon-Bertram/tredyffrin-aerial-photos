@@ -5,10 +5,14 @@ import { defineConfig, envField } from "astro/config";
 
 import react from "@astrojs/react";
 
+const wranglerConfigPath = "./wrangler.toml";
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  adapter: alchemy(),
+  adapter: alchemy({
+    configPath: wranglerConfigPath,
+  }),
 
   env: {
     schema: {

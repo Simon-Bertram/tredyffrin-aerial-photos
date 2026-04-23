@@ -1,0 +1,74 @@
+---
+interface FeaturePhoto {
+  src: string;
+  alt: string;
+  slug: string;
+  locationName: string;
+  photoDate?: string;
+}
+
+interface Props {
+  photo: FeaturePhoto;
+  width: number;
+  height: number;
+  imageClassName: string;
+  imageContainerClassName: string;
+  captionClassName: string;
+  loading?: "lazy" | "eager";
+  showViewLink?: boolean;
+  showPhotoDate?: boolean;
+}
+
+const {
+  photo,
+  width,
+  height,
+  imageClassName,
+  imageContainerClassName,
+  captionClassName,
+  loading = "lazy",
+  showViewLink = false,
+  showPhotoDate = false,
+} = Astro.props;
+---
+
+<figure>
+  <a
+    href={`/locations/${photo.slug}`}
+    class="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+  >
+    <div class={imageContainerClassName}>
+      <img
+        src={photo.src}
+        alt={photo.alt}
+        width={width}
+        height={height}
+        class={imageClassName}
+        loading={loading}
+        decoding="async"
+      />
+    </div>
+  </a>
+  <figcaption class={captionClassName}>
+    <span class="font-display text-sm italic text-on-surface-variant">
+      {photo.locationName}
+      {
+        showPhotoDate && photo.photoDate && (
+          <span class="ml-2 font-sans not-italic text-[11px] uppercase tracking-[0.14em] text-on-surface-variant">
+            {photo.photoDate}
+          </span>
+        )
+      }
+    </span>
+    {
+      showViewLink && (
+        <a
+          href={`/locations/${photo.slug}`}
+          class="font-sans text-[11px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline"
+        >
+          View photographs
+        </a>
+      )
+    }
+  </figcaption>
+</figure>

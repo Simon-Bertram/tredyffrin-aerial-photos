@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { LocationPhotoCarousel } from "@/components/location/location-photo-carousel";
-import type { LocationPhoto } from "@/lib/locations";
+import { getPhotoMetadataItems, type LocationPhoto } from "@/lib/locations";
 
 interface LocationPhotoGalleryLauncherProps {
   photos: LocationPhoto[];
@@ -84,32 +84,11 @@ export function LocationPhotoGalleryLauncher({
             </header>
 
             <div className="space-y-1">
-              {photo.photographer ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">Photographer:</span>{" "}
-                  {photo.photographer}
+              {getPhotoMetadataItems(photo).map((item) => (
+                <p key={item.key} className="text-sm text-muted-foreground">
+                  <span className="italic">{item.label}:</span> {item.value}
                 </p>
-              ) : null}
-              {photo.photoDate ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">Year:</span> {photo.photoDate}
-                </p>
-              ) : null}
-              {photo.direction ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">Direction:</span> {photo.direction}
-                </p>
-              ) : null}
-              {photo.references ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">References:</span> {photo.references}
-                </p>
-              ) : null}
-              {photo.comments ? (
-                <p className="text-sm text-muted-foreground">
-                  <span className="italic">Comments:</span> {photo.comments}
-                </p>
-              ) : null}
+              ))}
             </div>
           </div>
         </button>

@@ -707,34 +707,84 @@ function MarkerTooltip({
 
     tooltip.setDOMContent(container);
 
-    let focusOutTimer: ReturnType<typeof setTimeout> | null = null;
+    let closeTimer: ReturnType<typeof setTimeout> | null = null;
+    let isPointerOnMarker = false;
+    let isPointerOnTooltip = false;
+    let openedByPointer = false;
 
-    const clearFocusOutTimer = () => {
-      if (focusOutTimer) {
-        clearTimeout(focusOutTimer);
-        focusOutTimer = null;
-      }
+    const clearCloseTimer = () => {
+      if (!closeTimer) return;
+      clearTimeout(closeTimer);
+      closeTimer = null;
     };
 
     const showTooltip = () => {
-      clearFocusOutTimer();
+      clearCloseTimer();
+      if (tooltip.isOpen()) {
+        return;
+      }
+
       tooltip.setLngLat(marker.getLngLat()).addTo(map);
     };
 
+    const shouldRemainOpen = () => {
+      const markerEl = marker.getElement();
+      const activeElement = document.activeElement;
+      const hasMarkerFocus =
+        markerEl !== null &&
+        activeElement instanceof Node &&
+        markerEl.contains(activeElement);
+      const hasTooltipFocus =
+        activeElement instanceof Node && container.contains(activeElement);
+
+      return (
+        isPointerOnMarker ||
+        isPointerOnTooltip ||
+        hasMarkerFocus ||
+        (hasTooltipFocus && !openedByPointer)
+      );
+    };
+
+    const scheduleClose = () => {
+      clearCloseTimer();
+      closeTimer = setTimeout(() => {
+        if (!shouldRemainOpen()) {
+          tooltip.remove();
+        }
+        closeTimer = null;
+      }, 120);
+    };
+
     const handleMouseEnter = () => {
+      openedByPointer = true;
+      isPointerOnMarker = true;
       showTooltip();
     };
-    const handleMouseLeave = () => tooltip.remove();
+    const handleMouseLeave = () => {
+      isPointerOnMarker = false;
+      scheduleClose();
+    };
+
+    const handleTooltipMouseEnter = () => {
+      openedByPointer = true;
+      isPointerOnTooltip = true;
+      showTooltip();
+    };
+    const handleTooltipMouseLeave = () => {
+      isPointerOnTooltip = false;
+      scheduleClose();
+    };
 
     const handleFocusIn = () => {
+      if (tooltip.isOpen() && container.contains(document.activeElement)) {
+        return;
+      }
+
+      openedByPointer = false;
       showTooltip();
     };
     const handleFocusOut = () => {
-      clearFocusOutTimer();
-      focusOutTimer = setTimeout(() => {
-        tooltip.remove();
-        focusOutTimer = null;
-      }, 100);
+      scheduleClose();
     };
 
     const el = marker.getElement();
@@ -742,13 +792,21 @@ function MarkerTooltip({
     el?.addEventListener("mouseleave", handleMouseLeave);
     el?.addEventListener("focusin", handleFocusIn);
     el?.addEventListener("focusout", handleFocusOut);
+    container.addEventListener("mouseenter", handleTooltipMouseEnter);
+    container.addEventListener("mouseleave", handleTooltipMouseLeave);
+    container.addEventListener("focusin", handleFocusIn);
+    container.addEventListener("focusout", handleFocusOut);
 
     return () => {
-      clearFocusOutTimer();
+      clearCloseTimer();
       el?.removeEventListener("mouseenter", handleMouseEnter);
       el?.removeEventListener("mouseleave", handleMouseLeave);
       el?.removeEventListener("focusin", handleFocusIn);
       el?.removeEventListener("focusout", handleFocusOut);
+      container.removeEventListener("mouseenter", handleTooltipMouseEnter);
+      container.removeEventListener("mouseleave", handleTooltipMouseLeave);
+      container.removeEventListener("focusin", handleFocusIn);
+      container.removeEventListener("focusout", handleFocusOut);
       tooltip.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -6,11 +6,8 @@ import { MapMarker, MarkerContent, MarkerTooltip } from "@/components/ui/map";
 import type { MapVisualStyleId } from "@/components/map/map-types";
 import type { LocationRecord } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { LocationMarkerTooltipCard } from "@/components/map/location-marker-tooltip-card";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface MapLocationMarkerProps {
   location: LocationRecord;
@@ -25,13 +22,8 @@ export function MapLocationMarker({
   mapVisualStyle,
 }: MapLocationMarkerProps) {
   const detailPath = `/locations/${location.slug}`;
-  const hasPhotos = location.photos.length > 0;
-  const firstPhoto = location.photos[0];
   const multiplePhotos = location.photos.length > 1;
   const activePhotoIndex = Number(activeTab) - 1;
-  const activePhoto = location.photos[activePhotoIndex] ?? location.photos[0];
-  const activePhotoDirection = activePhoto?.direction ?? "Direction unknown";
-  const activePhotoDate = activePhoto?.photoDate ?? "Date unknown";
 
   const isOnImagery = mapVisualStyle === "terrain";
 
@@ -39,14 +31,19 @@ export function MapLocationMarker({
     ? `View details for ${location.name}, ${location.photos.length} photos`
     : `View details for ${location.name}`;
 
+  const handleNavigateToLocation = (path: string) => {
+    if (typeof window === "undefined") return;
+    window.location.assign(path);
+  };
+
   return (
     <MapMarker
       longitude={location.coordinates.longitude}
       latitude={location.coordinates.latitude}
     >
       <MarkerContent>
-        <a
-          href={detailPath}
+        <button
+          type="button"
           aria-label={markerLinkLabel}
           className={cn(
             "group relative rounded-none outline-none",
@@ -89,100 +86,36 @@ export function MapLocationMarker({
             )}
             <Camera className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
-        </a>
+        </button>
       </MarkerContent>
 
-      <MarkerTooltip className="w-72 p-0">
-        {/* Artifact preview: stacked paper, no dividers, ambient shadow. */}
-        <article
-          className={cn(
-            "bg-surface-container-lowest overflow-hidden",
-            "ring-1 ring-inset ring-[color-mix(in_srgb,var(--outline-variant)_20%,transparent)]",
-            "shadow-[0_32px_48px_color-mix(in_srgb,var(--on-surface)_6%,transparent)]",
-          )}
+      <MarkerTooltip className="w-108 p-0">
+        <ErrorBoundary
+          fallback={
+            <article className="bg-surface-container-lowest p-4">
+              <h3 className="font-display text-[1.05rem] leading-tight text-on-surface">
+                {location.name}
+              </h3>
+              <a
+                href={detailPath}
+                className={cn(
+                  "mt-3 inline-flex text-xs underline",
+                  "text-on-surface-variant hover:text-on-surface",
+                )}
+              >
+                View details
+              </a>
+            </article>
+          }
         >
-          <div className="relative h-40 bg-surface-dim">
-            {multiplePhotos ? (
-              <Carousel tabIndex={-1} aria-label="Preview photograph slides">
-                <CarouselContent>
-                  {location.photos.map((photo) => (
-                    <CarouselItem key={photo.id}>
-                      <img
-                        src={photo.src}
-                        alt={photo.alt}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
-            ) : hasPhotos ? (
-              <img
-                src={firstPhoto.src}
-                alt={firstPhoto.alt}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-surface-container font-display italic text-on-surface-variant">
-                No plate on file
-              </div>
-            )}
-
-            {/* Metadata chip: navy on pale-blue, per DESIGN §5. */}
-            <div
-              className={cn(
-                "absolute left-3 top-3 px-2 py-1",
-                "bg-secondary-fixed text-on-secondary-fixed",
-                "font-sans text-[10px] uppercase tracking-[0.14em]",
-                "backdrop-blur-sm",
-              )}
-            >
-              Plate {location.photos.length.toString().padStart(2, "0")}
-            </div>
-          </div>
-
-          <div className="space-y-2 px-4 pt-4 pb-4">
-            <h3 className="font-display text-[1.05rem] font-normal leading-tight text-on-surface">
-              {location.name}
-            </h3>
-            <p className="text-xs leading-relaxed text-on-surface-variant">
-              {location.shortDescription}
-            </p>
-
-            <div
-              className={cn(
-                "mt-3 flex items-center gap-2 font-sans text-[11px] tracking-[0.02em]",
-                isOnImagery
-                  ? cn(
-                      "bg-on-surface/88 text-surface",
-                      "px-2 py-1.5 backdrop-blur-md",
-                      "shadow-[0_6px_18px_color-mix(in_srgb,var(--on-surface)_30%,transparent)]",
-                    )
-                  : "text-on-surface-variant",
-              )}
-            >
-              <Camera className="size-3.5 shrink-0" strokeWidth={1.75} />
-              <span>{activePhotoDirection}</span>
-              <span aria-hidden="true" className="opacity-60">
-                &middot;
-              </span>
-              <span>{activePhotoDate}</span>
-              {multiplePhotos && (
-                <>
-                  <span aria-hidden="true" className="opacity-60">
-                    &middot;
-                  </span>
-                  <span className="tabular-nums">
-                    {activePhotoIndex + 1}&thinsp;/&thinsp;
-                    {location.photos.length}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        </article>
+          <LocationMarkerTooltipCard
+            location={location}
+            detailPath={detailPath}
+            isOnImagery={isOnImagery}
+            activePhotoIndex={activePhotoIndex}
+            onNavigate={handleNavigateToLocation}
+          />
+        </ErrorBoundary>
       </MarkerTooltip>
     </MapMarker>
   );
