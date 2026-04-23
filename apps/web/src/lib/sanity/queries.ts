@@ -1,5 +1,23 @@
-/** GROQ projection shared by list + detail fetches. */
-export const locationProjection = /* groq */ `{
+/** Minimal projection for map/list routes. */
+export const locationForMapProjection = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  coordinates,
+  shortDescription,
+  photos[]{
+    _key,
+    title,
+    alt,
+    photoDate,
+    direction,
+    photo,
+    addToSelectedPhotosCollection
+  }
+}`;
+
+/** Full projection for detail pages. */
+export const locationForDetailProjection = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
@@ -25,12 +43,32 @@ export const locationProjection = /* groq */ `{
 export const locationsForMapQuery = /* groq */ `
  *[_type == "location" && defined(slug.current) && defined(coordinates)]
   | order(name asc)
-  ${locationProjection}
+  ${locationForMapProjection}
+`;
+
+/** About page feature strip — same location set as map, minimal fields. */
+export const locationForAboutFeatureProjection = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  photos[]{
+    _key,
+    title,
+    alt,
+    photoDate,
+    photo
+  }
+}`;
+
+export const locationsForAboutFeatureQuery = /* groq */ `
+ *[_type == "location" && defined(slug.current) && defined(coordinates)]
+  | order(name asc)
+  ${locationForAboutFeatureProjection}
 `;
 
 export const locationBySlugQuery = /* groq */ `
   *[_type == "location" && slug.current == $slug][0]
-  ${locationProjection}
+  ${locationForDetailProjection}
 `;
 
 /** Slugs only — for sitemap and discovery endpoints. */

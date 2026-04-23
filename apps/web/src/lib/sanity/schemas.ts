@@ -45,6 +45,14 @@ export const sanityLocationRawSchema = z.object({
   photos: z.array(z.unknown()).nullable().optional(),
 });
 
+/** Location row for about-page feature photos only (no map fields). */
+export const sanityLocationAboutFeatureRawSchema = z.object({
+  _id: z.string().optional(),
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  photos: z.array(z.unknown()).nullable().optional(),
+});
+
 export type SanityLocationRaw = z.infer<typeof sanityLocationRawSchema>;
 export type SanityLocationPhotoRaw = z.infer<
   typeof sanityLocationPhotoRawSchema

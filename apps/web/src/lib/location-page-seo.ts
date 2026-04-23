@@ -2,6 +2,9 @@ import type { LocationRecord } from '@/lib/locations'
 import { toAbsoluteUrl } from '@/lib/site-url'
 import { truncateMeta } from '@/lib/truncate-meta'
 
+/** Cap Place JSON-LD images — enough for rich previews without huge HTML. */
+const JSON_LD_PLACE_IMAGE_MAX = 5
+
 export const LOCATION_PAGE_NOT_FOUND_DESCRIPTION =
 	'This location is not listed in the Tredyffrin aerial photograph archive.'
 
@@ -59,7 +62,8 @@ function buildPlaceJsonLd(
 		url: `${siteOrigin}/locations/${location.slug}`,
 	}
 	if (location.photos.length > 0) {
-		doc.image = location.photos.map((p) => toAbsoluteUrl(p.src))
+		const capped = location.photos.slice(0, JSON_LD_PLACE_IMAGE_MAX)
+		doc.image = capped.map((p) => toAbsoluteUrl(p.src))
 	}
 	return doc
 }

@@ -3,6 +3,11 @@ import {
 	PUBLIC_SANITY_PROJECT_ID,
 } from 'astro:env/server'
 
+import {
+	mapSanityRowsToAboutFeatureLocations,
+	pickFeaturePhotos,
+	type AboutFeaturePhoto,
+} from '@/lib/about-feature-photos'
 import type { LocationRecord } from '@/lib/locations'
 import { getSanityClient } from '@/lib/sanity/client'
 import { createSanityImageBuilder } from '@/lib/sanity/image'
@@ -10,10 +15,12 @@ import { mapSanityLocationToRecord } from '@/lib/sanity/map-location'
 import {
 	locationBySlugQuery,
 	locationSlugsQuery,
+	locationsForAboutFeatureQuery,
 	locationsForMapQuery,
 } from '@/lib/sanity/queries'
 
 const MAP_IMAGE_WIDTH = 1200
+const ABOUT_FEATURE_IMAGE_WIDTH = 1200
 const DETAIL_IMAGE_WIDTH = 1600
 
 function logSkip(
@@ -62,6 +69,31 @@ export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
 		out.push(mapped)
 	}
 	return out
+}
+
+export async function fetchAboutPageFeaturePhotos(
+	max: number,
+): Promise<AboutFeaturePhoto[]> {
+	const client = getSanityClient()
+	const imageBuilder = createSanityImageBuilder(
+		PUBLIC_SANITY_PROJECT_ID,
+		PUBLIC_SANITY_DATASET,
+	)
+	const rows = await client.fetch<unknown[]>(locationsForAboutFeatureQuery)
+	if (!Array.isArray(rows)) {
+		console.warn('[sanity:fetchAboutPageFeaturePhotos] expected array', rows)
+		return []
+	}
+
+	const locations = mapSanityRowsToAboutFeatureLocations(rows, {
+		imageWidth: ABOUT_FEATURE_IMAGE_WIDTH,
+		imageBuilder,
+		onPhotoSkipped: (slug, reason, detail) => {
+			logSkip('fetchAboutPageFeaturePhotos', slug, reason, detail)
+		},
+	})
+
+	return pickFeaturePhotos(locations, max)
 }
 
 export async function fetchPublishedLocationSlugs(): Promise<string[]> {

@@ -1,60 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
+import { fetchAboutPageFeaturePhotos } from "@/lib/sanity-location-repository";
 import { getSiteOrigin } from "@/lib/site-url";
 import FeaturePhotoFigure from "@/components/location/feature-photo-figure.astro";
-import type { LocationRecord } from "@/lib/locations";
 
-interface FeaturePhoto {
-  src: string;
-  alt: string;
-  slug: string;
-  locationName: string;
-  photoDate?: string;
-}
-
-function pickFeaturePhotos(
-  locations: LocationRecord[],
-  max: number,
-): FeaturePhoto[] {
-  const flat: FeaturePhoto[] = [];
-  for (const loc of locations) {
-    for (const photo of loc.photos) {
-      flat.push({
-        src: photo.src,
-        alt: photo.alt,
-        slug: loc.slug,
-        locationName: loc.name,
-        photoDate: photo.photoDate,
-      });
-    }
-  }
-  if (flat.length === 0) return [];
-  if (flat.length <= max) return flat;
-
-  const picks: FeaturePhoto[] = [];
-  const usedSrc = new Set<string>();
-  for (let i = 0; i < max; i++) {
-    const t = max === 1 ? 0 : i / (max - 1);
-    const idx = Math.min(flat.length - 1, Math.round(t * (flat.length - 1)));
-    const candidate = flat[idx];
-    if (!usedSrc.has(candidate.src)) {
-      usedSrc.add(candidate.src);
-      picks.push(candidate);
-    }
-  }
-  for (const p of flat) {
-    if (picks.length >= max) break;
-    if (!usedSrc.has(p.src)) {
-      usedSrc.add(p.src);
-      picks.push(p);
-    }
-  }
-  return picks;
-}
-
-const locations = await fetchLocationsForMap();
-const features = pickFeaturePhotos(locations, 5);
+const features = await fetchAboutPageFeaturePhotos(5);
 const [hero, sideTop, sideBottom, spreadLeft, spreadRight] = features;
 
 const aboutTitle = "About — Tredyffrin Aerial Photos";
