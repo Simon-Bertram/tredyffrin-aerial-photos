@@ -2,6 +2,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import alchemy from "alchemy/cloudflare/astro";
 import { defineConfig, envField } from "astro/config";
+import { visualizer } from "rollup-plugin-visualizer";
 
 import react from "@astrojs/react";
 
@@ -38,9 +39,28 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      visualizer({
+        open: true,
+        filename: "stats.html",
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ],
     resolve: {
       dedupe: ["react", "react-dom"],
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("maplibre-gl")) return "maplibre";
+            if (id.includes("@sanity/")) return "sanity-vendor";
+          },
+        },
+      },
     },
   },
 

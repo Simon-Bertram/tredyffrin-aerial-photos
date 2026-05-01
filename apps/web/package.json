@@ -41,6 +41,7 @@
     "@tailwindcss/vite": "^4.2.3",
     "@tredyffrin-aerial-photos/config": "workspace:*",
     "alchemy": "^0.90.1",
+    "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^4.2.3",
     "typescript": "^6.0.3"
   }
