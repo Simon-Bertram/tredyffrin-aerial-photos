@@ -9,12 +9,12 @@
     "preflight:cloudflare": "bun run ./scripts/preflight-cloudflare.ts"
   },
   "dependencies": {
-    "dotenv": "catalog:",
-    "zod": "catalog:"
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@tredyffrin-aerial-photos/config": "workspace:*",
     "alchemy": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "^5.9.3"
   }
 }

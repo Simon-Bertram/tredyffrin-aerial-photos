@@ -11,7 +11,7 @@
       "zod": "^4.1.13",
       "typescript": "^5",
       "@cloudflare/workers-types": "^4.20251213.0",
-      "alchemy": "^0.90.0"
+      "alchemy": "^0.93.6"
     }
   },
   "type": "module",
@@ -29,15 +29,15 @@
     "@fontsource-variable/newsreader": "^5.2.10",
     "@fontsource-variable/public-sans": "^5.2.7",
     "@tredyffrin-aerial-photos/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "catalog:",
+    "@cloudflare/workers-types": "^4.20260501.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@tredyffrin-aerial-photos/config": "workspace:*",
-    "jsdom": "^29.0.2",
+    "jsdom": "^29.1.1",
     "turbo": "^2.9.7",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
