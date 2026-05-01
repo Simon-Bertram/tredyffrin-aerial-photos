@@ -164,16 +164,6 @@ function SelectedPhotoCard({ photo, isActive }: SelectedPhotoCardProps) {
 							"group-hover:scale-[1.03]",
 						)}
 					/>
-					<span
-						aria-hidden
-						className={cn(
-							"absolute left-3 top-3",
-							"bg-surface/85 text-on-surface backdrop-blur-sm",
-							"px-2 py-1 font-sans text-[10px] uppercase tracking-[0.18em]",
-						)}
-					>
-						Pl. {photo.plateNumber.toString().padStart(2, "0")}
-					</span>
 				</div>
 				<figcaption className="mt-4 flex items-baseline justify-between gap-4">
 					<div className="min-w-0">
