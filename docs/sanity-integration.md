@@ -76,7 +76,7 @@ Nested **image** fields: query `photo` as stored (object with `asset`), not only
 ## Images
 
 - Validate minimally that `photo.asset._ref` exists before calling the builder.
-- Use different **widths** for thumbnails vs hero (this repo: ~1200 map, ~1600 detail).
+- Use different **widths** for thumbnails vs hero (this repo: map-route primary `src` **1200**, map tooltip `previewSrc` **800**, detail **1600**).
 - `auto('format')` serves modern formats when supported.
 
 Docs: [Image URL](https://www.sanity.io/docs/image-url).

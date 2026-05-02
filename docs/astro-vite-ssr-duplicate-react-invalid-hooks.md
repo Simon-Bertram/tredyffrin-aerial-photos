@@ -20,23 +20,15 @@ Client-side **`resolve.dedupe: ["react", "react-dom"]`** helps the browser bundl
 
 ## Fix (this repo)
 
-In **`apps/web/astro.config.mjs`**, under `vite`, keep existing `resolve.dedupe` and add **`ssr.noExternal`** so these packages are **not** treated as separate SSR externals with diverging resolution:
+In **`apps/web/astro.config.mjs`**, under `vite`:
 
-```javascript
-vite: {
-  resolve: {
-    dedupe: ["react", "react-dom"],
-  },
-  ssr: {
-    noExternal: ["react", "react-dom", "framer-motion"],
-  },
-  // …plugins, build, etc.
-},
-```
+1. **`resolve.dedupe`** — `["react", "react-dom"]`.
+2. **`resolve.alias`** — pin **`react`** to **`path.resolve(__dirname, "node_modules/react")`** (Bun symlink + `deps_ssr` can still split hooks without this). **Do not** alias **`react-dom`** to the package root on **Cloudflare SSR**: that resolves Node’s `server.js` (`util`, `crypto`, …) and breaks the worker build; let Vite keep prebundling the worker-safe server entry.
+3. **`ssr.noExternal`** — include **`react`**, **`react-dom`**, **`react/jsx-runtime`**, **`react/jsx-dev-runtime`**, and **`framer-motion`** so JSX and Motion stay on the same React instance as the renderer.
 
-Including **`framer-motion`** keeps motion components on the **same** React instance during SSR (the carousel uses `motion` from Framer).
+Do **not** add **`scheduler`** to **`ssr.optimizeDeps.include`** unless it resolves from the app root: with **Bun**, dev may log **`Failed to resolve dependency: scheduler`** and the graph can stay broken.
 
-After changing this, **restart dev** and let Vite finish re-optimizing dependencies; then load a page that SSR-renders multiple React islands (e.g. the homepage with map + carousel).
+After changing this, **restart dev**, optionally delete **`apps/web/node_modules/.vite`**, let Vite re-optimize, then load the homepage (map + carousel).
 
 ## How to confirm the fix
 
@@ -51,4 +43,4 @@ After changing this, **restart dev** and let Vite finish re-optimizing dependenc
 
 ## History
 
-- **2026-05:** Observed during `bun run dev` with Turbo + Alchemy + Astro; fixed by adding `ssr.noExternal` as above.
+- **2026-05:** Observed during `bun run dev` with Turbo + Alchemy + Astro; fixed by expanding `ssr.noExternal` (incl. JSX runtimes), **`react`-only** `resolve.alias`, and avoiding broken `scheduler` / `optimizeDeps` entries. Importing **`react`** in **`index.astro`** frontmatter for debugging was removed—it can add another resolution path during SSR.

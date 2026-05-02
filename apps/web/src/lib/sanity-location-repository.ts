@@ -20,6 +20,8 @@ import {
 } from '@/lib/sanity/queries'
 
 const MAP_IMAGE_WIDTH = 1200
+/** Map marker tooltip previews (`h-60`); primary `src` stays `MAP_IMAGE_WIDTH`. */
+const MAP_PREVIEW_IMAGE_WIDTH = 800
 const ABOUT_FEATURE_IMAGE_WIDTH = 1200
 const DETAIL_IMAGE_WIDTH = 1600
 
@@ -53,6 +55,7 @@ export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
 
 		const mapped = mapSanityLocationToRecord(row, {
 			imageWidth: MAP_IMAGE_WIDTH,
+			previewImageWidth: MAP_PREVIEW_IMAGE_WIDTH,
 			imageBuilder,
 			onPhotoSkipped: (reason, detail) => {
 				logSkip('fetchLocationsForMap', slug, reason, detail)

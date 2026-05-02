@@ -68,6 +68,8 @@ export function LocationMarkerTooltipCard({
 
   const activePhoto =
     location.photos[currentPhotoIndex] ?? location.photos[0];
+  const activePreviewSrc =
+    activePhoto?.previewSrc ?? activePhoto?.src;
   const activePhotoDirection = activePhoto?.direction ?? "Direction unknown";
   const activePhotoDate = activePhoto?.photoDate ?? "Date unknown";
   return (
@@ -90,7 +92,7 @@ export function LocationMarkerTooltipCard({
         {multiplePhotos ? (
           <>
             <img
-              src={activePhoto?.src}
+              src={activePreviewSrc}
               alt={activePhoto?.alt ?? `Preview image for ${location.name}`}
               className="h-full w-full object-cover"
               loading="lazy"
@@ -126,7 +128,9 @@ export function LocationMarkerTooltipCard({
           </>
         ) : hasPhotos ? (
           <img
-            src={location.photos[0].src}
+            src={
+              location.photos[0].previewSrc ?? location.photos[0].src
+            }
             alt={location.photos[0].alt}
             className="h-full w-full object-cover"
             loading="lazy"

@@ -2,6 +2,8 @@ export interface LocationPhoto {
 	id: string
 	title: string
 	src: string
+	/** Narrow Sanity CDN URL for small previews (e.g. map tooltips). */
+	previewSrc?: string
 	alt: string
 	caption?: string
 	addToSelectedPhotosCollection?: boolean

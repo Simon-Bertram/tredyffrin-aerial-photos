@@ -10,6 +10,8 @@ import {
 
 export interface MapLocationOptions {
 	imageWidth: number
+	/** When set, builds `LocationPhoto.previewSrc` for small previews (e.g. map tooltips). */
+	previewImageWidth?: number
 	imageBuilder: ImageUrlBuilder
 	onPhotoSkipped?: (reason: string, detail?: unknown) => void
 }
@@ -91,6 +93,16 @@ export function mapSanityLocationToRecord(
 			continue
 		}
 
+		let previewSrc: string | undefined
+		if (options.previewImageWidth != null) {
+			previewSrc =
+				buildImageUrl(
+					options.imageBuilder,
+					imgParsed.data,
+					options.previewImageWidth,
+				) ?? undefined
+		}
+
 		const id =
 			p._key && p._key.length > 0 ? p._key : `${doc.slug}-photo-${i}`
 
@@ -98,6 +110,7 @@ export function mapSanityLocationToRecord(
 			id,
 			title: p.title ?? '',
 			src,
+			...(previewSrc != null ? { previewSrc } : {}),
 			alt: p.alt ?? '',
 			caption: emptyToUndefined(p.caption),
 			addToSelectedPhotosCollection:

@@ -1,4 +1,7 @@
 // @ts-check
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import tailwindcss from "@tailwindcss/vite";
 import alchemy from "alchemy/cloudflare/astro";
 import { defineConfig, envField } from "astro/config";
@@ -7,6 +10,8 @@ import { visualizer } from "rollup-plugin-visualizer";
 import react from "@astrojs/react";
 
 const wranglerConfigPath = "./wrangler.toml";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const reactRoot = path.resolve(__dirname, "node_modules/react");
 
 // https://astro.build/config
 export default defineConfig({
@@ -49,11 +54,21 @@ export default defineConfig({
       }),
     ],
     resolve: {
+      // Pin `react` only — aliasing `react-dom` pulls Node `server.js` and breaks Cloudflare SSR (util/crypto).
+      alias: {
+        react: reactRoot,
+      },
       dedupe: ["react", "react-dom"],
     },
-    // Avoid two React copies in SSR (Vite deps_ssr + react-dom/server) — invalid hook / null dispatcher.
+    // Avoid two React copies in SSR — invalid hook / null dispatcher (see docs/astro-vite-ssr-duplicate-react-invalid-hooks.md).
     ssr: {
-      noExternal: ["react", "react-dom", "framer-motion"],
+      noExternal: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+        "framer-motion",
+      ],
     },
     build: {
       rollupOptions: {
