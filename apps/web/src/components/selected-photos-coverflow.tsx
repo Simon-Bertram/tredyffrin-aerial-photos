@@ -19,7 +19,7 @@ export function SelectedPhotosCoverflow({
 
   if (photos.length === 0) {
     return (
-      <div className="md:col-span-8 md:col-start-5">
+      <div className="w-full">
         <p className="font-display italic text-on-surface-variant">
           The plate drawers await their first photograph.
         </p>
@@ -43,7 +43,7 @@ export function SelectedPhotosCoverflow({
   };
 
   return (
-    <div className="md:col-span-8 md:col-start-5">
+    <div className="w-full">
       <Carousel_001
         className="max-w-none"
         images={images}

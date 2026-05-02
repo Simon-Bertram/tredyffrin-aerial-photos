@@ -22,44 +22,8 @@ export type Carousel001Image = {
   src: string;
   alt: string;
   title?: string;
+  year?: string;
 };
-
-const Skiper47 = () => {
-  const images: Carousel001Image[] = [
-    {
-      src: "/images/x.com/11.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-    {
-      src: "/images/x.com/13.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-    {
-      src: "/images/x.com/32.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-    {
-      src: "/images/x.com/20.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-    {
-      src: "/images/x.com/21.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-    {
-      src: "/images/x.com/19.jpeg",
-      alt: "Illustrations by my fav AarzooAly",
-    },
-  ];
-
-  return (
-    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-[#f5f4f3]">
-      <Carousel_001 className="" images={images} showPagination loop />
-    </div>
-  );
-};
-
-export { Skiper47 };
 
 const navButtonClass =
   "flex size-10 items-center justify-center rounded-none bg-surface-container-low text-on-surface shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-primary-foreground";
@@ -86,6 +50,33 @@ const Carousel_001 = ({
   onSlideClick?: (index: number) => void;
 }) => {
   const delayMs = autoplayDelay ?? 1500;
+  /** Wider viewports need *higher* slidesPerView so each slide stays narrower; lowering it widens cards and makes coverflow read as heavier overlap. */
+  const carouselBreakpoints = {
+    480: {
+      slidesPerView: 1.4,
+      spaceBetween: Math.max(14, Math.round(spaceBetween * 0.55)),
+    },
+    640: {
+      slidesPerView: 1.85,
+      spaceBetween: Math.max(18, Math.round(spaceBetween * 0.72)),
+    },
+    768: {
+      slidesPerView: 2.2,
+      spaceBetween: spaceBetween,
+    },
+    1024: {
+      slidesPerView: 2.55,
+      spaceBetween: Math.round(spaceBetween * 1.15),
+    },
+    1280: {
+      slidesPerView: 2.9,
+      spaceBetween: Math.round(spaceBetween * 1.35),
+    },
+    1536: {
+      slidesPerView: 3.15,
+      spaceBetween: Math.round(spaceBetween * 1.5),
+    },
+  };
   const css = `
   .Carousal_001 {
     padding-bottom: 50px !important;
@@ -111,7 +102,8 @@ const Carousel_001 = ({
       <style>{css}</style>
 
       <Swiper
-        spaceBetween={spaceBetween}
+        spaceBetween={Math.max(12, Math.round(spaceBetween * 0.5))}
+        breakpoints={carouselBreakpoints}
         autoplay={
           autoplay
             ? {
@@ -124,7 +116,7 @@ const Carousel_001 = ({
         grabCursor={true}
         centeredSlides={true}
         loop={loop}
-        slidesPerView={2.43}
+        slidesPerView={1.1}
         slideToClickedSlide={true}
         coverflowEffect={{
           rotate: 0,
@@ -174,10 +166,19 @@ const Carousel_001 = ({
                   "cursor-pointer focus-visible:ring-1 focus-visible:ring-primary",
               )}
             >
-              {image.title ? (
-                <p className="mb-2 line-clamp-2 shrink-0 px-1 text-center font-display text-sm leading-snug text-on-surface md:text-base">
-                  {image.title}
-                </p>
+              {image.title || image.year ? (
+                <div className="m-2 shrink-0 px-1 text-center">
+                  {image.title ? (
+                    <p className="line-clamp-2 font-display text-sm leading-snug text-on-surface md:text-base">
+                      {image.title}
+                    </p>
+                  ) : null}
+                  {image.year ? (
+                    <p className="mt-0.5 font-display text-xs text-on-surface-variant md:text-sm">
+                      {image.year}
+                    </p>
+                  ) : null}
+                </div>
               ) : null}
               <div className="relative min-h-[220px] flex-1 overflow-hidden bg-surface-dim md:min-h-[260px]">
                 <img

@@ -262,14 +262,4 @@
     @apply text-primary!;
   }
 
-  /* Hide scrollbar chrome while preserving scroll behavior.
-	   Used by the selected-photos thumbnail rail — chrome would disrupt the
-	   parchment aesthetic. */
-  .no-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
 }

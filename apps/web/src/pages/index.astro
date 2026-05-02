@@ -4,6 +4,7 @@ import { TredyffrinMap } from "../components/map/tredyffrinMap";
 import { SelectedPhotosCoverflow } from "../components/selected-photos-coverflow";
 import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
 import { getSiteOrigin } from "@/lib/site-url";
+import Footer from "../components/Footer.astro";
 
 const locations = await fetchLocationsForMap();
 
@@ -86,7 +87,7 @@ const jsonLd = [
         >
           &ldquo;Activate a marker to open that location&rsquo;s photographs and
           details. When using a mouse or trackpad, pointing at a marker may show
-          a preview first. The same locations appear in{' '}
+          a preview first. The same locations appear in{" "}
           <a
             href="#selected-photographs"
             class="text-primary underline-offset-4 hover:underline not-italic"
@@ -162,8 +163,8 @@ const jsonLd = [
       id="selected-photographs"
       class="relative mx-auto max-w-7xl px-6 pb-24 md:px-10 md:pb-32"
     >
-      <div class="grid gap-10 md:grid-cols-12 md:gap-16">
-        <div class="md:col-span-4">
+      <div class="flex flex-col gap-10 md:gap-16">
+        <div class="md:max-w-md">
           <h2
             class="mt-3 font-display text-3xl font-light tracking-[-0.01em] md:text-[2.5rem]"
           >
@@ -172,8 +173,7 @@ const jsonLd = [
           <p
             class="mt-4 max-w-xs text-sm leading-relaxed text-on-surface-variant"
           >
-            Catalogued by date and plate, each photograph preserves the
-            photographer&rsquo;s notes alongside the image.
+            Click on a photo to see more details.
           </p>
         </div>
 
@@ -181,14 +181,6 @@ const jsonLd = [
       </div>
     </section>
   </main>
-  {/* ------------------------------------------------------------------ */}
-  {/* Colophon                                                            */}
-  {/* ------------------------------------------------------------------ */}
-  <footer class="mx-auto max-w-7xl px-6 pb-16 md:px-10">
-    <div
-      class="flex flex-wrap items-baseline justify-between gap-2 bg-[linear-gradient(to_right,transparent,color-mix(in_srgb,var(--outline-variant)_30%,transparent),transparent)] bg-size-[100%_1px] bg-no-repeat bg-top pt-10 font-sans text-[11px] uppercase tracking-[0.28em] text-on-surface-variant"
-    >
-      <span>Tredyffrin Aerial Photos</span>
-    </div>
-  </footer>
+
+  <Footer />
 </Layout>
