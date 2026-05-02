@@ -5,9 +5,11 @@ import { LocationPhotoGalleryLauncher } from "@/components/location/location-pho
 
 interface Props {
   location: LocationRecord;
+  /** Sanity photo id; passed as `?photo=` so the gallery opens on that image. */
+  highlightPhotoId?: string | null;
 }
 
-const { location } = Astro.props;
+const { location, highlightPhotoId } = Astro.props;
 const photoCount = location.photos.length;
 ---
 
@@ -17,7 +19,11 @@ const photoCount = location.photos.length;
   photoCount > 0 ? (
     <section>
       <h2 class="text-lg font-bold mb-8">Location Photos ({photoCount})</h2>
-      <LocationPhotoGalleryLauncher client:load photos={location.photos} />
+      <LocationPhotoGalleryLauncher
+        client:load
+        photos={location.photos}
+        initialPhotoId={highlightPhotoId}
+      />
     </section>
   ) : (
     <section class="rounded-lg border bg-card p-6 text-sm text-muted-foreground">

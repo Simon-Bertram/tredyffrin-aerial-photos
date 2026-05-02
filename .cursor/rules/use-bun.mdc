@@ -1,0 +1,23 @@
+---
+description: Use Bun for all package scripts and CLI invocations; never npx/npm/pnpm/yarn for this repo.
+alwaysApply: true
+---
+
+# Package manager: Bun only
+
+This monorepo declares **`packageManager: "bun@…"`** in the root [`package.json`](package.json). The agent **must** use Bun for installs and commands.
+
+## Do
+
+- **`bun install`** — add or sync dependencies (not `npm install`, `pnpm i`, etc.).
+- **`bun run <script>`** — run scripts from `package.json` (e.g. `bun run build`, `bun run dev`, `bun run check-types`). From repo root, Turbo scripts apply (e.g. `bun run build`).
+- **`bunx <package> <args>`** — one-off CLIs when a script does not exist (not `npx`).
+- In **`apps/web`**, use `bun run build`, `bun run astro`, etc., as defined in that package’s `package.json`.
+
+## Do not
+
+- **`npx`**, **`npm run`**, **`pnpm`**, **`yarn`** for this project unless the user explicitly asks to debug something that requires them.
+
+## Rationale
+
+Avoids wrong lockfiles, inconsistent behavior, and wasted time; matches project and user expectations.

@@ -23,6 +23,7 @@
   },
   "registries": {
     "@mapcn": "https://mapcn.dev/r/{name}.json",
-    "@shadcn-space": "https://shadcnspace.com/r/{name}.json"
+    "@shadcn-space": "https://shadcnspace.com/r/{name}.json",
+    "@skiper-ui": "https://skiper-ui.com/registry/{name}.json"
   }
 }

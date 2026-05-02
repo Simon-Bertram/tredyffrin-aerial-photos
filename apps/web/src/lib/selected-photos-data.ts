@@ -2,6 +2,7 @@ import type { LocationRecord } from '@/lib/locations'
 
 export interface SelectedPhoto {
 	key: string
+	photoId: string
 	plateNumber: number
 	locationName: string
 	locationSlug: string
@@ -26,6 +27,7 @@ export function buildSelectedPhotos(
 		for (const photo of location.photos) {
 			allPhotos.push({
 				key: `${location.slug}-${photo.id}`,
+				photoId: photo.id,
 				locationName: location.name,
 				locationSlug: location.slug,
 				src: photo.src,
@@ -43,6 +45,7 @@ export function buildSelectedPhotos(
 
 	return photosToShow.map((photo, index) => ({
 		key: photo.key,
+		photoId: photo.photoId,
 		plateNumber: index + 1,
 		locationName: photo.locationName,
 		locationSlug: photo.locationSlug,

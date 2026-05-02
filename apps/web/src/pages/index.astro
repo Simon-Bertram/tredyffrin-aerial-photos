@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { TredyffrinMap } from "../components/map/tredyffrinMap";
-import { SelectedPhotos } from "../components/selected-photos";
+import { SelectedPhotosCoverflow } from "../components/selected-photos-coverflow";
 import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
 import { getSiteOrigin } from "@/lib/site-url";
 
@@ -177,7 +177,7 @@ const jsonLd = [
           </p>
         </div>
 
-        <SelectedPhotos client:only="react" locations={locations} />
+        <SelectedPhotosCoverflow client:only="react" locations={locations} />
       </div>
     </section>
   </main>
