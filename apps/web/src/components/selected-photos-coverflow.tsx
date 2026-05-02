@@ -4,19 +4,16 @@ import {
   Carousel_001,
   type Carousel001Image,
 } from "@/components/ui/skiper-ui/skiper47";
-import type { LocationRecord } from "@/lib/locations";
-import { buildSelectedPhotos } from "@/lib/selected-photos-data";
+import type { CoverflowIslandPhoto } from "@/lib/selected-photos-data";
 
 /** Perspective coverflow (Skiper UI); attribution: https://skiper-ui.com/v1/skiper47 */
 interface SelectedPhotosCoverflowProps {
-  locations: LocationRecord[];
+  photos: CoverflowIslandPhoto[];
 }
 
 export function SelectedPhotosCoverflow({
-  locations,
+  photos,
 }: SelectedPhotosCoverflowProps) {
-  const photos = buildSelectedPhotos(locations);
-
   if (photos.length === 0) {
     return (
       <div className="w-full">

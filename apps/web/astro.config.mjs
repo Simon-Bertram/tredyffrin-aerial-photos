@@ -42,7 +42,7 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
       visualizer({
-        open: true,
+        open: false,
         filename: "stats.html",
         gzipSize: true,
         brotliSize: true,
@@ -50,6 +50,10 @@ export default defineConfig({
     ],
     resolve: {
       dedupe: ["react", "react-dom"],
+    },
+    // Avoid two React copies in SSR (Vite deps_ssr + react-dom/server) — invalid hook / null dispatcher.
+    ssr: {
+      noExternal: ["react", "react-dom", "framer-motion"],
     },
     build: {
       rollupOptions: {

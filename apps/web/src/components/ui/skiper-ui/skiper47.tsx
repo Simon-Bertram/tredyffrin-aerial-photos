@@ -185,6 +185,7 @@ const Carousel_001 = ({
                   className="h-full min-h-[220px] w-full object-cover md:min-h-[260px]"
                   src={image.src}
                   alt={image.alt}
+                  decoding="async"
                 />
               </div>
             </div>

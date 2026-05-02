@@ -3,10 +3,15 @@ import Layout from "../layouts/Layout.astro";
 import { TredyffrinMap } from "../components/map/tredyffrinMap";
 import { SelectedPhotosCoverflow } from "../components/selected-photos-coverflow";
 import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
+import {
+  buildSelectedPhotos,
+  toCoverflowIslandPhotos,
+} from "@/lib/selected-photos-data";
 import { getSiteOrigin } from "@/lib/site-url";
 import Footer from "../components/Footer.astro";
 
 const locations = await fetchLocationsForMap();
+const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations));
 
 const photoCount = locations.reduce(
   (total, location) => total + location.photos.length,
@@ -177,7 +182,30 @@ const jsonLd = [
           </p>
         </div>
 
-        <SelectedPhotosCoverflow client:only="react" locations={locations} />
+        <div class="relative min-h-[min(360px,55vh)] w-full">
+          <SelectedPhotosCoverflow
+            client:visible={{ rootMargin: "200px" }}
+            photos={coverflowPhotos}
+          >
+            <div slot="fallback" class="absolute inset-0">
+              <div
+                class="bg-surface-container-low flex h-full min-h-[280px] w-full items-center justify-center border border-outline-variant/20"
+              >
+                <div class="flex gap-1" aria-hidden="true">
+                  <span
+                    class="bg-on-surface-variant/30 size-1.5 rounded-full animate-pulse"
+                  />
+                  <span
+                    class="bg-on-surface-variant/30 size-1.5 rounded-full animate-pulse [animation-delay:150ms]"
+                  />
+                  <span
+                    class="bg-on-surface-variant/30 size-1.5 rounded-full animate-pulse [animation-delay:300ms]"
+                  />
+                </div>
+              </div>
+            </div>
+          </SelectedPhotosCoverflow>
+        </div>
       </div>
     </section>
   </main>

@@ -12,6 +12,29 @@ export interface SelectedPhoto {
 	direction?: string
 }
 
+/** Fields serialized to the coverflow client island (no full `locations` graph). */
+export interface CoverflowIslandPhoto {
+	src: string
+	alt: string
+	locationName: string
+	locationSlug: string
+	photoId: string
+	photoDate?: string
+}
+
+export function toCoverflowIslandPhotos(
+	photos: SelectedPhoto[],
+): CoverflowIslandPhoto[] {
+	return photos.map((p) => ({
+		src: p.src,
+		alt: p.alt,
+		locationName: p.locationName,
+		locationSlug: p.locationSlug,
+		photoId: p.photoId,
+		photoDate: p.photoDate,
+	}))
+}
+
 interface SelectedPhotoCandidate extends Omit<SelectedPhoto, 'plateNumber'> {
 	isSelected: boolean
 }

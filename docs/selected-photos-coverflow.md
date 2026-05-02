@@ -4,11 +4,11 @@ This document describes the **homepage “selected photographs”** experience b
 
 ## What the user sees
 
-1. **Default state:** A 3D-style **coverflow** carousel shows one curated image per slide, with **title above the image** (here: location name), **pagination dots**, **prev/next arrows**, **loop**, and **autoplay** (this project: **4 seconds** per slide).
-2. **Click a slide:** The UI switches to the **full album for that photo’s location**—same carousel + metadata pattern used on individual location pages—not a second small carousel on the home page.
-3. **Back:** A button closes the album view and returns to the coverflow.
+1. **Default state:** A 3D-style **coverflow** carousel shows one curated image per slide, with **title above the image** (here: location name), **pagination dots**, **prev/next arrows**, **loop**, and **autoplay** (this project: **6 seconds** per slide in `index.astro`).
+2. **Click a slide:** This repository **navigates** to the location detail page with a **`photo` query param** (`/locations/{slug}?photo={photoId}`), where the full album UI lives—not an inline gallery on the home page.
+3. **Back:** The browser **back** button returns from the location page to the homepage coverflow.
 
-Cross-location behavior matters: the coverflow is a **flat list** of highlights, but the detail view always uses **`LocationPhoto[]` for one location** and scrolls to the **index of the clicked photo inside that array**.
+Cross-location behavior matters: the coverflow is a **flat list** of highlights; the location page loads **`LocationPhoto[]` for one location** and can highlight the clicked photo via the query string.
 
 ## Component graph
 
@@ -19,29 +19,31 @@ Use **quoted node labels** (`id["Label"]`) and avoid ambiguous text inside unquo
 ```mermaid
 flowchart TB
   page["index.astro"]
-  cover["SelectedPhotosCoverflow"]
   buildSelectedPhotosFn["buildSelectedPhotos"]
+  toIslandFn["toCoverflowIslandPhotos"]
+  cover["SelectedPhotosCoverflow"]
   carousel001["Carousel_001 · skiper47.tsx"]
   gallerySession["LocationPhotoGallerySession"]
   photoCarousel["LocationPhotoCarousel"]
 
-  page -->|"locations"| cover
-  cover --> buildSelectedPhotosFn
+  page --> buildSelectedPhotosFn
+  buildSelectedPhotosFn --> toIslandFn
+  page -->|"photos CoverflowIslandPhoto"| cover
   cover --> carousel001
   carousel001 -->|"onSlideClick index"| cover
-  cover -->|"open gallery state"| gallerySession
   gallerySession --> photoCarousel
 ```
 
 | Piece | Role |
 | ----- | ---- |
-| **`SelectedPhotosCoverflow`** | Orchestrates data, coverflow vs gallery mode, and resolves **which location album** + **which index** on slide click. |
-| **`buildSelectedPhotos`** | Builds the **ordered flat list** of slides for the coverflow from all locations. |
+| **`SelectedPhotosCoverflow`** | Renders the coverflow from a pre-built **`photos`** prop; on slide click, **navigates** to the location page with **`photo`** query (no inline gallery on the homepage). |
+| **`buildSelectedPhotos`** | Server-side: builds the **ordered flat list** `SelectedPhoto[]` from all `locations`. |
+| **`toCoverflowIslandPhotos`** | Server-side: maps `SelectedPhoto[]` → **`CoverflowIslandPhoto[]`** (slim fields only) for the client island payload. |
 | **`Carousel_001`** | Swiper coverflow: images + optional titles, autoplay delay, nav, dots, `onSlideClick(index)`. |
 | **`LocationPhotoGallerySession`** | Reusable “open gallery” chrome: back button + **`LocationPhotoCarousel`**. |
 | **`LocationPhotoCarousel`** | Embla (shadcn `Carousel`) with large image, caption/metadata, prev/next; **`initialPhotoIndex`** + `api.scrollTo` when API is ready. |
 
-**Note:** `LocationPhotoGalleryLauncher` (grid of cards → session) uses the same **`LocationPhotoGallerySession`**; the homepage skips the grid and opens the session directly from the coverflow.
+**Note:** `LocationPhotoGalleryLauncher` (grid of cards → session) uses **`LocationPhotoGallerySession`** on **location pages**. The **homepage** coverflow does not mount that session; it **assigns** to `/locations/{slug}?photo={id}` instead.
 
 ## Data model
 
@@ -53,15 +55,19 @@ Conceptually you need:
 - **`LocationPhoto`**: at minimum `id`, `src`, `alt`; optional `title`, `caption`, metadata fields.
 - A **boolean** on each photo (here: `addToSelectedPhotosCollection`) meaning “include in the curated set.”
 
-### `SelectedPhoto` (coverflow slide payload)
+### `SelectedPhoto` (server-side list after selection rules)
 
-Built by **`buildSelectedPhotos(locations)`**. Important fields:
+Built by **`buildSelectedPhotos(locations)`** on the server. Important fields:
 
 | Field | Purpose |
 | ----- | ------- |
-| **`photoId`** | Same as **`LocationPhoto.id`**. Required to find `initialPhotoIndex` via `location.photos.findIndex(p => p.id === photoId)`. Do **not** parse composite `key` strings if slugs can contain delimiters. |
-| **`locationSlug`** | Find the parent location: `locations.find(l => l.slug === locationSlug)`. |
+| **`photoId`** | Same as **`LocationPhoto.id`**. Used in the homepage click URL and, on location pages, to resolve `initialPhotoIndex` via `location.photos.findIndex(p => p.id === photoId)`. Do **not** parse composite `key` strings if slugs can contain delimiters. |
+| **`locationSlug`** | Parent location slug for navigation and lookups. |
 | **`src` / `alt` / `locationName`** | Image URL, accessibility, title above image in coverflow. |
+
+### `CoverflowIslandPhoto` (client island wire format)
+
+Built by **`toCoverflowIslandPhotos(buildSelectedPhotos(locations))`** in **`index.astro`**. Subset of **`SelectedPhoto`**: **`src`**, **`alt`**, **`locationName`**, **`locationSlug`**, **`photoId`**, optional **`photoDate`**. Omits **`key`**, **`plateNumber`**, **`direction`** so the serialized HTML payload stays smaller.
 
 ### Selection rules (`buildSelectedPhotos`)
 
@@ -69,11 +75,24 @@ Built by **`buildSelectedPhotos(locations)`**. Important fields:
 2. If **any** photo is selected, the coverflow shows **only those** (filter).
 3. If **none** are selected, fall back to a small default set (here: **last five** photos in flattened order).
 
-Porting tip: keep this function **pure** and easy to unit test; the UI only needs the resulting `SelectedPhoto[]` plus the original **`locations`** array for resolving full albums.
+Porting tip: keep **`buildSelectedPhotos`** **pure** and easy to unit test; the coverflow island only needs the resulting slim list (this repo: **`CoverflowIslandPhoto[]`**), not the full **`locations`** graph.
 
-## Slide click → gallery (core algorithm)
+## Slide click → navigation (this repository’s homepage)
 
-Inputs: **`photos`** = `buildSelectedPhotos(locations)`, **`realIndex`** from the coverflow (must match array index in `photos`), and **`locations`**.
+Inputs: **`photos`** = **`CoverflowIslandPhoto[]`** (same order as **`Carousel_001`** `images`), **`realIndex`** from the coverflow (logical index).
+
+```text
+selected = photos[realIndex]
+navigate to /locations/{selected.locationSlug}?photo={selected.photoId}
+```
+
+If **`selected`** is missing, ignore the click. The **location page** loads the full **`LocationRecord`** and can use the **`photo`** query param to highlight the right plate.
+
+## Slide click → inline gallery (porting / location-grid pattern)
+
+If you open a **modal or inline** gallery instead of navigating away, use the full **`locations`** (or a single **`LocationRecord`**) on the client:
+
+Inputs: **`photos`** = `buildSelectedPhotos(locations)`, **`realIndex`**, and **`locations`**.
 
 ```text
 selected = photos[realIndex]
@@ -117,7 +136,7 @@ type Carousel001Image = { src: string; alt: string; title?: string }
 | ---- | -------- |
 | `showPagination` / `showNavigation` | Swiper pagination + custom prev/next nodes. |
 | `loop` | Infinite loop; slides use `virtualIndex={index}` to align loop duplicates with logical indices when needed. |
-| `autoplay` + `autoplayDelay` | Default delay if unset is **1500 ms**; homepage passes **4000**. |
+| `autoplay` + `autoplayDelay` | Default delay if unset is **1500 ms**; homepage passes **6000**. |
 | `onSlideClick(index)` | Fired with the **logical** slide index (same as `images` array order). Implemented via a focusable slide wrapper (`role="button"`, keyboard activation). |
 | `slideToClickedSlide` | Enabled so clicking a side slide centers it before or while opening the gallery. |
 
@@ -143,17 +162,18 @@ Porting: any Embla-based carousel with the same `scrollTo` behavior is sufficien
 
 ## Page integration (this repo)
 
-- **Server:** Load `locations` (e.g. from CMS).
-- **Client island:** `SelectedPhotosCoverflow` is rendered with **`client:only="react"`** (or equivalent) so Swiper/React hooks run only in the browser—see **`apps/web/src/pages/index.astro`**.
+- **Server:** Load **`locations`** (Sanity), then compute  
+  **`coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations))`** in **`apps/web/src/pages/index.astro`**.
+- **Client island:** `SelectedPhotosCoverflow` is rendered with **`client:visible`** (with a **`rootMargin`** prefetch) and receives **`photos={coverflowPhotos}`** only—so the full **`locations`** graph is **not** serialized into this island (the map island still receives **`locations`**).
 
-The component expects the **same `locations` array** passed into `buildSelectedPhotos` and into the click resolver.
+The click handler uses **`photos[realIndex]`** only; it does **not** need the original **`locations`** array.
 
 ## Porting checklist
 
 1. **Data:** Per-photo “in collection” flag; stable **`photoId`** on each photo; parent **`slug`** on each location.
 2. **Pure builder:** `buildSelectedPhotos` → flat `SelectedPhoto[]` with selection + fallback rules.
 3. **Coverflow:** Swiper coverflow (or alternative) with **logical index** on slide activate/click.
-4. **Click handler:** `find` location by slug + `findIndex` by `photoId` on `location.photos`.
+4. **Click handler:** Either **navigate** with slug + `photoId` (this repo’s homepage) or **`find`** location by slug + **`findIndex`** by `photoId` for an inline gallery.
 5. **Detail:** Full **`LocationPhoto[]`** for that location only + **`initialPhotoIndex`**; remount or force scroll when inputs change.
 6. **Attribution:** If you keep Skiper-derived UI, retain license/attribution per their terms.
 7. **A11y:** Slide click target should be keyboard-accessible if you use click-to-open; keep `alt` text on images.
@@ -163,12 +183,12 @@ The component expects the **same `locations` array** passed into `buildSelectedP
 | File | Purpose |
 | ---- | ------- |
 | `apps/web/src/components/selected-photos-coverflow.tsx` | Homepage orchestration. |
-| `apps/web/src/lib/selected-photos-data.ts` | `SelectedPhoto`, `buildSelectedPhotos`. |
+| `apps/web/src/lib/selected-photos-data.ts` | `SelectedPhoto`, `CoverflowIslandPhoto`, `buildSelectedPhotos`, `toCoverflowIslandPhotos`. |
 | `apps/web/src/lib/locations.ts` | `LocationRecord`, `LocationPhoto`, `getPhotoMetadataItems`. |
 | `apps/web/src/components/ui/skiper-ui/skiper47.tsx` | `Carousel_001`, `Carousel001Image`. |
 | `apps/web/src/components/location/location-photo-gallery-session.tsx` | Shared session shell. |
 | `apps/web/src/components/location/location-photo-gallery-launcher.tsx` | Grid → same session (location pages). |
 | `apps/web/src/components/location/location-photo-carousel.tsx` | Embla carousel + metadata. |
-| `apps/web/src/pages/index.astro` | Wires `SelectedPhotosCoverflow` + `locations`. |
+| `apps/web/src/pages/index.astro` | Builds `coverflowPhotos`; wires `SelectedPhotosCoverflow` + `TredyffrinMap`. |
 
 The older horizontal strip **`selected-photos.tsx`** is kept as an alternative implementation and is **not** used by the homepage once the coverflow is enabled.
