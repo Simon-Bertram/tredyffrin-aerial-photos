@@ -1,0 +1,42 @@
+---
+import type { CoverflowIslandPhoto } from '@/lib/selected-photos-data'
+import { SelectedPhotosCoverflow } from '@/components/selected-photos-coverflow'
+import LoadingDotsFallback from '@/components/home/loading-dots-fallback.astro'
+
+interface Props {
+	photos: CoverflowIslandPhoto[]
+}
+
+const { photos } = Astro.props
+---
+
+<section
+	id="selected-photographs"
+	class="relative mx-auto max-w-7xl px-6 pb-24 md:px-10 md:pb-32"
+>
+	<div class="flex flex-col gap-10 md:gap-16">
+		<div class="md:max-w-md">
+			<h2
+				class="mt-3 font-display text-3xl font-light tracking-[-0.01em] md:text-[2.5rem]"
+			>
+				Selected <span class="italic">photographs.</span>
+			</h2>
+			<p
+				class="mt-4 max-w-xs text-sm leading-relaxed text-on-surface-variant"
+			>
+				Click on a photo to see more details.
+			</p>
+		</div>
+
+		<div class="relative min-h-[min(360px,55vh)] w-full">
+			<SelectedPhotosCoverflow
+				client:visible={{ rootMargin: '200px' }}
+				photos={photos}
+			>
+				<div slot="fallback" class="absolute inset-0">
+					<LoadingDotsFallback variant="coverflow" />
+				</div>
+			</SelectedPhotosCoverflow>
+		</div>
+	</div>
+</section>
