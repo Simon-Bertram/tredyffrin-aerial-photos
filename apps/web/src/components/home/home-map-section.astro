@@ -1,88 +1,87 @@
 ---
-import type { LocationRecord } from '@/lib/locations'
-import { TredyffrinMap } from '@/components/map/tredyffrinMap'
-import LoadingDotsFallback from '@/components/home/loading-dots-fallback.astro'
+import type { LocationRecord } from "@/lib/locations";
+import { TredyffrinMap } from "@/components/map/tredyffrinMap";
+import LoadingDotsFallback from "@/components/home/loading-dots-fallback.astro";
 
 interface Props {
-	locations: LocationRecord[]
-	photoCount: number
-	updated: string
+  locations: LocationRecord[];
+  photoCount: number;
+  updated: string;
 }
 
-const { locations, photoCount, updated } = Astro.props
+const { locations, photoCount, updated } = Astro.props;
 ---
 
 <section class="relative mx-auto max-w-7xl px-6 pb-16 md:px-10 md:pb-24">
-	<div
-		class="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between"
-	>
-		<h2
-			class="font-display text-[clamp(1.75rem,4vw,2.25rem)] font-light tracking-[-0.01em] text-foreground md:max-w-md"
-		>
-			The <span class="italic text-primary">map.</span>
-		</h2>
-		<p
-			class="max-w-sm font-display italic leading-snug text-on-surface-variant md:text-right"
-		>
-			&ldquo;Activate a marker to open that location&rsquo;s photographs and
-			details. When using a mouse or trackpad, pointing at a marker may show a
-			preview first. The same locations appear in{' '}
-			<a
-				href="#selected-photographs"
-				class="text-primary underline-offset-4 hover:underline not-italic"
-				>Selected photographs</a
-			>
-			below.&rdquo;
-		</p>
-	</div>
+  <div
+    class="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-end md:justify-between"
+  >
+    <h2
+      class="font-display text-[clamp(1.75rem,4vw,2.25rem)] font-light tracking-[-0.01em] text-foreground md:max-w-md"
+    >
+      The <span class="italic text-primary">map.</span>
+    </h2>
+    <p
+      class="max-w-sm font-display italic leading-snug text-on-surface-variant md:text-right"
+    >
+      &ldquo;Hover over a marker to open that location&rsquo;s photographs and
+      details. When using a mouse or trackpad, pointing at a marker may show a
+      preview first. View a selection of the photographs below the map.
+      <a
+        href="#selected-photographs"
+        class="text-primary underline-offset-4 hover:underline not-italic"
+        >Selected photographs</a
+      >
+    </p>
+  </div>
 
-	<div
-		class="bg-surface-container-low p-3 shadow-[0_32px_48px_color-mix(in_srgb,var(--on-surface)_5%,transparent)] md:p-4"
-	>
-		{
-			locations.length > 0 ? (
-				<div class="relative min-h-[320px] h-[75vh]">
-					<TredyffrinMap client:visible locations={locations}>
-						<div slot="fallback" class="absolute inset-0">
-							<LoadingDotsFallback variant="map" />
-						</div>
-					</TredyffrinMap>
-				</div>
-			) : (
-				<p class="p-16 text-center font-display italic text-on-surface-variant">
-					The atlas is unfurled, yet bears no markings. Add locations in Sanity
-					Studio to begin.
-				</p>
-			)
-		}
-	</div>
-	<dl
-		class="mt-12 flex flex-wrap items-center gap-2 md:mt-20"
-		aria-label="Collection at a glance"
-	>
-		<dt class="sr-only">Locations</dt>
-		<dd
-			class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
-		>
-			{locations.length} Locations
-		</dd>
-		<dt class="sr-only">Photographs</dt>
-		<dd
-			class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
-		>
-			{photoCount} Photographs
-		</dd>
-		<dt class="sr-only">Region</dt>
-		<dd
-			class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
-		>
-			Chester County, PA
-		</dd>
-		<dt class="sr-only">As of</dt>
-		<dd
-			class="px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant"
-		>
-			As of {updated}
-		</dd>
-	</dl>
+  <div
+    class="bg-surface-container-low p-3 shadow-[0_32px_48px_color-mix(in_srgb,var(--on-surface)_5%,transparent)] md:p-4"
+  >
+    {
+      locations.length > 0 ? (
+        <div class="relative min-h-[320px] h-[75vh]">
+          <TredyffrinMap client:visible locations={locations}>
+            <div slot="fallback" class="absolute inset-0">
+              <LoadingDotsFallback variant="map" />
+            </div>
+          </TredyffrinMap>
+        </div>
+      ) : (
+        <p class="p-16 text-center font-display italic text-on-surface-variant">
+          The atlas is unfurled, yet bears no markings. Add locations in Sanity
+          Studio to begin.
+        </p>
+      )
+    }
+  </div>
+  <dl
+    class="mt-12 flex flex-wrap items-center gap-2 md:mt-20"
+    aria-label="Collection at a glance"
+  >
+    <dt class="sr-only">Locations</dt>
+    <dd
+      class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
+    >
+      {locations.length} Locations
+    </dd>
+    <dt class="sr-only">Photographs</dt>
+    <dd
+      class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
+    >
+      {photoCount} Photographs
+    </dd>
+    <dt class="sr-only">Region</dt>
+    <dd
+      class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em]"
+    >
+      Chester County, PA
+    </dd>
+    <dt class="sr-only">As of</dt>
+    <dd
+      class="px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant"
+    >
+      As of {updated}
+    </dd>
+  </dl>
 </section>

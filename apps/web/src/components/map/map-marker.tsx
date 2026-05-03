@@ -36,13 +36,17 @@ export function MapLocationMarker({
     <MapMarker
       longitude={location.coordinates.longitude}
       latitude={location.coordinates.latitude}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleNavigateToLocation(detailPath);
+      }}
     >
       <MarkerContent>
         <button
           type="button"
           aria-label={markerLinkLabel}
           className={cn(
-            "group relative rounded-none outline-none",
+            "group relative cursor-pointer rounded-none outline-none",
             "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "focus-visible:ring-offset-background",
           )}
