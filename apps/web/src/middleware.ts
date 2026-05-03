@@ -1,5 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 
+// / is prerendered: validate real Cache-Control on production GET / before
+// changing max-age/s-maxage (edge may treat static HTML differently).
 const HTML_CACHE_CONTROL =
 	'public, max-age=60, s-maxage=600, stale-while-revalidate=86400'
 

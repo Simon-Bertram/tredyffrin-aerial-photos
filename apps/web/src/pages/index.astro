@@ -1,4 +1,6 @@
 ---
+export const prerender = true
+
 import Layout from "../layouts/Layout.astro";
 import { TredyffrinMap } from "../components/map/tredyffrinMap";
 import { SelectedPhotosCoverflow } from "../components/selected-photos-coverflow";
@@ -152,11 +154,11 @@ const jsonLd = [
         >
           Chester County, PA
         </dd>
-        <dt class="sr-only">Last updated</dt>
+        <dt class="sr-only">As of</dt>
         <dd
           class="px-3 py-1.5 font-sans text-[11px] uppercase tracking-[0.16em] text-on-surface-variant"
         >
-          Updated {updated}
+          As of {updated}
         </dd>
       </dl>
     </section>
