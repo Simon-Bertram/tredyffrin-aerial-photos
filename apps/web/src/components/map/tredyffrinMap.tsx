@@ -18,9 +18,6 @@ interface MapProps {
 }
 
 export function TredyffrinMap({ locations }: MapProps) {
-  const [activePhotoTabs, setActivePhotoTabs] = useState<
-    Record<string, string>
-  >({});
   const [selectedStyle, setSelectedStyle] =
     useState<MapVisualStyleId>("terrain");
   const mapStyles = getMapStylesForVisualStyle(selectedStyle);
@@ -39,24 +36,13 @@ export function TredyffrinMap({ locations }: MapProps) {
         selectedStyle={selectedStyle}
         onStyleChange={setSelectedStyle}
       />
-      {locations.map((location) => {
-        const activeTab = activePhotoTabs[location.slug] ?? "1";
-
-        return (
-          <MapLocationMarker
-            key={location.slug}
-            location={location}
-            mapVisualStyle={selectedStyle}
-            activeTab={activeTab}
-            onActiveTabChange={(nextTab) => {
-              setActivePhotoTabs((prev) => ({
-                ...prev,
-                [location.slug]: nextTab,
-              }));
-            }}
-          />
-        );
-      })}
+      {locations.map((location) => (
+        <MapLocationMarker
+          key={location.slug}
+          location={location}
+          mapVisualStyle={selectedStyle}
+        />
+      ))}
     </Map>
   );
 }

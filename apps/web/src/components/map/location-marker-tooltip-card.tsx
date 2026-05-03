@@ -10,7 +10,6 @@ interface LocationMarkerTooltipCardProps {
   location: LocationRecord;
   detailPath: string;
   isOnImagery: boolean;
-  activePhotoIndex?: number;
   onNavigate?: (path: string) => void;
 }
 
@@ -18,22 +17,17 @@ export function LocationMarkerTooltipCard({
   location,
   detailPath,
   isOnImagery,
-  activePhotoIndex = 0,
   onNavigate,
 }: LocationMarkerTooltipCardProps) {
   const hasPhotos = location.photos.length > 0;
   const multiplePhotos = location.photos.length > 1;
 
   const maxPhotoIndex = Math.max(location.photos.length - 1, 0);
-  const initialPhotoIndex = Math.min(
-    Math.max(activePhotoIndex, 0),
-    maxPhotoIndex,
-  );
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(initialPhotoIndex);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   useEffect(() => {
-    setCurrentPhotoIndex(initialPhotoIndex);
-  }, [initialPhotoIndex]);
+    setCurrentPhotoIndex((prev) => Math.min(prev, maxPhotoIndex));
+  }, [maxPhotoIndex]);
 
   const navigateToDetail = () => {
     if (onNavigate) {

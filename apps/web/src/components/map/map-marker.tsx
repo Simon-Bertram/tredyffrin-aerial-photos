@@ -11,19 +11,15 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface MapLocationMarkerProps {
   location: LocationRecord;
-  activeTab: string;
-  onActiveTabChange: (nextTab: string) => void;
   mapVisualStyle: MapVisualStyleId;
 }
 
 export function MapLocationMarker({
   location,
-  activeTab,
   mapVisualStyle,
 }: MapLocationMarkerProps) {
   const detailPath = `/locations/${location.slug}`;
   const multiplePhotos = location.photos.length > 1;
-  const activePhotoIndex = Number(activeTab) - 1;
 
   const isOnImagery = mapVisualStyle === "terrain";
 
@@ -112,7 +108,6 @@ export function MapLocationMarker({
             location={location}
             detailPath={detailPath}
             isOnImagery={isOnImagery}
-            activePhotoIndex={activePhotoIndex}
             onNavigate={handleNavigateToLocation}
           />
         </ErrorBoundary>
