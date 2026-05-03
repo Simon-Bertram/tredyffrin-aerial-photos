@@ -10,59 +10,14 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { LocationPhotoCard } from "@/components/location/location-photo-card";
+import { LocationPhotoMetadata } from "@/components/location/location-photo-metadata";
 import { useCarouselSlideState } from "@/hooks/use-carousel-slide-state";
-import { getPhotoMetadataItems, type LocationPhoto } from "@/lib/locations";
+import type { LocationPhoto } from "@/lib/locations";
 
 export interface LocationPhotoCarouselProps {
   photos: LocationPhoto[];
   initialPhotoIndex?: number;
-}
-
-function PhotoCarouselSlide({ photo }: { photo: LocationPhoto }) {
-  return (
-    <figure className="overflow-hidden rounded-lg border bg-card">
-      {photo.title ? (
-        <figcaption className="border-b bg-muted/50 p-4 text-lg font-medium text-card-foreground">
-          {photo.title}
-        </figcaption>
-      ) : null}
-      <div className="flex max-h-[70vh] items-center justify-center bg-muted/40">
-        <img
-          src={photo.src}
-          alt={photo.alt}
-          width={2400}
-          height={1800}
-          loading="lazy"
-          decoding="async"
-          className="max-h-[70vh] w-full object-contain"
-        />
-      </div>
-    </figure>
-  );
-}
-
-function PhotoCarouselMetadata({ photo }: { photo: LocationPhoto }) {
-  const rows = getPhotoMetadataItems(photo);
-
-  return (
-    <div aria-live="polite" aria-atomic="true" className="space-y-2 text-sm">
-      {photo.caption ? (
-        <p className="text-card-foreground">{photo.caption}</p>
-      ) : null}
-      {rows.length > 0 ? (
-        <dl className="grid gap-1 text-muted-foreground sm:grid-cols-[auto_1fr] sm:gap-x-4">
-          {rows.map((row) => (
-            <React.Fragment key={row.key}>
-              <dt className="italic text-card-foreground">{row.label}</dt>
-              <dd>{row.value}</dd>
-            </React.Fragment>
-          ))}
-        </dl>
-      ) : !photo.caption ? (
-        <p className="text-muted-foreground">No photo metadata available.</p>
-      ) : null}
-    </div>
-  );
 }
 
 /** Prev/next stay outside `<Carousel>` so `useCarousel` context is unavailable; state comes from {@link useCarouselSlideState}. */
@@ -100,7 +55,7 @@ export function LocationPhotoCarousel({
         <CarouselContent>
           {photos.map((photo) => (
             <CarouselItem key={photo.id}>
-              <PhotoCarouselSlide photo={photo} />
+              <LocationPhotoCard photo={photo} layout="slideshow" />
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -140,7 +95,13 @@ export function LocationPhotoCarousel({
         </div>
       ) : null}
 
-      {currentPhoto ? <PhotoCarouselMetadata photo={currentPhoto} /> : null}
+      {currentPhoto ? (
+        <LocationPhotoMetadata
+          variant="slideshow"
+          section="details"
+          photo={currentPhoto}
+        />
+      ) : null}
     </section>
   );
 }

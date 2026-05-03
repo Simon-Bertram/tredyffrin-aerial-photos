@@ -1,37 +1,12 @@
 ---
-import { getPhotoMetadataItems, type LocationPhoto } from "@/lib/locations";
+import { LocationPhotoCard as LocationPhotoCardUi } from "@/components/location/location-photo-card";
+import type { LocationPhoto } from "@/lib/locations";
 
 interface Props {
   photo: LocationPhoto;
 }
 
 const { photo } = Astro.props;
-const metadataItems = getPhotoMetadataItems(photo);
 ---
 
-<article class="card border border-border bg-card shadow-sm">
-  <figure class="aspect-4/3 w-full overflow-hidden">
-    <img
-      src={photo.src}
-      alt={photo.alt}
-      class="h-full w-full object-cover"
-      loading="lazy"
-      decoding="async"
-    />
-  </figure>
-  <div class="card-body">
-    {photo.title ? <h3 class="card-title">{photo.title}</h3> : null}
-    {
-      photo.caption ? (
-        <p class="text-sm text-muted-foreground">{photo.caption}</p>
-      ) : null
-    }
-    {
-      metadataItems.map((item) => (
-        <p class="text-sm text-muted-foreground">
-          <span class="italic">{item.label}:</span> {item.value}
-        </p>
-      ))
-    }
-  </div>
-</article>
+<LocationPhotoCardUi photo={photo} layout="grid" />

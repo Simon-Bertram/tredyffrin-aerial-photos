@@ -1,58 +1,58 @@
 ---
-export const prerender = true
+export const prerender = true;
 
-import Layout from '../layouts/Layout.astro'
-import Footer from '../components/Footer.astro'
-import HomeHero from '../components/home/home-hero.astro'
-import HomeMapSection from '../components/home/home-map-section.astro'
-import HomeSelectedPhotosSection from '../components/home/home-selected-photos-section.astro'
-import { fetchLocationsForMap } from '@/lib/sanity-location-repository'
+import Layout from "../layouts/Layout.astro";
+import Footer from "../components/Footer.astro";
+import HomeHero from "../components/home/home-hero.astro";
+import HomeMapSection from "../components/home/home-map-section.astro";
+import HomeSelectedPhotosSection from "../components/home/home-selected-photos-section.astro";
+import { fetchLocationsForMap } from "@/lib/sanity-location-repository";
 import {
-	buildSelectedPhotos,
-	toCoverflowIslandPhotos,
-} from '@/lib/selected-photos-data'
-import { getSiteOrigin } from '@/lib/site-url'
+  buildSelectedPhotos,
+  toCoverflowIslandPhotos,
+} from "@/lib/selected-photos-data";
+import { getSiteOrigin } from "@/lib/site-url";
 import {
-	HOME_DESCRIPTION,
-	HOME_TITLE,
-	buildHomeJsonLd,
-	getFirstPreviewPhoto,
-} from '@/lib/home-layout'
+  HOME_DESCRIPTION,
+  HOME_TITLE,
+  buildHomeJsonLd,
+  getFirstPreviewPhoto,
+} from "@/lib/home-layout";
 
-const locations = await fetchLocationsForMap()
-const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations))
+const locations = await fetchLocationsForMap();
+const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations));
 
 const photoCount = locations.reduce(
-	(total, location) => total + location.photos.length,
-	0,
-)
+  (total, location) => total + location.photos.length,
+  0,
+);
 
-const updated = new Date().toLocaleDateString('en-US', {
-	month: 'long',
-	year: 'numeric',
-})
+const updated = new Date().toLocaleDateString("en-US", {
+  month: "long",
+  year: "numeric",
+});
 
-const firstPreview = getFirstPreviewPhoto(locations)
-const siteOrigin = getSiteOrigin()
-const jsonLd = buildHomeJsonLd(siteOrigin)
+const firstPreview = getFirstPreviewPhoto(locations);
+const siteOrigin = getSiteOrigin();
+const jsonLd = buildHomeJsonLd(siteOrigin);
 ---
 
 <Layout
-	title={HOME_TITLE}
-	description={HOME_DESCRIPTION}
-	image={firstPreview?.src}
-	imageAlt={firstPreview?.alt}
-	jsonLd={jsonLd}
+  title={HOME_TITLE}
+  description={HOME_DESCRIPTION}
+  image={firstPreview?.src}
+  imageAlt={firstPreview?.alt}
+  jsonLd={jsonLd}
 >
-	<main id="main-content" class="relative">
-		<HomeHero />
-		<HomeMapSection
-			locations={locations}
-			photoCount={photoCount}
-			updated={updated}
-		/>
-		<HomeSelectedPhotosSection photos={coverflowPhotos} />
-	</main>
+  <main id="main-content" class="relative">
+    <HomeHero />
+    <HomeMapSection
+      locations={locations}
+      photoCount={photoCount}
+      updated={updated}
+    />
+    <HomeSelectedPhotosSection photos={coverflowPhotos} />
+  </main>
 
-	<Footer />
+  <Footer />
 </Layout>
