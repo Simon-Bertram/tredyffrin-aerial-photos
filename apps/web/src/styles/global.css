@@ -35,6 +35,7 @@
   --color-on-secondary-container: var(--on-secondary-container);
   --color-secondary-fixed: var(--secondary-fixed);
   --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-secondary-wash: var(--secondary-wash);
 
   --color-outline-variant: var(--outline-variant);
 
@@ -116,6 +117,7 @@
   --on-secondary-container: #526478;
   --secondary-fixed: #d1e4fb;
   --on-secondary-fixed: #091d2e;
+  --secondary-wash: color-mix(in srgb, var(--secondary-container) 55%, var(--surface));
 
   --outline-variant: #dcc0be;
 
@@ -177,6 +179,7 @@
   --on-secondary-container: #cfe2f9;
   --secondary-fixed: #22334a;
   --on-secondary-fixed: #cfe2f9;
+  --secondary-wash: color-mix(in srgb, var(--secondary-fixed) 50%, var(--surface));
 
   --outline-variant: #5a4644;
 

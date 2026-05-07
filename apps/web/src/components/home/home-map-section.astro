@@ -1,6 +1,6 @@
 ---
 import type { LocationRecord } from "@/lib/locations";
-import { TredyffrinMap } from "@/components/map/tredyffrinMap";
+import { HomeMapIsland } from "@/components/home/home-map-island";
 import LoadingDotsFallback from "@/components/home/loading-dots-fallback.astro";
 
 interface Props {
@@ -26,11 +26,11 @@ const { locations, photoCount, updated } = Astro.props;
     >
       &ldquo;Hover over a marker to open that location&rsquo;s photographs and
       details. When using a mouse or trackpad, pointing at a marker may show a
-      preview first. View a selection of the photographs below the map.
+      preview first.
       <a
         href="#selected-photographs"
         class="text-primary underline-offset-4 hover:underline not-italic"
-        >Selected photographs</a
+        >View selected photographs below the map.</a
       >
     </p>
   </div>
@@ -41,11 +41,11 @@ const { locations, photoCount, updated } = Astro.props;
     {
       locations.length > 0 ? (
         <div class="relative min-h-[320px] h-[75vh]">
-          <TredyffrinMap client:visible locations={locations}>
+          <HomeMapIsland client:visible locations={locations}>
             <div slot="fallback" class="absolute inset-0">
               <LoadingDotsFallback variant="map" />
             </div>
-          </TredyffrinMap>
+          </HomeMapIsland>
         </div>
       ) : (
         <p class="p-16 text-center font-display italic text-on-surface-variant">

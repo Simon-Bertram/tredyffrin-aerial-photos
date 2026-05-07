@@ -1,6 +1,6 @@
 ---
 import type { CoverflowIslandPhoto } from "@/lib/selected-photos-data";
-import { SelectedPhotosCoverflow } from "@/components/selected-photos-coverflow";
+import { SelectedPhotosCoverflowIsland } from "@/components/home/selected-photos-coverflow-island";
 import LoadingDotsFallback from "@/components/home/loading-dots-fallback.astro";
 import { SkipperAttribution } from "@/components/skipper-attribution";
 
@@ -28,14 +28,14 @@ const { photos } = Astro.props;
     </div>
 
     <div class="relative min-h-[min(360px,55vh)] w-full">
-      <SelectedPhotosCoverflow
+      <SelectedPhotosCoverflowIsland
         client:visible={{ rootMargin: "200px" }}
         photos={photos}
       >
         <div slot="fallback" class="absolute inset-0">
           <LoadingDotsFallback variant="coverflow" />
         </div>
-      </SelectedPhotosCoverflow>
+      </SelectedPhotosCoverflowIsland>
       <SkipperAttribution client:visible />
     </div>
   </div>

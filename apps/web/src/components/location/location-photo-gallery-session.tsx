@@ -28,7 +28,7 @@ export function LocationPhotoGallerySession({
 		<section className="space-y-4">
 			<div className="flex justify-end">
 				<Button
-					className="bg-[color-mix(in_srgb,var(--secondary-container)_55%,var(--surface))] dark:bg-[color-mix(in_srgb,var(--secondary-fixed)_50%,var(--surface))]"
+					className="bg-secondary-wash"
 					type="button"
 					variant="outline"
 					onClick={onClose}
