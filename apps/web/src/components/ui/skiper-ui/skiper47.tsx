@@ -147,7 +147,7 @@ const Carousel_001 = ({
           <SwiperSlide
             key={`${image.src}-${index}`}
             virtualIndex={index}
-            className="!h-auto w-full border border-outline-variant/30"
+            className="h-auto! w-full border border-outline-variant/30"
           >
             <div
               role={onSlideClick ? "button" : undefined}
