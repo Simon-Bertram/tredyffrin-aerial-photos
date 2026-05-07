@@ -22,6 +22,7 @@ export function MapLocationMarker({
   const multiplePhotos = location.photos.length > 1;
 
   const isOnImagery = mapVisualStyle === "terrain";
+  const isDarkStyle = mapVisualStyle === "dark";
 
   const markerLinkLabel = multiplePhotos
     ? `View details for ${location.name}, ${location.photos.length} photos`
@@ -63,7 +64,7 @@ export function MapLocationMarker({
           <span
             className={cn(
               "relative flex size-8 items-center justify-center rounded-none",
-              "bg-primary text-primary-foreground",
+              isDarkStyle ? "bg-surface text-primary" : "bg-primary text-primary-foreground",
               "shadow-[0_8px_20px_color-mix(in_srgb,var(--primary)_35%,transparent)]",
               "ring-1 ring-inset ring-[color-mix(in_srgb,white_18%,transparent)]",
               "transition-transform duration-200 group-hover:scale-[1.08]",
