@@ -18,6 +18,7 @@ export default defineConfig({
   output: "server",
   adapter: alchemy({
     configPath: wranglerConfigPath,
+    prerenderEnvironment: "node",
   }),
 
   env: {
