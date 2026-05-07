@@ -26,7 +26,7 @@ export type Carousel001Image = {
 };
 
 const navButtonClass =
-  "flex size-10 items-center justify-center rounded-none bg-surface-container-low text-on-surface shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-primary-foreground";
+  "flex size-10 items-center justify-center rounded-none bg-secondary-wash text-on-surface shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-white";
 
 const Carousel_001 = ({
   images,
