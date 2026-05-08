@@ -14,9 +14,6 @@ interface SelectedPhotosCoverflowProps {
 export function SelectedPhotosCoverflow({
   photos,
 }: SelectedPhotosCoverflowProps) {
-  // #region agent log
-  fetch('http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ee545a'},body:JSON.stringify({sessionId:'ee545a',runId:'initial',hypothesisId:'H1-H5',location:'selected-photos-coverflow.tsx:SelectedPhotosCoverflow',message:'Coverflow render entry',data:{photosCount:photos.length,hasWindow:typeof window!=='undefined'},timestamp:Date.now()})}).catch(()=>{})
-  // #endregion
   if (photos.length === 0) {
     return (
       <div className="w-full">

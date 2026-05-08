@@ -3,17 +3,10 @@ import { Tooltip as TooltipPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
-// #region agent log
-fetch('http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ee545a'},body:JSON.stringify({sessionId:'ee545a',runId:'initial',hypothesisId:'H6-H7',location:'tooltip.tsx:module',message:'Tooltip module evaluated',data:{hasWindow:typeof window!=='undefined',hasTooltipPrimitive:typeof TooltipPrimitive!=='undefined'},timestamp:Date.now()})}).catch(()=>{})
-// #endregion
-
 function TooltipProvider({
   delayDuration = 0,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  // #region agent log
-  fetch('http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ee545a'},body:JSON.stringify({sessionId:'ee545a',runId:'initial',hypothesisId:'H2-H4',location:'tooltip.tsx:TooltipProvider',message:'Tooltip provider render entry',data:{hasWindow:typeof window!=='undefined',hasProvider:typeof TooltipPrimitive?.Provider!=='undefined'},timestamp:Date.now()})}).catch(()=>{})
-  // #endregion
   return (
     <TooltipPrimitive.Provider
       data-slot="tooltip-provider"
@@ -32,6 +25,28 @@ function Tooltip({
 function TooltipTrigger({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+  const isServer = typeof window === "undefined"
+  const childCount = React.Children.count(props.children)
+
+  // #region agent log
+  fetch("http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Debug-Session-Id": "994dba",
+    },
+    body: JSON.stringify({
+      sessionId: "994dba",
+      runId: "pre-fix",
+      hypothesisId: "H3",
+      location: "tooltip.tsx:31",
+      message: "TooltipTrigger render props",
+      data: { isServer, asChild: Boolean(props.asChild), childCount },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {})
+  // #endregion
+
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 

@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import React from "react";
 import {
   Autoplay,
   EffectCoverflow,
@@ -26,7 +25,7 @@ export type Carousel001Image = {
 };
 
 const navButtonClass =
-  "flex size-10 items-center justify-center rounded-none bg-secondary-wash text-on-surface shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-white";
+  "flex size-10 items-center justify-center rounded-none bg-surface-container-low text-on-surface [--swiper-navigation-color:var(--on-surface)] shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-white hover:[--swiper-navigation-color:white]";
 
 const Carousel_001 = ({
   images,
@@ -49,9 +48,6 @@ const Carousel_001 = ({
   spaceBetween?: number;
   onSlideClick?: (index: number) => void;
 }) => {
-  // #region agent log
-  fetch('http://127.0.0.1:7782/ingest/2b0c5321-63a0-48fd-9d23-b9365f9aa9d7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'ee545a'},body:JSON.stringify({sessionId:'ee545a',runId:'initial',hypothesisId:'H1-H5',location:'skiper47.tsx:Carousel_001',message:'Carousel module rendered',data:{imagesCount:images.length,hasWindow:typeof window!=='undefined'},timestamp:Date.now()})}).catch(()=>{})
-  // #endregion
   const delayMs = autoplayDelay ?? 1500;
   /** Wider viewports need *higher* slidesPerView so each slide stays narrower; lowering it widens cards and makes coverflow read as heavier overlap. */
   const carouselBreakpoints = {
