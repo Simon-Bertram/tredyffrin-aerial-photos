@@ -18,7 +18,7 @@ interface SelectedPhotosCoverflowProps {
 export function SelectedPhotosCoverflow({
   photos,
 }: SelectedPhotosCoverflowProps) {
-  const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(false);
+  const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
 
   if (photos.length === 0) {
     return (
