@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Carousel_001,
@@ -19,6 +19,41 @@ export function SelectedPhotosCoverflow({
   photos,
 }: SelectedPhotosCoverflowProps) {
   const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
+  const [isAutoplayReady, setIsAutoplayReady] = useState(false);
+  const [isUiEnhanced, setIsUiEnhanced] = useState(false);
+
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      setIsUiEnhanced(true);
+    });
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let idleId: number | undefined;
+    const idleCallback = window.requestIdleCallback;
+
+    if (typeof idleCallback === "function") {
+      idleId = idleCallback(
+        () => {
+          setIsAutoplayReady(true);
+        },
+        { timeout: 1400 },
+      );
+    } else {
+      timeoutId = setTimeout(() => {
+        setIsAutoplayReady(true);
+      }, 400);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      if (typeof idleId === "number") {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   if (photos.length === 0) {
     return (
@@ -30,12 +65,16 @@ export function SelectedPhotosCoverflow({
     );
   }
 
-  const images: Carousel001Image[] = photos.map((p) => ({
-    src: p.src,
-    alt: p.alt,
-    title: p.locationName,
-    year: p.photoDate,
-  }));
+  const images: Carousel001Image[] = useMemo(
+    () =>
+      photos.map((p) => ({
+        src: p.src,
+        alt: p.alt,
+        title: p.locationName,
+        year: p.photoDate,
+      })),
+    [photos],
+  );
 
   const handleSlideClick = (realIndex: number) => {
     const selected = photos[realIndex];
@@ -50,10 +89,10 @@ export function SelectedPhotosCoverflow({
       <Carousel_001
         className="max-w-none"
         images={images}
-        showPagination
-        showNavigation
+        showPagination={isUiEnhanced}
+        showNavigation={isUiEnhanced}
         loop
-        autoplay={isAutoplayEnabled}
+        autoplay={isAutoplayEnabled && isAutoplayReady}
         autoplayDelay={6000}
         onSlideClick={handleSlideClick}
         spaceBetween={40}
