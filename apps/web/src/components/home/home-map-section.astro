@@ -41,7 +41,7 @@ const { locations, photoCount, updated } = Astro.props;
     {
       locations.length > 0 ? (
         <div class="relative min-h-[320px] h-[75vh]">
-          <HomeMapIsland client:visible locations={locations}>
+          <HomeMapIsland client:idle={{ timeout: 1200 }} locations={locations}>
             <div slot="fallback" class="absolute inset-0">
               <LoadingDotsFallback variant="map" />
             </div>
