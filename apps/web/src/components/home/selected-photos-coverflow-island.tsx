@@ -1,6 +1,6 @@
 "use client";
 
-import { SelectedPhotosCoverflow } from "@/components/selected-photos-coverflow";
+import { SelectedPhotosCoverflow } from "@/components/selected-photos/selected-photos-coverflow";
 import {
   ErrorBoundary,
   IslandErrorFallback,

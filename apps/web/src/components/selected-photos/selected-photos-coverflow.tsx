@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   Carousel_001,
   type Carousel001Image,
 } from "@/components/ui/skiper-ui/skiper47";
 import type { CoverflowIslandPhoto } from "@/lib/selected-photos-data";
+
+import { SelectedPhotosAutoplayToggle } from "./selected-photos-autoplay-toggle";
 
 /** Perspective coverflow (Skiper UI); attribution: https://skiper-ui.com/v1/skiper47 */
 interface SelectedPhotosCoverflowProps {
@@ -14,6 +18,8 @@ interface SelectedPhotosCoverflowProps {
 export function SelectedPhotosCoverflow({
   photos,
 }: SelectedPhotosCoverflowProps) {
+  const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
+
   if (photos.length === 0) {
     return (
       <div className="w-full">
@@ -47,11 +53,17 @@ export function SelectedPhotosCoverflow({
         showPagination
         showNavigation
         loop
-        autoplay
+        autoplay={isAutoplayEnabled}
         autoplayDelay={6000}
         onSlideClick={handleSlideClick}
         spaceBetween={40}
       />
+      <div className="my-4 text-sm flex justify-center">
+        <SelectedPhotosAutoplayToggle
+          isAutoplayEnabled={isAutoplayEnabled}
+          onToggle={() => setIsAutoplayEnabled((prev) => !prev)}
+        />
+      </div>
     </div>
   );
 }

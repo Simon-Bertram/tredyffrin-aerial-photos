@@ -149,6 +149,8 @@ type MapProps = {
   loading?: boolean;
   /** Optional 3D terrain (DEM source, hillshade, sky) when the style is ready. */
   terrain3d?: MapTerrainConfig;
+  /** Enable WebGL antialiasing for smoother rendered edges. */
+  antialias?: boolean;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 function DefaultLoader() {
@@ -198,6 +200,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     onViewportChange,
     loading = false,
     terrain3d,
+    antialias,
     ...props
   },
   ref,
@@ -258,6 +261,10 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
       },
       ...props,
       ...viewport,
+      canvasContextAttributes: {
+        ...props.canvasContextAttributes,
+        ...(antialias !== undefined ? { antialias } : {}),
+      },
     });
 
     const removeStyleIdleListener = () => {

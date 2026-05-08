@@ -30,6 +30,7 @@ export function TredyffrinMap({ locations }: MapProps) {
       zoom={11}
       styles={mapStyles}
       terrain3d={terrain3d}
+      canvasContextAttributes={{ antialias: true }}
     >
       <MapControls />
       <MapVisualStyleControls
