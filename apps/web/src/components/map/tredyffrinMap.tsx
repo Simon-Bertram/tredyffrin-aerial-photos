@@ -19,7 +19,7 @@ interface MapProps {
 
 export function TredyffrinMap({ locations }: MapProps) {
   const [selectedStyle, setSelectedStyle] =
-    useState<MapVisualStyleId>("terrain");
+    useState<MapVisualStyleId>("streets");
   const mapStyles = getMapStylesForVisualStyle(selectedStyle);
   const terrain3d = getTerrainForVisualStyle(selectedStyle);
 
