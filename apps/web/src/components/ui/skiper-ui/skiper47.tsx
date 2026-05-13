@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import {
@@ -8,6 +9,7 @@ import {
   Navigation,
   Pagination,
 } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
@@ -49,6 +51,18 @@ const Carousel_001 = ({
   onSlideClick?: (index: number) => void;
 }) => {
   const delayMs = autoplayDelay ?? 1500;
+  const swiperRef = useRef<SwiperType | null>(null);
+
+  useEffect(() => {
+    const swiper = swiperRef.current;
+    if (!swiper?.autoplay) return;
+    if (autoplay) {
+      swiper.autoplay.start();
+    } else {
+      swiper.autoplay.stop();
+    }
+  }, [autoplay, delayMs]);
+
   /** Wider viewports need *higher* slidesPerView so each slide stays narrower; lowering it widens cards and makes coverflow read as heavier overlap. */
   const carouselBreakpoints = {
     480: {
@@ -103,14 +117,14 @@ const Carousel_001 = ({
       <Swiper
         spaceBetween={Math.max(12, Math.round(spaceBetween * 0.5))}
         breakpoints={carouselBreakpoints}
-        autoplay={
-          autoplay
-            ? {
-                delay: delayMs,
-                disableOnInteraction: false,
-              }
-            : false
-        }
+        autoplay={{
+          delay: delayMs,
+          disableOnInteraction: false,
+          waitForTransition: true,
+        }}
+        onSwiper={(swiper: SwiperType) => {
+          swiperRef.current = swiper;
+        }}
         effect="coverflow"
         grabCursor={true}
         centeredSlides={true}

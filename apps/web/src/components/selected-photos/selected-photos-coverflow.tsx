@@ -19,39 +19,14 @@ export function SelectedPhotosCoverflow({
   photos,
 }: SelectedPhotosCoverflowProps) {
   const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
-  const [isAutoplayReady, setIsAutoplayReady] = useState(false);
   const [isUiEnhanced, setIsUiEnhanced] = useState(false);
 
   useEffect(() => {
     const rafId = window.requestAnimationFrame(() => {
       setIsUiEnhanced(true);
     });
-
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    let idleId: number | undefined;
-    const idleCallback = window.requestIdleCallback;
-
-    if (typeof idleCallback === "function") {
-      idleId = idleCallback(
-        () => {
-          setIsAutoplayReady(true);
-        },
-        { timeout: 1400 },
-      );
-    } else {
-      timeoutId = setTimeout(() => {
-        setIsAutoplayReady(true);
-      }, 400);
-    }
-
     return () => {
       window.cancelAnimationFrame(rafId);
-      if (typeof idleId === "number") {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
     };
   }, []);
 
@@ -92,7 +67,7 @@ export function SelectedPhotosCoverflow({
         showPagination={isUiEnhanced}
         showNavigation={isUiEnhanced}
         loop
-        autoplay={isAutoplayEnabled && isAutoplayReady}
+        autoplay={isAutoplayEnabled}
         autoplayDelay={6000}
         onSlideClick={handleSlideClick}
         spaceBetween={40}
