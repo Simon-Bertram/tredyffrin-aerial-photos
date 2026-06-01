@@ -87,6 +87,7 @@ export const otherLocationPlacesQuery = /* groq */ `
   | order(name asc)
   {
     name,
-    "slug": slug.current
+    "slug": slug.current,
+    "photoCount": count(photos[defined(photo.asset._ref)])
   }
 `;

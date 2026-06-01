@@ -24,6 +24,7 @@ import {
 export interface OtherLocationPlaceLink {
 	name: string
 	href: string
+	photoCount: number
 }
 
 const MAP_IMAGE_WIDTH = 1200
@@ -159,7 +160,13 @@ export async function fetchOtherLocationPlaces(
 		if (excludeSlug != null && slug === excludeSlug) {
 			continue
 		}
-		out.push({ name, href: `/locations/${slug}` })
+		const photoCount =
+			'photoCount' in row &&
+			typeof row.photoCount === 'number' &&
+			Number.isFinite(row.photoCount)
+				? row.photoCount
+				: 0
+		out.push({ name, href: `/locations/${slug}`, photoCount })
 	}
 	return out
 }
