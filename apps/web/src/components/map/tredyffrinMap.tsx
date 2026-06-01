@@ -8,13 +8,13 @@ import {
   getTerrainForVisualStyle,
 } from "@/components/map/map-style-config";
 import type { MapVisualStyleId } from "@/components/map/map-types";
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 
 /** Tredyffrin area — MapLibre uses [longitude, latitude] (GeoJSON order). */
 const TREDDYFFRIN_CENTER: [number, number] = [-75.483168, 40.0402];
 
 interface MapProps {
-  locations: LocationRecord[];
+  locations: MapLocationRecord[];
 }
 
 export function TredyffrinMap({ locations }: MapProps) {

@@ -6,18 +6,18 @@ config({ path: "./.env", override: true });
 config({ path: "../../apps/web/.env", override: true });
 
 if (!process.env.CLOUDFLARE_COMPATIBILITY_DATE) {
-  process.env.CLOUDFLARE_COMPATIBILITY_DATE = "2026-04-22";
+	process.env.CLOUDFLARE_COMPATIBILITY_DATE = "2026-04-22";
 }
 
 const app = await alchemy("tredyffrin-aerial-photos");
 
 export const web = await Astro("web", {
-  cwd: "../../apps/web",
-  entrypoint: "dist/server/entry.mjs",
-  assets: "dist/client",
-  bindings: {
-    PUBLIC_SERVER_URL: alchemy.env.PUBLIC_SERVER_URL!,
-  },
+	cwd: "../../apps/web",
+	entrypoint: "dist/server/entry.mjs",
+	assets: "dist/client",
+	bindings: {
+		PUBLIC_SERVER_URL: alchemy.env.PUBLIC_SERVER_URL!,
+	},
 });
 
 console.log(`Web    -> ${web.url}`);

@@ -8,16 +8,23 @@ import {
 	pickFeaturePhotos,
 	type AboutFeaturePhoto,
 } from '@/lib/about-feature-photos'
-import type { LocationRecord } from '@/lib/locations'
+import type { LocationRecord, MapLocationRecord } from '@/lib/locations'
 import { getSanityClient } from '@/lib/sanity/client'
 import { createSanityImageBuilder } from '@/lib/sanity/image'
 import { mapSanityLocationToRecord } from '@/lib/sanity/map-location'
+import { TREDYFFRIN_EASTTOWN_VALUE } from '@/lib/place-collections'
 import {
 	locationBySlugQuery,
 	locationSlugsQuery,
 	locationsForAboutFeatureQuery,
 	locationsForMapQuery,
+	otherLocationPlacesQuery,
 } from '@/lib/sanity/queries'
+
+export interface OtherLocationPlaceLink {
+	name: string
+	href: string
+}
 
 const MAP_IMAGE_WIDTH = 1200
 /** Map marker tooltip previews (`h-60`); primary `src` stays `MAP_IMAGE_WIDTH`. */
@@ -34,7 +41,7 @@ function logSkip(
 	console.warn(`[sanity:${context}] ${slugOrId}: ${reason}`, detail ?? '')
 }
 
-export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
+export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
 	const client = getSanityClient()
 	const imageBuilder = createSanityImageBuilder(
 		PUBLIC_SANITY_PROJECT_ID,
@@ -46,7 +53,7 @@ export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
 		return []
 	}
 
-	const out: LocationRecord[] = []
+	const out: MapLocationRecord[] = []
 	for (const row of rows) {
 		const slug =
 			typeof row === 'object' && row !== null && 'slug' in row
@@ -69,7 +76,11 @@ export async function fetchLocationsForMap(): Promise<LocationRecord[]> {
 			)
 			continue
 		}
-		out.push(mapped)
+		if (!mapped.coordinates) {
+			logSkip('fetchLocationsForMap', slug, 'missing coordinates')
+			continue
+		}
+		out.push(mapped as MapLocationRecord)
 	}
 	return out
 }
@@ -116,6 +127,39 @@ export async function fetchPublishedLocationSlugs(): Promise<string[]> {
 		) {
 			out.push((row as { slug: string }).slug)
 		}
+	}
+	return out
+}
+
+export async function fetchOtherLocationPlaces(
+	excludeSlug?: string,
+): Promise<OtherLocationPlaceLink[]> {
+	const client = getSanityClient()
+	const rows = await client.fetch<unknown[]>(otherLocationPlacesQuery, {
+		tredyffrinEasttown: TREDYFFRIN_EASTTOWN_VALUE,
+	})
+	if (!Array.isArray(rows)) {
+		console.warn('[sanity:fetchOtherLocationPlaces] expected array', rows)
+		return []
+	}
+
+	const out: OtherLocationPlaceLink[] = []
+	for (const row of rows) {
+		if (typeof row !== 'object' || row === null) {
+			continue
+		}
+		const name =
+			'name' in row && typeof row.name === 'string' ? row.name.trim() : ''
+		const slug =
+			'slug' in row && typeof row.slug === 'string' ? row.slug.trim() : ''
+		if (name === '' || slug === '') {
+			logSkip('fetchOtherLocationPlaces', slug || 'unknown', 'missing name or slug')
+			continue
+		}
+		if (excludeSlug != null && slug === excludeSlug) {
+			continue
+		}
+		out.push({ name, href: `/locations/${slug}` })
 	}
 	return out
 }

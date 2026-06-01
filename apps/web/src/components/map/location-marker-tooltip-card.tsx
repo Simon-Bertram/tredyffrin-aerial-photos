@@ -3,11 +3,11 @@
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { Camera, ChevronLeft, ChevronRight } from "lucide-react";
 
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 
 interface LocationMarkerTooltipCardProps {
-  location: LocationRecord;
+  location: MapLocationRecord;
   detailPath: string;
   isOnImagery: boolean;
   onNavigate?: (path: string) => void;

@@ -1,10 +1,10 @@
 ---
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 import { HomeMapIsland } from "@/components/home/home-map-island";
 import LoadingDotsFallback from "@/components/home/loading-dots-fallback.astro";
 
 interface Props {
-  locations: LocationRecord[];
+  locations: MapLocationRecord[];
   photoCount: number;
   updated: string;
 }

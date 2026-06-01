@@ -1,4 +1,4 @@
-import type { LocationRecord } from '@/lib/locations'
+import type { MapLocationRecord } from '@/lib/locations'
 
 export interface SelectedPhoto {
 	key: string
@@ -43,7 +43,7 @@ interface SelectedPhotoCandidate extends Omit<SelectedPhoto, 'plateNumber'> {
  * Flattens location photo lists into a single ordered sequence for the strip.
  */
 export function buildSelectedPhotos(
-	locations: LocationRecord[],
+	locations: MapLocationRecord[],
 ): SelectedPhoto[] {
 	const allPhotos: SelectedPhotoCandidate[] = []
 	for (const location of locations) {

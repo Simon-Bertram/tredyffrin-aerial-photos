@@ -85,10 +85,12 @@ function safeJsonLd(value: Record<string, unknown>): string {
       ))
     }
   </head>
-  <body class="min-h-screen bg-background text-foreground antialiased">
+  <body
+    class="grid min-h-screen grid-rows-[auto_1fr_auto] bg-background text-foreground antialiased"
+  >
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-[11px] focus:uppercase focus:tracking-[0.18em] focus:text-primary-foreground"
+      class="absolute top-0 left-0 sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-primary focus:px-3 focus:py-2 focus:text-[11px] focus:uppercase focus:tracking-[0.18em] focus:text-primary-foreground"
     >
       Skip to content
     </a>

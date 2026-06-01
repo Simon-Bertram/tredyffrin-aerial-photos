@@ -7,18 +7,19 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "dev": "astro dev",
     "dev:bare": "astro dev"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
-    "@astrojs/react": "^5.0.4",
+    "@astrojs/react": "5.0.6",
     "@fontsource-variable/geist": "^5.2.8",
     "@sanity/client": "^7.22.0",
     "@sanity/image-url": "^2.1.1",
     "@tredyffrin-aerial-photos/env": "workspace:*",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "astro": "6.3.0",
+    "astro": "6.4.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^5.5.19",
@@ -37,7 +38,7 @@
     "zod": "^4.4.1"
   },
   "devDependencies": {
-    "@astrojs/cloudflare": "13.5.0",
+    "@astrojs/cloudflare": "13.6.0",
     "@cloudflare/workers-types": "^4.20260501.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.4",

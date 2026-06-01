@@ -126,10 +126,14 @@ export function mapSanityLocationToRecord(
 	return {
 		slug: doc.slug,
 		name: doc.name,
-		coordinates: {
-			longitude: doc.coordinates.lng,
-			latitude: doc.coordinates.lat,
-		},
+		...(doc.coordinates
+			? {
+					coordinates: {
+						longitude: doc.coordinates.lng,
+						latitude: doc.coordinates.lat,
+					},
+				}
+			: {}),
 		shortDescription: doc.shortDescription ?? '',
 		fullDescription: doc.fullDescription ?? '',
 		photos,

@@ -1,4 +1,4 @@
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 
 export const HOME_TITLE = "Tredyffrin Easttown Aerial Photos";
 
@@ -6,8 +6,8 @@ export const HOME_DESCRIPTION =
   "A collection of aerial photographs documenting the landscape of Tredyffrin Easttown Townships, Pennsylvania.";
 
 export function getFirstPreviewPhoto(
-  locations: LocationRecord[],
-): LocationRecord["photos"][number] | undefined {
+  locations: MapLocationRecord[],
+): MapLocationRecord["photos"][number] | undefined {
   return locations[0]?.photos[0];
 }
 

@@ -5,10 +5,10 @@ import {
   ErrorBoundary,
   IslandErrorFallback,
 } from "@/components/ui/error-boundary";
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 
 interface HomeMapIslandProps {
-  locations: LocationRecord[];
+  locations: MapLocationRecord[];
 }
 
 export function HomeMapIsland({ locations }: HomeMapIslandProps) {

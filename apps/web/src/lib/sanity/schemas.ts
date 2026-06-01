@@ -39,7 +39,7 @@ export const sanityLocationRawSchema = z.object({
   _id: z.string().optional(),
   name: z.string().min(1),
   slug: z.string().min(1),
-  coordinates: sanityGeopointSchema,
+  coordinates: sanityGeopointSchema.nullish(),
   shortDescription: z.string().nullable().optional(),
   fullDescription: z.string().nullable().optional(),
   photos: z.array(z.unknown()).nullable().optional(),

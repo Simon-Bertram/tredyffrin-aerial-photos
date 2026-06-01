@@ -76,3 +76,17 @@ export const locationSlugsQuery = /* groq */ `
   *[_type == "location" && defined(slug.current)]
     | order(name asc) {"slug": slug.current}
 `;
+
+/** Studio “Other locations” sidebar — places outside Tredyffrin Easttown. */
+export const otherLocationPlacesQuery = /* groq */ `
+  *[
+    _type == "location" &&
+    placeCollection != $tredyffrinEasttown &&
+    defined(slug.current)
+  ]
+  | order(name asc)
+  {
+    name,
+    "slug": slug.current
+  }
+`;

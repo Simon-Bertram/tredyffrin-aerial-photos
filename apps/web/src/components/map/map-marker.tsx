@@ -4,13 +4,13 @@ import { Camera } from "lucide-react";
 
 import { MapMarker, MarkerContent, MarkerTooltip } from "@/components/ui/map";
 import type { MapVisualStyleId } from "@/components/map/map-types";
-import type { LocationRecord } from "@/lib/locations";
+import type { MapLocationRecord } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { LocationMarkerTooltipCard } from "@/components/map/location-marker-tooltip-card";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface MapLocationMarkerProps {
-  location: LocationRecord;
+  location: MapLocationRecord;
   mapVisualStyle: MapVisualStyleId;
 }
 

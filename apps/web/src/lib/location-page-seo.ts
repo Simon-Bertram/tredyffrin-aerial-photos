@@ -54,12 +54,14 @@ function buildPlaceJsonLd(
 			location.shortDescription || location.fullDescription,
 			300,
 		),
-		geo: {
+		url: `${siteOrigin}/locations/${location.slug}`,
+	}
+	if (location.coordinates) {
+		doc.geo = {
 			'@type': 'GeoCoordinates',
 			latitude: location.coordinates.latitude,
 			longitude: location.coordinates.longitude,
-		},
-		url: `${siteOrigin}/locations/${location.slug}`,
+		}
 	}
 	if (location.photos.length > 0) {
 		const capped = location.photos.slice(0, JSON_LD_PLACE_IMAGE_MAX)

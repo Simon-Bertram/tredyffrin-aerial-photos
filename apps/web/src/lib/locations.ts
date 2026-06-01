@@ -66,11 +66,15 @@ export function getPhotoMetadataItems(
 export interface LocationRecord {
 	slug: string
 	name: string
-	coordinates: {
+	coordinates?: {
 		longitude: number
 		latitude: number
 	}
 	shortDescription: string
 	fullDescription: string
 	photos: LocationPhoto[]
+}
+
+export type MapLocationRecord = LocationRecord & {
+	coordinates: NonNullable<LocationRecord['coordinates']>
 }
