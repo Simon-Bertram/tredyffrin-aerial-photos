@@ -115,6 +115,9 @@ export function mapSanityLocationToRecord(
 			caption: emptyToUndefined(p.caption),
 			addToSelectedPhotosCollection:
 				p.addToSelectedPhotosCollection === true,
+			...(p.selectedCollection
+				? { selectedCollection: p.selectedCollection }
+				: {}),
 			photographer: emptyToUndefined(p.photographer),
 			photoDate: formatPhotoDate(p.photoDate ?? undefined),
 			direction: emptyToUndefined(p.direction),

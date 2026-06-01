@@ -5,8 +5,10 @@ import HomeMapSection from "../components/home/home-map-section.astro";
 import HomeSelectedPhotosSection from "../components/home/home-selected-photos-section.astro";
 import OtherLocations from "@/components/OtherLocations.astro";
 import {
+  buildThemeCollectionLinks,
   fetchLocationsForMap,
   fetchOtherLocationPlaces,
+  fetchThemeCollectionPhotoCounts,
 } from "@/lib/sanity-location-repository";
 import {
   buildSelectedPhotos,
@@ -22,6 +24,8 @@ import {
 
 const locations = await fetchLocationsForMap();
 const otherPlaces = await fetchOtherLocationPlaces();
+const themeCounts = await fetchThemeCollectionPhotoCounts();
+const themes = buildThemeCollectionLinks(themeCounts);
 const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations));
 
 const photoCount = locations.reduce(
@@ -54,6 +58,6 @@ const jsonLd = buildHomeJsonLd(siteOrigin);
       updated={updated}
     />
     <HomeSelectedPhotosSection photos={coverflowPhotos} />
-    <OtherLocations places={otherPlaces} />
+    <OtherLocations places={otherPlaces} themes={themes} />
   </main>
 </Layout>

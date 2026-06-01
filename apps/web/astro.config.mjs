@@ -1,7 +1,4 @@
 // @ts-check
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import tailwindcss from "@tailwindcss/vite";
 import alchemy from "alchemy/cloudflare/astro";
 import { defineConfig, envField } from "astro/config";
@@ -10,7 +7,45 @@ import { visualizer } from "rollup-plugin-visualizer";
 import react from "@astrojs/react";
 
 const wranglerConfigPath = "./wrangler.toml";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** Pre-bundle SSR deps in one pass — avoids deps_ssr / react-dom/server split (Astro 6 + Cloudflare). */
+const SERVER_OPTIMIZE_DEPS = [
+  "react",
+  "react/jsx-runtime",
+  "react/jsx-dev-runtime",
+  "react-dom",
+  "react-dom/server",
+  "framer-motion",
+  // Discovered lazily on first homepage SSR after Sanity env imports; late reload breaks React hooks.
+  "astro/env/runtime",
+];
+
+const SERVER_OPTIMIZE_ENTRIES = [
+  "./src/pages/index.astro",
+  "./src/lib/sanity-location-repository.ts",
+];
+
+function optimizeServerDeps() {
+  return {
+    name: "optimize-server-deps",
+    configEnvironment(name) {
+      if (name === "client") {
+        return {
+          optimizeDeps: {
+            include: SERVER_OPTIMIZE_DEPS,
+          },
+        };
+      }
+      return {
+        optimizeDeps: {
+          include: SERVER_OPTIMIZE_DEPS,
+          entries: SERVER_OPTIMIZE_ENTRIES,
+          holdUntilCrawlEnd: true,
+        },
+      };
+    },
+  };
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -45,6 +80,7 @@ export default defineConfig({
 
   vite: {
     plugins: [
+      optimizeServerDeps(),
       tailwindcss(),
       visualizer({
         open: false,
@@ -53,9 +89,11 @@ export default defineConfig({
         brotliSize: true,
       }),
     ],
+    optimizeDeps: {
+      include: SERVER_OPTIMIZE_DEPS,
+      entries: SERVER_OPTIMIZE_ENTRIES,
+    },
     resolve: {
-      // Keep single React instance without forcing package-dir alias resolution.
-      alias: {},
       dedupe: ["react", "react-dom"],
     },
     // Avoid two React copies in SSR — invalid hook / null dispatcher (see docs/astro-vite-ssr-duplicate-react-invalid-hooks.md).

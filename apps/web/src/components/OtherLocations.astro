@@ -1,11 +1,15 @@
 ---
-import type { OtherLocationPlaceLink } from "@/lib/sanity-location-repository";
+import type {
+  OtherLocationPlaceLink,
+  ThemeCollectionLink,
+} from "@/lib/sanity-location-repository";
 
 interface Props {
   places: OtherLocationPlaceLink[];
+  themes: ThemeCollectionLink[];
 }
 
-const { places } = Astro.props;
+const { places, themes } = Astro.props;
 ---
 
 {
@@ -39,3 +43,29 @@ const { places } = Astro.props;
     </section>
   )
 }
+
+<section
+  id="themes"
+  class="relative mx-auto max-w-7xl px-6 pb-24 md:px-10 md:pb-32"
+>
+  <h2
+    class="mt-3 font-display text-3xl font-light tracking-[-0.01em] md:text-[2.5rem]"
+  >
+    Themes
+  </h2>
+  <p class="mt-4 max-w-xs text-sm leading-relaxed text-on-surface-variant">
+    Here are some themes that you may be interested in.
+  </p>
+  <ul class="mt-8">
+    {themes.map((theme) => (
+      <li>
+        <a
+          href={theme.href}
+          class="text-foreground underline-offset-4 hover:text-primary hover:underline"
+        >
+          {theme.title} ({theme.photoCount})
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>

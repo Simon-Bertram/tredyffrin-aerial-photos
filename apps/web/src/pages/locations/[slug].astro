@@ -5,6 +5,10 @@ import LocationNotFound from "@/components/location/location-not-found.astro";
 import { buildLocationPageLayoutMeta } from "@/lib/location-page-seo";
 import { getSanityLocationRecordBySlug } from "@/lib/sanity-location-repository";
 import { getSiteOrigin } from "@/lib/site-url";
+import {
+  getSelectedPhotoCollectionTitle,
+  isSelectedPhotoCollectionValue,
+} from "@/lib/selected-photo-collections";
 
 const { slug } = Astro.params;
 const location = slug ? await getSanityLocationRecordBySlug(slug) : undefined;
@@ -13,9 +17,27 @@ if (!location) {
   Astro.response.status = 404;
 }
 
+const collectionParam = Astro.url.searchParams.get("collection");
+const activeCollection =
+  collectionParam != null && isSelectedPhotoCollectionValue(collectionParam)
+    ? collectionParam
+    : undefined;
+const collectionTitle = activeCollection
+  ? getSelectedPhotoCollectionTitle(activeCollection)
+  : undefined;
+const displayPhotos =
+  location && activeCollection
+    ? location.photos.filter(
+        (photo) => photo.selectedCollection === activeCollection,
+      )
+    : location?.photos;
+
 const siteOrigin = getSiteOrigin();
 const { pageTitle, pageDescription, previewSrc, previewAlt, jsonLd } =
-  buildLocationPageLayoutMeta(location, siteOrigin);
+  buildLocationPageLayoutMeta(location, siteOrigin, {
+    collectionTitle,
+    displayPhotos,
+  });
 ---
 
 <Layout
@@ -30,9 +52,9 @@ const { pageTitle, pageDescription, previewSrc, previewAlt, jsonLd } =
     id="main-content"
     class="container mx-auto max-w-7xl space-y-6 px-4 py-6"
   >
-    {location ? (
+    {location && displayPhotos ? (
       <LocationDetail
-        location={location}
+        location={{ ...location, photos: displayPhotos }}
         highlightPhotoId={Astro.url.searchParams.get("photo")}
       />
     ) : (

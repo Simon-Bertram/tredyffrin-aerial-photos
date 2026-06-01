@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { fetchPublishedLocationSlugs } from '@/lib/sanity-location-repository'
+import { SELECTED_PHOTO_COLLECTIONS } from '@/lib/selected-photo-collections'
 import { getSiteOrigin } from '@/lib/site-url'
 
 function escapeXml(s: string): string {
@@ -15,7 +16,15 @@ export const GET: APIRoute = async () => {
 	const origin = getSiteOrigin()
 	const slugs = await fetchPublishedLocationSlugs()
 
-	const paths = ['', 'about', ...slugs.map((s) => `locations/${s}`)]
+	const themePaths = SELECTED_PHOTO_COLLECTIONS.map(
+		(c) => `themes/${c.value}`,
+	)
+	const paths = [
+		'',
+		'about',
+		...themePaths,
+		...slugs.map((s) => `locations/${s}`),
+	]
 	const urls = paths.map((p) =>
 		p === '' ? `${origin}/` : `${origin}/${p}`,
 	)

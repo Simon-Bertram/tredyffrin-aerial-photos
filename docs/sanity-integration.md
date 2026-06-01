@@ -129,6 +129,7 @@ Files: `apps/web/src/lib/sanity/*`, `sanity-location-repository.ts`, `locations.
 
 ## Further reading
 
+- [Selected photo collections (themes)](./selected-photo-collections.md) — per-photo `selectedCollection` buckets, `/themes/*`, and `?collection=` on location pages
 - [Sanity: GROQ](https://www.sanity.io/docs/groq)
 - [Sanity: JS client](https://www.sanity.io/docs/js-client)
 - [Sanity: Image URLs](https://www.sanity.io/docs/image-url)

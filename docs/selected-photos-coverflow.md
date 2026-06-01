@@ -2,6 +2,8 @@
 
 This document describes the **homepage “selected photographs”** experience built from a Swiper-based coverflow carousel (`Carousel_001`) and the existing **location photo gallery** (Embla carousel + metadata). Use it to reimplement the same pattern in another codebase.
 
+For **theme buckets** (Airfields, Bridges, etc.) tagged via Sanity `selectedCollection` and surfaced under `/themes/*`, see [selected-photo-collections.md](./selected-photo-collections.md). That system uses a different field (`addToSelectedPhotosCollection` vs `selectedCollection`).
+
 ## What the user sees
 
 1. **Default state:** A 3D-style **coverflow** carousel shows one curated image per slide, with **title above the image** (here: location name), **pagination dots**, **prev/next arrows**, **loop**, and **autoplay** (this project: **6 seconds** per slide in `index.astro`).
@@ -53,7 +55,7 @@ Conceptually you need:
 
 - **`LocationRecord`**: `slug`, `name`, `photos: LocationPhoto[]`, etc.
 - **`LocationPhoto`**: at minimum `id`, `src`, `alt`; optional `title`, `caption`, metadata fields.
-- A **boolean** on each photo (here: `addToSelectedPhotosCollection`) meaning “include in the curated set.”
+- A **boolean** on each photo (here: `addToSelectedPhotosCollection`) meaning “include in the curated set.” This is **not** the same as theme buckets (`selectedCollection`); see [selected-photo-collections.md](./selected-photo-collections.md).
 
 ### `SelectedPhoto` (server-side list after selection rules)
 

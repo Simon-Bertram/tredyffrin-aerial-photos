@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { SELECTED_PHOTO_COLLECTION_VALUES } from "@/lib/selected-photo-collections";
+
 /** Raw geopoint from Sanity Content Lake. */
 export const sanityGeopointSchema = z.object({
   _type: z.literal("geopoint").optional(),
@@ -31,6 +33,10 @@ export const sanityLocationPhotoRawSchema = z.object({
   comments: z.string().nullable().optional(),
   photo: z.unknown(),
   addToSelectedPhotosCollection: z.boolean().nullable().optional(),
+  selectedCollection: z
+    .enum(SELECTED_PHOTO_COLLECTION_VALUES)
+    .nullable()
+    .optional(),
   references: z.array(z.string()).nullable().optional(),
   ownership: z.string().nullable().optional(),
 });

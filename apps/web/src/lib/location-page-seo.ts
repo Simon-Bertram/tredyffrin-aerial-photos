@@ -16,12 +16,22 @@ export interface LocationPageLayoutMeta {
 	jsonLd: Record<string, unknown> | undefined
 }
 
+export interface LocationPageLayoutMetaOptions {
+	/** When filtering by theme bucket, use for title and photo preview. */
+	collectionTitle?: string
+	displayPhotos?: LocationRecord['photos']
+}
+
 export function buildLocationPageLayoutMeta(
 	location: LocationRecord | undefined,
 	siteOrigin: string,
+	options?: LocationPageLayoutMetaOptions,
 ): LocationPageLayoutMeta {
+	const photos = options?.displayPhotos ?? location?.photos
 	const pageTitle = location
-		? `${location.name} — Tredyffrin Aerial Photos`
+		? options?.collectionTitle
+			? `${location.name} — ${options.collectionTitle} — Tredyffrin Aerial Photos`
+			: `${location.name} — Tredyffrin Aerial Photos`
 		: 'Page not found — Tredyffrin Aerial Photos'
 	const pageDescription = location
 		? truncateMeta(
@@ -29,10 +39,11 @@ export function buildLocationPageLayoutMeta(
 				160,
 			)
 		: LOCATION_PAGE_NOT_FOUND_DESCRIPTION
-	const preview = location?.photos[0]
-	const jsonLd = location
-		? buildPlaceJsonLd(location, siteOrigin)
-		: undefined
+	const preview = photos?.[0]
+	const jsonLd =
+		location && photos
+			? buildPlaceJsonLd({ ...location, photos }, siteOrigin)
+			: undefined
 	return {
 		pageTitle,
 		pageDescription,

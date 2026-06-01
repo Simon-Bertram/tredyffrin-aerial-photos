@@ -7,6 +7,8 @@ export interface LocationPhoto {
 	alt: string
 	caption?: string
 	addToSelectedPhotosCollection?: boolean
+	/** Sanity `selectedCollection` — theme bucket (airfields, bridges, etc.). */
+	selectedCollection?: string
 	photographer?: string
 	photoDate?: string
 	direction?: string

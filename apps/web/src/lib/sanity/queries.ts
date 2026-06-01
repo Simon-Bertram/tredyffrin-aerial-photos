@@ -12,7 +12,8 @@ export const locationForMapProjection = /* groq */ `{
     photoDate,
     direction,
     photo,
-    addToSelectedPhotosCollection
+    addToSelectedPhotosCollection,
+    selectedCollection
   }
 }`;
 
@@ -36,7 +37,8 @@ export const locationForDetailProjection = /* groq */ `{
     comments,
     references,
     photo,
-    addToSelectedPhotosCollection
+    addToSelectedPhotosCollection,
+    selectedCollection
   }
 }`;
 
@@ -89,5 +91,63 @@ export const otherLocationPlacesQuery = /* groq */ `
     name,
     "slug": slug.current,
     "photoCount": count(photos[defined(photo.asset._ref)])
+  }
+`;
+
+/** Locations with theme-tagged photos only (for theme index gallery). */
+export const themeLocationsWithPhotosQuery = /* groq */ `
+  *[
+    _type == "location" &&
+    defined(slug.current) &&
+    count(photos[selectedCollection == $collection]) > 0
+  ]
+  | order(name asc)
+  {
+    _id,
+    name,
+    "slug": slug.current,
+    coordinates,
+    shortDescription,
+    fullDescription,
+    "photos": photos[selectedCollection == $collection]{
+      _key,
+      title,
+      alt,
+      caption,
+      photographer,
+      ownership,
+      photoDate,
+      direction,
+      comments,
+      references,
+      photo,
+      addToSelectedPhotosCollection,
+      selectedCollection
+    }
+  }
+`;
+
+/** Places with at least one photo in a theme bucket. */
+export const themePlacesQuery = /* groq */ `
+  *[
+    _type == "location" &&
+    defined(slug.current) &&
+    count(photos[selectedCollection == $collection]) > 0
+  ]
+  | order(name asc)
+  {
+    name,
+    "slug": slug.current,
+    "photoCount": count(photos[selectedCollection == $collection])
+  }
+`;
+
+/** Total tagged photos per theme bucket (homepage theme labels). */
+export const themeCollectionPhotoCountsQuery = /* groq */ `
+  {
+    "airfields": count(*[_type == "location"].photos[selectedCollection == "airfields"]),
+    "bridges": count(*[_type == "location"].photos[selectedCollection == "bridges"]),
+    "railroads": count(*[_type == "location"].photos[selectedCollection == "railroads"]),
+    "philadelphia-art-museum": count(*[_type == "location"].photos[selectedCollection == "philadelphia-art-museum"])
   }
 `;
