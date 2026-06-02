@@ -1,4 +1,5 @@
 import type { MapLocationRecord } from '@/lib/locations'
+import { isSelectedPhotoCollectionValue } from '@/lib/selected-photo-collections'
 
 export interface SelectedPhoto {
 	key: string
@@ -11,6 +12,7 @@ export interface SelectedPhoto {
 	photoDate?: string
 	direction?: string
 	selectedCollection?: string
+	inDefaultSet?: boolean
 }
 
 /** Fields serialized to the coverflow client island (no full `locations` graph). */
@@ -22,6 +24,8 @@ export interface CoverflowIslandPhoto {
 	photoId: string
 	photoDate?: string
 	selectedCollection?: string
+	/** When false, photo is only shown when a theme collection filter is active. */
+	inDefaultSet?: boolean
 }
 
 export function toCoverflowIslandPhotos(
@@ -35,7 +39,53 @@ export function toCoverflowIslandPhotos(
 		photoId: p.photoId,
 		photoDate: p.photoDate,
 		selectedCollection: p.selectedCollection,
+		...(p.inDefaultSet !== undefined ? { inDefaultSet: p.inDefaultSet } : {}),
 	}))
+}
+
+/**
+ * Homepage coverflow payload: curated default strip plus theme-tagged photos
+ * so the collection dropdown can filter without an empty slideshow.
+ */
+export function buildHomepageCoverflowPhotos(
+	locations: MapLocationRecord[],
+	themeTaggedLocations: LocationRecord[] = [],
+): CoverflowIslandPhoto[] {
+	const defaultPhotos = buildSelectedPhotos(locations)
+	const defaultKeys = new Set(defaultPhotos.map((photo) => photo.key))
+
+	const defaultIslandPhotos = toCoverflowIslandPhotos(
+		defaultPhotos.map((photo) => ({ ...photo, inDefaultSet: true })),
+	)
+
+	const themeTaggedExtras: CoverflowIslandPhoto[] = []
+	const seenExtraKeys = new Set<string>()
+	for (const location of [...locations, ...themeTaggedLocations]) {
+		for (const photo of location.photos) {
+			const key = `${location.slug}-${photo.id}`
+			if (defaultKeys.has(key) || seenExtraKeys.has(key)) {
+				continue
+			}
+			const collection = photo.selectedCollection
+			if (!collection || !isSelectedPhotoCollectionValue(collection)) {
+				continue
+			}
+
+			seenExtraKeys.add(key)
+			themeTaggedExtras.push({
+				src: photo.src,
+				alt: photo.alt,
+				locationName: location.name,
+				locationSlug: location.slug,
+				photoId: photo.id,
+				photoDate: photo.photoDate,
+				selectedCollection: collection,
+				inDefaultSet: false,
+			})
+		}
+	}
+
+	return [...defaultIslandPhotos, ...themeTaggedExtras]
 }
 
 interface SelectedPhotoCandidate extends Omit<SelectedPhoto, 'plateNumber'> {

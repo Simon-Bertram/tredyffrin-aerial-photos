@@ -76,11 +76,25 @@ describe("SelectedPhotosCoverflow", () => {
     document.body.innerHTML = "";
   });
 
-  it("shows all photos by default when no collection is selected", () => {
+  it("shows default-set photos when no collection is selected", () => {
     render(<SelectedPhotosCoverflow photos={photos} />);
 
     expect(screen.getByText("Paoli")).toBeTruthy();
     expect(screen.getByText("Berwyn")).toBeTruthy();
+  });
+
+  it("hides filter-only photos from the default slideshow", () => {
+    render(
+      <SelectedPhotosCoverflow
+        photos={[
+          { ...photos[0], inDefaultSet: true },
+          { ...photos[1], inDefaultSet: false },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Paoli")).toBeTruthy();
+    expect(screen.queryByText("Berwyn")).toBeNull();
   });
 
   it("filters photos when a valid collection is selected", () => {
@@ -94,6 +108,16 @@ describe("SelectedPhotosCoverflow", () => {
 
     expect(screen.getByText("Paoli")).toBeTruthy();
     expect(screen.queryByText("Berwyn")).toBeNull();
+  });
+
+  it("applies an already-selected dropdown value at mount time", () => {
+    document.body.innerHTML = "";
+    mountCollectionSelect("bridges");
+
+    render(<SelectedPhotosCoverflow photos={photos} />);
+
+    expect(screen.queryByText("Paoli")).toBeNull();
+    expect(screen.getByText("Berwyn")).toBeTruthy();
   });
 
   it("resets to all photos when collection is cleared", () => {

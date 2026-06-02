@@ -48,6 +48,17 @@ export const locationsForMapQuery = /* groq */ `
   ${locationForMapProjection}
 `;
 
+/** Locations with theme-tagged photos (no coordinates requirement). */
+export const locationsWithThemeTaggedPhotosQuery = /* groq */ `
+  *[
+    _type == "location" &&
+    defined(slug.current) &&
+    count(photos[defined(selectedCollection)]) > 0
+  ]
+  | order(name asc)
+  ${locationForMapProjection}
+`;
+
 /** About page feature strip — same location set as map, minimal fields. */
 export const locationForAboutFeatureProjection = /* groq */ `{
   _id,

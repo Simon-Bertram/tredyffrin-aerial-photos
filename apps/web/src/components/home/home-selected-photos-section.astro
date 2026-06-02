@@ -39,7 +39,7 @@ const { photos } = Astro.props;
 
     <div class="relative min-h-[min(360px,55vh)] w-full">
       <SelectedPhotosCoverflowIsland
-        client:visible={{ rootMargin: "400px" }}
+        client:load
         photos={photos}
       >
         <div slot="fallback" class="absolute inset-0">

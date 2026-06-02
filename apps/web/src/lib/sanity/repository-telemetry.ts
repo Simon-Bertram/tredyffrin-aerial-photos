@@ -1,5 +1,6 @@
 export type SanityRepositoryQueryKind =
 	| 'locationsForMap'
+	| 'locationsWithThemeTaggedPhotos'
 	| 'locationsForAboutFeature'
 	| 'locationSlugs'
 	| 'otherLocationPlaces'

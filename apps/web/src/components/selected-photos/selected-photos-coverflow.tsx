@@ -21,9 +21,11 @@ export function SelectedPhotosCoverflow({
 }: SelectedPhotosCoverflowProps) {
   const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
   const [isUiEnhanced, setIsUiEnhanced] = useState(false);
+  // Mirror the server-rendered collection select so this island can react to filtering.
   const [activeCollection, setActiveCollection] = useState("");
 
   useEffect(() => {
+    // Enable enhanced controls after first paint to keep initial SSR/CSR output aligned.
     const rafId = window.requestAnimationFrame(() => {
       setIsUiEnhanced(true);
     });
@@ -33,6 +35,7 @@ export function SelectedPhotosCoverflow({
   }, []);
 
   useEffect(() => {
+    // The collection picker lives outside this React island, so we subscribe imperatively.
     const select = document.getElementById("photo-collection");
     if (!(select instanceof HTMLSelectElement)) {
       return;
@@ -65,8 +68,9 @@ export function SelectedPhotosCoverflow({
   }, []);
 
   const visiblePhotos = useMemo(() => {
+    // With no explicit collection selected, show the curated default set.
     if (!activeCollection) {
-      return photos;
+      return photos.filter((photo) => photo.inDefaultSet !== false);
     }
     return photos.filter((photo) => photo.selectedCollection === activeCollection);
   }, [activeCollection, photos]);
@@ -103,6 +107,8 @@ export function SelectedPhotosCoverflow({
   return (
     <div className="w-full">
       <Carousel_001
+        // Reset carousel position when the active collection changes.
+        key={activeCollection || "all"}
         className="max-w-none"
         images={images}
         showPagination={isUiEnhanced}

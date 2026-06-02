@@ -33,6 +33,7 @@ import {
 	locationSlugsQuery,
 	locationsForAboutFeatureQuery,
 	locationsForMapQuery,
+	locationsWithThemeTaggedPhotosQuery,
 	otherLocationPlacesQuery,
 	themeCollectionPhotoCountsQuery,
 	themeLocationsWithPhotosQuery,
@@ -124,6 +125,50 @@ export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
 			continue
 		}
 		out.push(mapped as MapLocationRecord)
+	}
+	return out
+}
+
+export async function fetchLocationsWithThemeTaggedPhotos(): Promise<
+	LocationRecord[]
+> {
+	const { client, imageBuilder } = getSanityRepositoryContext()
+	const rows = await client.fetch<unknown[]>(locationsWithThemeTaggedPhotosQuery)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchLocationsWithThemeTaggedPhotos',
+		'locationsWithThemeTaggedPhotos',
+	)
+	if (safeRows == null) {
+		return []
+	}
+
+	const out: LocationRecord[] = []
+	for (const row of safeRows) {
+		const slug = getRowSlug(row)
+		const mapped = mapSanityLocationToRecord(row, {
+			imageWidth: MAP_IMAGE_WIDTH,
+			imageBuilder,
+			onPhotoSkipped: (reason, detail) => {
+				emitSanityRepositorySkip(
+					'fetchLocationsWithThemeTaggedPhotos',
+					'locationsWithThemeTaggedPhotos',
+					slug,
+					reason,
+					detail,
+				)
+			},
+		})
+		if (!mapped) {
+			emitSanityRepositorySkip(
+				'fetchLocationsWithThemeTaggedPhotos',
+				'locationsWithThemeTaggedPhotos',
+				slug,
+				'location skipped after validation',
+			)
+			continue
+		}
+		out.push(mapped)
 	}
 	return out
 }

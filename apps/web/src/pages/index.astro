@@ -7,13 +7,11 @@ import OtherLocations from "@/components/OtherLocations.astro";
 import {
   buildThemeCollectionLinks,
   fetchLocationsForMap,
+  fetchLocationsWithThemeTaggedPhotos,
   fetchOtherLocationPlaces,
   fetchThemeCollectionPhotoCounts,
 } from "@/lib/sanity-location-repository";
-import {
-  buildSelectedPhotos,
-  toCoverflowIslandPhotos,
-} from "@/lib/selected-photos-data";
+import { buildHomepageCoverflowPhotos } from "@/lib/selected-photos-data";
 import { getSiteOrigin } from "@/lib/site-url";
 import {
   HOME_DESCRIPTION,
@@ -22,13 +20,18 @@ import {
   getFirstPreviewPhoto,
 } from "@/lib/home-layout";
 
-const [locations, otherPlaces, themeCounts] = await Promise.all([
-  fetchLocationsForMap(),
-  fetchOtherLocationPlaces(),
-  fetchThemeCollectionPhotoCounts(),
-]);
+const [locations, themeTaggedLocations, otherPlaces, themeCounts] =
+  await Promise.all([
+    fetchLocationsForMap(),
+    fetchLocationsWithThemeTaggedPhotos(),
+    fetchOtherLocationPlaces(),
+    fetchThemeCollectionPhotoCounts(),
+  ]);
 const themes = buildThemeCollectionLinks(themeCounts);
-const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations));
+const coverflowPhotos = buildHomepageCoverflowPhotos(
+  locations,
+  themeTaggedLocations,
+);
 
 const photoCount = locations.reduce(
   (total, location) => total + location.photos.length,
