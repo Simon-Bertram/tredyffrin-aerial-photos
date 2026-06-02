@@ -6,7 +6,9 @@
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
-    "preflight:cloudflare": "bun run ./scripts/preflight-cloudflare.ts"
+    "preflight:cloudflare": "bun run ./scripts/preflight-cloudflare.ts",
+    "check-types": "echo \"No dedicated tsconfig for @tredyffrin-aerial-photos/infra\"",
+    "test": "echo \"No tests configured for @tredyffrin-aerial-photos/infra\""
   },
   "dependencies": {
     "dotenv": "^17.4.2",

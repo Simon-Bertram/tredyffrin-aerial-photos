@@ -11,9 +11,17 @@ import {
 } from "@/lib/selected-photo-collections";
 
 const { slug } = Astro.params;
-const location = slug ? await getSanityLocationRecordBySlug(slug) : undefined;
+let location: Awaited<ReturnType<typeof getSanityLocationRecordBySlug>>;
 
-if (!location) {
+try {
+  location = slug ? await getSanityLocationRecordBySlug(slug) : undefined;
+} catch (error) {
+  console.error("[locations/[slug]] Sanity fetch failed:", error);
+  Astro.response.status = 503;
+  location = undefined;
+}
+
+if (!location && Astro.response.status !== 503) {
   Astro.response.status = 404;
 }
 
@@ -31,6 +39,16 @@ const displayPhotos =
         (photo) => photo.selectedCollection === activeCollection,
       )
     : location?.photos;
+
+const highlightPhotoParam = Astro.url.searchParams.get("photo");
+const initialPhotoId =
+  displayPhotos != null &&
+  highlightPhotoParam != null &&
+  displayPhotos.some((photo) => photo.id === highlightPhotoParam)
+    ? highlightPhotoParam
+    : undefined;
+
+const isUnavailable = Astro.response.status === 503;
 
 const siteOrigin = getSiteOrigin();
 const { pageTitle, pageDescription, previewSrc, previewAlt, jsonLd } =
@@ -55,8 +73,15 @@ const { pageTitle, pageDescription, previewSrc, previewAlt, jsonLd } =
     {location && displayPhotos ? (
       <LocationDetail
         location={{ ...location, photos: displayPhotos }}
-        highlightPhotoId={Astro.url.searchParams.get("photo")}
+        highlightPhotoId={initialPhotoId}
       />
+    ) : isUnavailable ? (
+      <section class="space-y-4">
+        <h1 class="text-2xl font-bold">Temporarily unavailable</h1>
+        <p class="text-sm text-on-surface-variant">
+          Location data could not be loaded. Please try again shortly.
+        </p>
+      </section>
     ) : (
       <LocationNotFound />
     )}

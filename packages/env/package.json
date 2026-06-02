@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "check-types": "echo \"No dedicated typecheck for @tredyffrin-aerial-photos/env\"",
+    "test": "echo \"No tests configured for @tredyffrin-aerial-photos/env\""
+  },
   "exports": {
     "./web": "./src/web.ts"
   },

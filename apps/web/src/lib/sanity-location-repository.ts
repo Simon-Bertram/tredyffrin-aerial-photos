@@ -1,9 +1,4 @@
 import {
-	PUBLIC_SANITY_DATASET,
-	PUBLIC_SANITY_PROJECT_ID,
-} from 'astro:env/server'
-
-import {
 	mapSanityRowsToAboutFeatureLocations,
 	pickFeaturePhotos,
 	type AboutFeaturePhoto,
@@ -13,8 +8,20 @@ import type {
 	LocationRecord,
 	MapLocationRecord,
 } from '@/lib/locations'
-import { getSanityClient } from '@/lib/sanity/client'
-import { createSanityImageBuilder } from '@/lib/sanity/image'
+import { getSanityRepositoryContext } from '@/lib/sanity/repository-context'
+import {
+	getRowSlug,
+	parsePlaceLinkRow,
+	requireSanityRows,
+} from '@/lib/sanity/repository-row-guards'
+import {
+	emitSanityRepositorySkip,
+	resetSanityRepositoryTelemetryEmitter,
+	setSanityRepositoryTelemetryEmitter,
+	type SanityRepositoryQueryKind,
+	type SanityRepositoryTelemetryEmitter,
+	type SanityRepositoryTelemetryEvent,
+} from '@/lib/sanity/repository-telemetry'
 import { mapSanityLocationToRecord } from '@/lib/sanity/map-location'
 import { TREDYFFRIN_EASTTOWN_VALUE } from '@/lib/place-collections'
 import {
@@ -31,6 +38,17 @@ import {
 	themeLocationsWithPhotosQuery,
 	themePlacesQuery,
 } from '@/lib/sanity/queries'
+
+export type {
+	SanityRepositoryQueryKind,
+	SanityRepositoryTelemetryEmitter,
+	SanityRepositoryTelemetryEvent,
+}
+
+export {
+	resetSanityRepositoryTelemetryEmitter,
+	setSanityRepositoryTelemetryEmitter,
+}
 
 export interface OtherLocationPlaceLink {
 	name: string
@@ -57,52 +75,52 @@ const MAP_PREVIEW_IMAGE_WIDTH = 800
 const ABOUT_FEATURE_IMAGE_WIDTH = 1200
 const DETAIL_IMAGE_WIDTH = 1600
 
-function logSkip(
-	context: string,
-	slugOrId: string,
-	reason: string,
-	detail?: unknown,
-) {
-	console.warn(`[sanity:${context}] ${slugOrId}: ${reason}`, detail ?? '')
-}
-
 export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
-	const client = getSanityClient()
-	const imageBuilder = createSanityImageBuilder(
-		PUBLIC_SANITY_PROJECT_ID,
-		PUBLIC_SANITY_DATASET,
-	)
+	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(locationsForMapQuery)
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:fetchLocationsForMap] expected array', rows)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchLocationsForMap',
+		'locationsForMap',
+	)
+	if (safeRows == null) {
 		return []
 	}
 
 	const out: MapLocationRecord[] = []
-	for (const row of rows) {
-		const slug =
-			typeof row === 'object' && row !== null && 'slug' in row
-				? String((row as { slug?: string }).slug ?? 'unknown')
-				: 'unknown'
+	for (const row of safeRows) {
+		const slug = getRowSlug(row)
 
 		const mapped = mapSanityLocationToRecord(row, {
 			imageWidth: MAP_IMAGE_WIDTH,
 			previewImageWidth: MAP_PREVIEW_IMAGE_WIDTH,
 			imageBuilder,
 			onPhotoSkipped: (reason, detail) => {
-				logSkip('fetchLocationsForMap', slug, reason, detail)
+				emitSanityRepositorySkip(
+					'fetchLocationsForMap',
+					'locationsForMap',
+					slug,
+					reason,
+					detail,
+				)
 			},
 		})
 		if (!mapped) {
-			logSkip(
+			emitSanityRepositorySkip(
 				'fetchLocationsForMap',
+				'locationsForMap',
 				slug,
 				'location skipped after validation',
 			)
 			continue
 		}
 		if (!mapped.coordinates) {
-			logSkip('fetchLocationsForMap', slug, 'missing coordinates')
+			emitSanityRepositorySkip(
+				'fetchLocationsForMap',
+				'locationsForMap',
+				slug,
+				'missing coordinates',
+			)
 			continue
 		}
 		out.push(mapped as MapLocationRecord)
@@ -113,22 +131,28 @@ export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
 export async function fetchAboutPageFeaturePhotos(
 	max: number,
 ): Promise<AboutFeaturePhoto[]> {
-	const client = getSanityClient()
-	const imageBuilder = createSanityImageBuilder(
-		PUBLIC_SANITY_PROJECT_ID,
-		PUBLIC_SANITY_DATASET,
-	)
+	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(locationsForAboutFeatureQuery)
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:fetchAboutPageFeaturePhotos] expected array', rows)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchAboutPageFeaturePhotos',
+		'locationsForAboutFeature',
+	)
+	if (safeRows == null) {
 		return []
 	}
 
-	const locations = mapSanityRowsToAboutFeatureLocations(rows, {
+	const locations = mapSanityRowsToAboutFeatureLocations(safeRows, {
 		imageWidth: ABOUT_FEATURE_IMAGE_WIDTH,
 		imageBuilder,
 		onPhotoSkipped: (slug, reason, detail) => {
-			logSkip('fetchAboutPageFeaturePhotos', slug, reason, detail)
+			emitSanityRepositorySkip(
+				'fetchAboutPageFeaturePhotos',
+				'locationsForAboutFeature',
+				slug,
+				reason,
+				detail,
+			)
 		},
 	})
 
@@ -136,14 +160,19 @@ export async function fetchAboutPageFeaturePhotos(
 }
 
 export async function fetchPublishedLocationSlugs(): Promise<string[]> {
-	const client = getSanityClient()
+	const { client } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown>(locationSlugsQuery)
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:fetchPublishedLocationSlugs] expected array', rows)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchPublishedLocationSlugs',
+		'locationSlugs',
+	)
+	if (safeRows == null) {
 		return []
 	}
+
 	const out: string[] = []
-	for (const row of rows) {
+	for (const row of safeRows) {
 		if (
 			typeof row === 'object' &&
 			row !== null &&
@@ -159,38 +188,40 @@ export async function fetchPublishedLocationSlugs(): Promise<string[]> {
 export async function fetchOtherLocationPlaces(
 	excludeSlug?: string,
 ): Promise<OtherLocationPlaceLink[]> {
-	const client = getSanityClient()
+	const { client } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(otherLocationPlacesQuery, {
 		tredyffrinEasttown: TREDYFFRIN_EASTTOWN_VALUE,
 	})
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:fetchOtherLocationPlaces] expected array', rows)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchOtherLocationPlaces',
+		'otherLocationPlaces',
+	)
+	if (safeRows == null) {
 		return []
 	}
 
 	const out: OtherLocationPlaceLink[] = []
-	for (const row of rows) {
-		if (typeof row !== 'object' || row === null) {
+	for (const row of safeRows) {
+		const parsed = parsePlaceLinkRow(row)
+		if (parsed == null) {
+			const slug = getRowSlug(row)
+			emitSanityRepositorySkip(
+				'fetchOtherLocationPlaces',
+				'otherLocationPlaces',
+				slug,
+				'missing name or slug',
+			)
 			continue
 		}
-		const name =
-			'name' in row && typeof row.name === 'string' ? row.name.trim() : ''
-		const slug =
-			'slug' in row && typeof row.slug === 'string' ? row.slug.trim() : ''
-		if (name === '' || slug === '') {
-			logSkip('fetchOtherLocationPlaces', slug || 'unknown', 'missing name or slug')
+		if (excludeSlug != null && parsed.slug === excludeSlug) {
 			continue
 		}
-		if (excludeSlug != null && slug === excludeSlug) {
-			continue
-		}
-		const photoCount =
-			'photoCount' in row &&
-			typeof row.photoCount === 'number' &&
-			Number.isFinite(row.photoCount)
-				? row.photoCount
-				: 0
-		out.push({ name, href: `/locations/${slug}`, photoCount })
+		out.push({
+			name: parsed.name,
+			href: `/locations/${parsed.slug}`,
+			photoCount: parsed.photoCount,
+		})
 	}
 	return out
 }
@@ -199,34 +230,22 @@ function mapThemePlaceRows(
 	rows: unknown[],
 	collection: string,
 ): ThemePlaceLink[] {
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:mapThemePlaceRows] expected array', rows)
-		return []
-	}
-
 	const out: ThemePlaceLink[] = []
 	for (const row of rows) {
-		if (typeof row !== 'object' || row === null) {
+		const parsed = parsePlaceLinkRow(row)
+		if (parsed == null) {
+			emitSanityRepositorySkip(
+				'mapThemePlaceRows',
+				'themePlaces',
+				getRowSlug(row),
+				'missing name or slug',
+			)
 			continue
 		}
-		const name =
-			'name' in row && typeof row.name === 'string' ? row.name.trim() : ''
-		const slug =
-			'slug' in row && typeof row.slug === 'string' ? row.slug.trim() : ''
-		if (name === '' || slug === '') {
-			logSkip('mapThemePlaceRows', slug || 'unknown', 'missing name or slug')
-			continue
-		}
-		const photoCount =
-			'photoCount' in row &&
-			typeof row.photoCount === 'number' &&
-			Number.isFinite(row.photoCount)
-				? row.photoCount
-				: 0
 		out.push({
-			name,
-			href: `/locations/${slug}?collection=${encodeURIComponent(collection)}`,
-			photoCount,
+			name: parsed.name,
+			href: `/locations/${parsed.slug}?collection=${encodeURIComponent(collection)}`,
+			photoCount: parsed.photoCount,
 		})
 	}
 	return out
@@ -235,46 +254,54 @@ function mapThemePlaceRows(
 export async function fetchThemePlaces(
 	collection: string,
 ): Promise<ThemePlaceLink[]> {
-	const client = getSanityClient()
+	const { client } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(themePlacesQuery, {
 		collection,
 	})
-	return mapThemePlaceRows(rows, collection)
+	const safeRows = requireSanityRows(rows, 'fetchThemePlaces', 'themePlaces')
+	if (safeRows == null) {
+		return []
+	}
+	return mapThemePlaceRows(safeRows, collection)
 }
 
 export async function fetchThemePhotos(
 	collection: string,
 ): Promise<LocationPhoto[]> {
-	const client = getSanityClient()
-	const imageBuilder = createSanityImageBuilder(
-		PUBLIC_SANITY_PROJECT_ID,
-		PUBLIC_SANITY_DATASET,
-	)
+	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(themeLocationsWithPhotosQuery, {
 		collection,
 	})
-	if (!Array.isArray(rows)) {
-		console.warn('[sanity:fetchThemePhotos] expected array', rows)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchThemePhotos',
+		'themeLocationsWithPhotos',
+	)
+	if (safeRows == null) {
 		return []
 	}
 
 	const photos: LocationPhoto[] = []
-	for (const row of rows) {
-		const slug =
-			typeof row === 'object' && row !== null && 'slug' in row
-				? String((row as { slug?: string }).slug ?? 'unknown')
-				: 'unknown'
+	for (const row of safeRows) {
+		const slug = getRowSlug(row)
 
 		const mapped = mapSanityLocationToRecord(row, {
 			imageWidth: DETAIL_IMAGE_WIDTH,
 			imageBuilder,
 			onPhotoSkipped: (reason, detail) => {
-				logSkip('fetchThemePhotos', slug, reason, detail)
+				emitSanityRepositorySkip(
+					'fetchThemePhotos',
+					'themeLocationsWithPhotos',
+					slug,
+					reason,
+					detail,
+				)
 			},
 		})
 		if (!mapped) {
-			logSkip(
+			emitSanityRepositorySkip(
 				'fetchThemePhotos',
+				'themeLocationsWithPhotos',
 				slug,
 				'location skipped after validation',
 			)
@@ -286,7 +313,7 @@ export async function fetchThemePhotos(
 }
 
 export async function fetchThemeCollectionPhotoCounts(): Promise<ThemeCollectionPhotoCounts> {
-	const client = getSanityClient()
+	const { client } = getSanityRepositoryContext()
 	const row = await client.fetch<unknown>(themeCollectionPhotoCountsQuery)
 	const counts = {} as ThemeCollectionPhotoCounts
 	for (const { value } of SELECTED_PHOTO_COLLECTIONS) {
@@ -316,11 +343,7 @@ export function buildThemeCollectionLinks(
 export async function getSanityLocationRecordBySlug(
 	slug: string,
 ): Promise<LocationRecord | undefined> {
-	const client = getSanityClient()
-	const imageBuilder = createSanityImageBuilder(
-		PUBLIC_SANITY_PROJECT_ID,
-		PUBLIC_SANITY_DATASET,
-	)
+	const { client, imageBuilder } = getSanityRepositoryContext()
 	const row = await client.fetch<unknown | null>(locationBySlugQuery, {
 		slug,
 	})
@@ -331,7 +354,13 @@ export async function getSanityLocationRecordBySlug(
 		imageWidth: DETAIL_IMAGE_WIDTH,
 		imageBuilder,
 		onPhotoSkipped: (reason, detail) => {
-			logSkip('getSanityLocationRecordBySlug', slug, reason, detail)
+			emitSanityRepositorySkip(
+				'getSanityLocationRecordBySlug',
+				'locationBySlug',
+				slug,
+				reason,
+				detail,
+			)
 		},
 	})
 }

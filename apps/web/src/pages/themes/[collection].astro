@@ -27,7 +27,12 @@ const themeTitle = isValidCollection
 	? getSelectedPhotoCollectionTitle(collection)
 	: undefined
 const photos = isValidCollection ? await fetchThemePhotos(collection) : []
-const highlightPhotoId = Astro.url.searchParams.get('photo')
+const highlightPhotoParam = Astro.url.searchParams.get('photo')
+const initialPhotoId =
+	highlightPhotoParam != null &&
+	photos.some((photo) => photo.id === highlightPhotoParam)
+		? highlightPhotoParam
+		: undefined
 
 const pageTitle = themeTitle
 	? `${themeTitle} — Tredyffrin Aerial Photos`
@@ -67,7 +72,7 @@ const previewPhoto = photos[0]
 						<LocationPhotoGalleryLauncherIsland
 							client:load
 							photos={photos}
-							initialPhotoId={highlightPhotoId}
+							initialPhotoId={initialPhotoId}
 						/>
 					</section>
 				) : (

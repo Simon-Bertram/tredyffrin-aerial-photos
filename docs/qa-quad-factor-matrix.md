@@ -161,3 +161,89 @@ and `packages/infra`.
 3. Add middleware tests covering method/status/path/header permutations.
 4. Add observability hooks beyond `console.warn` for high-risk skip/error paths.
 5. Add CI rule to prevent deploy commands that bypass preflight/safety checks.
+
+## P0 Refactor Notes (Implemented)
+
+This section documents the rationale, structural changes, and runtime behavior
+changes introduced by the P0 refactor pass.
+
+### Why These Changes Were Made
+
+- **Reduce edge cache drift risk:** previous cache eligibility logic used broad
+  prefix matching and only covered a subset of stable HTML routes.
+- **Lower homepage TTFB:** independent Sanity reads on `/` were performed
+  serially despite having no data dependency between them.
+- **Separate repository concerns:** data fetch orchestration, row guards, and
+  telemetry behaviors lived in one large module.
+- **Harden dynamic route behavior:** detail/theme pages accepted `?photo=`
+  values without checking that the photo exists in the resolved payload.
+- **Improve failure UX for upstream outages:** location detail route treated all
+  missing data as not-found rather than distinguishing fetch failures.
+- **Fix map control edge case:** locate button could enter waiting state in
+  unsupported geolocation environments.
+
+### New Structure
+
+The repository layer was split into focused support modules:
+
+- `apps/web/src/lib/sanity/repository-context.ts`
+  - Provides shared repository context (`client`, `imageBuilder`) and central
+    image builder memoization.
+- `apps/web/src/lib/sanity/repository-row-guards.ts`
+  - Encapsulates common row-shape checks and parsers:
+    - `requireSanityRows()`
+    - `getRowSlug()`
+    - `parsePlaceLinkRow()`
+- `apps/web/src/lib/sanity/repository-telemetry.ts`
+  - Centralizes telemetry types and emitters:
+    - `SanityRepositoryTelemetryEvent`
+    - `setSanityRepositoryTelemetryEmitter()`
+    - `resetSanityRepositoryTelemetryEmitter()`
+    - `emitSanityRepositorySkip()`
+    - `emitSanityRepositoryUnexpectedShape()`
+- `apps/web/src/lib/sanity-location-repository.ts`
+  - Retains public API surface but now delegates shared concerns to the modules
+    above to reduce duplication and improve maintainability.
+
+### Functionality Changes
+
+- **Middleware cache policy (`apps/web/src/middleware.ts`)**
+  - Cacheable HTML routes are now matched with explicit allowlist patterns:
+    `/`, `/about`, `/locations/[slug]`, `/themes/[collection]`.
+  - Header application now checks `Content-Type` and avoids adding HTML cache
+    policy to non-HTML responses.
+  - Decision logic is isolated in `shouldSetHtmlCacheHeader()` and covered in
+    unit tests.
+
+- **Homepage server data (`apps/web/src/pages/index.astro`)**
+  - `fetchLocationsForMap()`, `fetchOtherLocationPlaces()`, and
+    `fetchThemeCollectionPhotoCounts()` now run in `Promise.all(...)`.
+  - Expected impact: lower SSR latency for `/` under equivalent backend
+    conditions.
+
+- **Location detail route (`apps/web/src/pages/locations/[slug].astro`)**
+  - Adds explicit `try/catch` around Sanity fetch.
+  - Uses `503` + temporary unavailable UI for upstream failure path.
+  - Keeps `404` semantics for genuine not-found records.
+  - Validates `?photo=` against current `displayPhotos` before passing to the
+    gallery launcher.
+
+- **Theme route (`apps/web/src/pages/themes/[collection].astro`)**
+  - Validates `?photo=` against fetched photo IDs before passing initial photo
+    selection to the gallery launcher.
+
+- **Map controls (`apps/web/src/components/ui/map.tsx`)**
+  - Locate action now exits early when geolocation is unavailable and does not
+    leave control state in a waiting/spinner lock.
+
+### Expected Operational Impact
+
+- Reduced accidental cache broadening and better cache correctness for HTML
+  routes.
+- Lower server response time for homepage SSR due to parallel fetch fan-out.
+- Better resilience semantics (distinguishing unavailable vs missing content) on
+  location detail route.
+- Lower invalid deep-link surface for `?photo=` query parameters on location and
+  theme pages.
+- Cleaner repository internals for future Sanity query evolution and telemetry
+  extension.

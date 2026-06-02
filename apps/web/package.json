@@ -10,7 +10,7 @@
     "dev": "astro dev",
     "dev:bare": "astro dev",
     "check-types": "astro check",
-    "test": "bun run --cwd ../.. test:unit"
+    "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",

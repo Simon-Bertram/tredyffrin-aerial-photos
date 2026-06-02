@@ -22,9 +22,11 @@ import {
   getFirstPreviewPhoto,
 } from "@/lib/home-layout";
 
-const locations = await fetchLocationsForMap();
-const otherPlaces = await fetchOtherLocationPlaces();
-const themeCounts = await fetchThemeCollectionPhotoCounts();
+const [locations, otherPlaces, themeCounts] = await Promise.all([
+  fetchLocationsForMap(),
+  fetchOtherLocationPlaces(),
+  fetchThemeCollectionPhotoCounts(),
+]);
 const themes = buildThemeCollectionLinks(themeCounts);
 const coverflowPhotos = toCoverflowIslandPhotos(buildSelectedPhotos(locations));
 
