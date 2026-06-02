@@ -1,4 +1,4 @@
-import type { MapLocationRecord } from '@/lib/locations'
+import type { LocationRecord, MapLocationRecord } from '@/lib/locations'
 import { isSelectedPhotoCollectionValue } from '@/lib/selected-photo-collections'
 
 export interface SelectedPhoto {
