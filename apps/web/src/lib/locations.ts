@@ -29,14 +29,14 @@ export function getPhotoMetadataItems(
 		Pick<PhotoMetadataItem, 'key' | 'label'> & { value: string | undefined }
 	> = [
 		{
-			key: 'photographer',
-			label: 'Photographer',
-			value: photo.photographer,
-		},
-		{
 			key: 'photoDate',
 			label: 'Year',
 			value: photo.photoDate,
+		},
+		{
+			key: 'photographer',
+			label: 'Photographer',
+			value: photo.photographer,
 		},
 		{
 			key: 'direction',
