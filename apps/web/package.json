@@ -8,7 +8,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "dev": "astro dev",
-    "dev:bare": "astro dev"
+    "dev:bare": "astro dev",
+    "check-types": "astro check",
+    "test": "bun run --cwd ../.. test:unit"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
