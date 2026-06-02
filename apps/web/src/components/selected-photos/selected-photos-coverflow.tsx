@@ -7,6 +7,7 @@ import {
   type Carousel001Image,
 } from "@/components/ui/skiper-ui/skiper47";
 import type { CoverflowIslandPhoto } from "@/lib/selected-photos-data";
+import { isSelectedPhotoCollectionValue } from "@/lib/selected-photo-collections";
 
 import { SelectedPhotosAutoplayToggle } from "./selected-photos-autoplay-toggle";
 
@@ -20,6 +21,7 @@ export function SelectedPhotosCoverflow({
 }: SelectedPhotosCoverflowProps) {
   const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
   const [isUiEnhanced, setIsUiEnhanced] = useState(false);
+  const [activeCollection, setActiveCollection] = useState("");
 
   useEffect(() => {
     const rafId = window.requestAnimationFrame(() => {
@@ -30,7 +32,46 @@ export function SelectedPhotosCoverflow({
     };
   }, []);
 
-  if (photos.length === 0) {
+  useEffect(() => {
+    const select = document.getElementById("photo-collection");
+    if (!(select instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    const applyCollectionValue = (value: string) => {
+      if (!value) {
+        setActiveCollection("");
+        return;
+      }
+      if (!isSelectedPhotoCollectionValue(value)) {
+        setActiveCollection("");
+        return;
+      }
+      setActiveCollection(value);
+    };
+
+    applyCollectionValue(select.value);
+
+    const handleChange = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLSelectElement)) return;
+      applyCollectionValue(target.value);
+    };
+
+    select.addEventListener("change", handleChange);
+    return () => {
+      select.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  const visiblePhotos = useMemo(() => {
+    if (!activeCollection) {
+      return photos;
+    }
+    return photos.filter((photo) => photo.selectedCollection === activeCollection);
+  }, [activeCollection, photos]);
+
+  if (visiblePhotos.length === 0) {
     return (
       <div className="w-full">
         <p className="font-display italic text-on-surface-variant">
@@ -42,17 +83,17 @@ export function SelectedPhotosCoverflow({
 
   const images: Carousel001Image[] = useMemo(
     () =>
-      photos.map((p) => ({
+      visiblePhotos.map((p) => ({
         src: p.src,
         alt: p.alt,
         title: p.locationName,
         year: p.photoDate,
       })),
-    [photos],
+    [visiblePhotos],
   );
 
   const handleSlideClick = (realIndex: number) => {
-    const selected = photos[realIndex];
+    const selected = visiblePhotos[realIndex];
     if (!selected) return;
     const base = `/locations/${encodeURIComponent(selected.locationSlug)}`;
     const url = `${base}?photo=${encodeURIComponent(selected.photoId)}`;

@@ -58,8 +58,8 @@ const allowedCollectionValues = SELECTED_PHOTO_COLLECTIONS.map(
 
 		const { value } = target
 		if (!value) return
-		if (!allowedValues.has(value)) return
-
-		window.location.assign(`/themes/${value}`)
+		if (!allowedValues.has(value)) {
+			target.value = ''
+		}
 	})
 </script>

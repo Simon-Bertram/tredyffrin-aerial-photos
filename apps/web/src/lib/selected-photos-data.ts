@@ -10,6 +10,7 @@ export interface SelectedPhoto {
 	alt: string
 	photoDate?: string
 	direction?: string
+	selectedCollection?: string
 }
 
 /** Fields serialized to the coverflow client island (no full `locations` graph). */
@@ -20,6 +21,7 @@ export interface CoverflowIslandPhoto {
 	locationSlug: string
 	photoId: string
 	photoDate?: string
+	selectedCollection?: string
 }
 
 export function toCoverflowIslandPhotos(
@@ -32,6 +34,7 @@ export function toCoverflowIslandPhotos(
 		locationSlug: p.locationSlug,
 		photoId: p.photoId,
 		photoDate: p.photoDate,
+		selectedCollection: p.selectedCollection,
 	}))
 }
 
@@ -57,6 +60,7 @@ export function buildSelectedPhotos(
 				alt: photo.alt,
 				photoDate: photo.photoDate,
 				direction: photo.direction,
+				selectedCollection: photo.selectedCollection,
 				isSelected: photo.addToSelectedPhotosCollection === true,
 			})
 		}
@@ -76,5 +80,6 @@ export function buildSelectedPhotos(
 		alt: photo.alt,
 		photoDate: photo.photoDate,
 		direction: photo.direction,
+		selectedCollection: photo.selectedCollection,
 	}))
 }

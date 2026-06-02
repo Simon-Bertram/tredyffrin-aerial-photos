@@ -25,6 +25,7 @@ describe('buildSelectedPhotos', () => {
 						src: '/2.jpg',
 						alt: 'two',
 						addToSelectedPhotosCollection: true,
+						selectedCollection: 'airfields',
 					},
 				],
 			},
@@ -35,6 +36,7 @@ describe('buildSelectedPhotos', () => {
 			key: 'paoli-p2',
 			photoId: 'p2',
 			plateNumber: 1,
+			selectedCollection: 'airfields',
 		})
 	})
 
@@ -79,6 +81,7 @@ describe('toCoverflowIslandPhotos', () => {
 				alt: 'two',
 				photoDate: '1948',
 				direction: 'North',
+				selectedCollection: 'bridges',
 			},
 		])
 
@@ -90,6 +93,7 @@ describe('toCoverflowIslandPhotos', () => {
 				locationSlug: 'paoli',
 				photoId: 'p2',
 				photoDate: '1948',
+				selectedCollection: 'bridges',
 			},
 		])
 	})
