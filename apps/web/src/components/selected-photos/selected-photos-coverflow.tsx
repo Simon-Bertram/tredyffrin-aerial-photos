@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import {
   Carousel_001,
+  buildDefaultCarousel001Breakpoints,
+  defaultCarousel001SlidesPerGroup,
+  defaultCarousel001SlidesPerView,
+  type Carousel001Breakpoints,
   type Carousel001Image,
 } from "@/components/ui/skiper-ui/skiper47";
 import type { CoverflowIslandPhoto } from "@/lib/selected-photos-data";
@@ -14,10 +18,18 @@ import { SelectedPhotosAutoplayToggle } from "./selected-photos-autoplay-toggle"
 /** Perspective coverflow (Skiper UI); attribution: https://skiper-ui.com/v1/skiper47 */
 interface SelectedPhotosCoverflowProps {
   photos: CoverflowIslandPhoto[];
+  slidesPerView?: number;
+  slidesPerGroup?: number;
+  breakpoints?: Carousel001Breakpoints;
+  spaceBetween?: number;
 }
 
 export function SelectedPhotosCoverflow({
   photos,
+  slidesPerView,
+  slidesPerGroup,
+  breakpoints,
+  spaceBetween = 40,
 }: SelectedPhotosCoverflowProps) {
   const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
   const [isUiEnhanced, setIsUiEnhanced] = useState(false);
@@ -85,6 +97,26 @@ export function SelectedPhotosCoverflow({
       })),
     [visiblePhotos],
   );
+  const resolvedSlidesPerView =
+    slidesPerView ?? defaultCarousel001SlidesPerView;
+  const resolvedSlidesPerGroup =
+    slidesPerGroup ?? defaultCarousel001SlidesPerGroup;
+  const resolvedBreakpoints =
+    breakpoints ?? buildDefaultCarousel001Breakpoints(spaceBetween);
+  const breakpointConfigs = Object.values(resolvedBreakpoints);
+  const maxSlidesPerView = breakpointConfigs.reduce(
+    (max, breakpoint) => Math.max(max, breakpoint.slidesPerView ?? resolvedSlidesPerView),
+    resolvedSlidesPerView,
+  );
+  const maxSlidesPerGroup = breakpointConfigs.reduce(
+    (max, breakpoint) => Math.max(max, breakpoint.slidesPerGroup ?? resolvedSlidesPerGroup),
+    resolvedSlidesPerGroup,
+  );
+  const minSlidesForLoop = Math.max(
+    2,
+    Math.ceil(maxSlidesPerView) + maxSlidesPerGroup,
+  );
+  const canLoop = visiblePhotos.length >= minSlidesForLoop;
 
   if (visiblePhotos.length === 0) {
     return (
@@ -113,11 +145,14 @@ export function SelectedPhotosCoverflow({
         images={images}
         showPagination={isUiEnhanced}
         showNavigation={isUiEnhanced}
-        loop
+        loop={canLoop}
         autoplay={isAutoplayEnabled}
         autoplayDelay={6000}
         onSlideClick={handleSlideClick}
-        spaceBetween={40}
+        spaceBetween={spaceBetween}
+        slidesPerView={resolvedSlidesPerView}
+        slidesPerGroup={resolvedSlidesPerGroup}
+        breakpoints={resolvedBreakpoints}
       />
       <div className="my-4 text-sm flex justify-center">
         <SelectedPhotosAutoplayToggle

@@ -26,8 +26,48 @@ export type Carousel001Image = {
   year?: string;
 };
 
+export type Carousel001BreakpointConfig = {
+  slidesPerView?: number;
+  slidesPerGroup?: number;
+  spaceBetween?: number;
+};
+
+export type Carousel001Breakpoints = Record<number, Carousel001BreakpointConfig>;
+
 const navButtonClass =
   "flex size-10 items-center justify-center rounded-none bg-surface-container-low text-on-surface [--swiper-navigation-color:var(--on-surface)] shadow-[0_12px_24px_color-mix(in_srgb,var(--on-surface)_4%,transparent)] transition-colors after:hidden hover:bg-primary hover:text-white hover:[--swiper-navigation-color:white]";
+
+export const buildDefaultCarousel001Breakpoints = (
+  spaceBetween: number,
+): Carousel001Breakpoints => ({
+  480: {
+    slidesPerView: 1.4,
+    spaceBetween: Math.max(14, Math.round(spaceBetween * 0.55)),
+  },
+  640: {
+    slidesPerView: 1.85,
+    spaceBetween: Math.max(18, Math.round(spaceBetween * 0.72)),
+  },
+  768: {
+    slidesPerView: 2.2,
+    spaceBetween,
+  },
+  1024: {
+    slidesPerView: 2.55,
+    spaceBetween: Math.round(spaceBetween * 1.15),
+  },
+  1280: {
+    slidesPerView: 2.9,
+    spaceBetween: Math.round(spaceBetween * 1.35),
+  },
+  1536: {
+    slidesPerView: 3.15,
+    spaceBetween: Math.round(spaceBetween * 1.5),
+  },
+});
+
+export const defaultCarousel001SlidesPerView = 1.1;
+export const defaultCarousel001SlidesPerGroup = 1;
 
 const Carousel_001 = ({
   images,
@@ -38,6 +78,9 @@ const Carousel_001 = ({
   autoplay = false,
   autoplayDelay,
   spaceBetween = 40,
+  slidesPerView = defaultCarousel001SlidesPerView,
+  slidesPerGroup = defaultCarousel001SlidesPerGroup,
+  breakpoints,
   onSlideClick,
 }: {
   images: Carousel001Image[];
@@ -48,6 +91,9 @@ const Carousel_001 = ({
   autoplay?: boolean;
   autoplayDelay?: number;
   spaceBetween?: number;
+  slidesPerView?: number;
+  slidesPerGroup?: number;
+  breakpoints?: Carousel001Breakpoints;
   onSlideClick?: (index: number) => void;
 }) => {
   const delayMs = autoplayDelay ?? 1500;
@@ -64,32 +110,8 @@ const Carousel_001 = ({
   }, [autoplay, delayMs]);
 
   /** Wider viewports need *higher* slidesPerView so each slide stays narrower; lowering it widens cards and makes coverflow read as heavier overlap. */
-  const carouselBreakpoints = {
-    480: {
-      slidesPerView: 1.4,
-      spaceBetween: Math.max(14, Math.round(spaceBetween * 0.55)),
-    },
-    640: {
-      slidesPerView: 1.85,
-      spaceBetween: Math.max(18, Math.round(spaceBetween * 0.72)),
-    },
-    768: {
-      slidesPerView: 2.2,
-      spaceBetween: spaceBetween,
-    },
-    1024: {
-      slidesPerView: 2.55,
-      spaceBetween: Math.round(spaceBetween * 1.15),
-    },
-    1280: {
-      slidesPerView: 2.9,
-      spaceBetween: Math.round(spaceBetween * 1.35),
-    },
-    1536: {
-      slidesPerView: 3.15,
-      spaceBetween: Math.round(spaceBetween * 1.5),
-    },
-  };
+  const carouselBreakpoints =
+    breakpoints ?? buildDefaultCarousel001Breakpoints(spaceBetween);
   const css = `
   .Carousal_001 {
     padding-bottom: 50px !important;
@@ -129,7 +151,8 @@ const Carousel_001 = ({
         grabCursor={true}
         centeredSlides={true}
         loop={loop}
-        slidesPerView={1.1}
+        slidesPerView={slidesPerView}
+        slidesPerGroup={slidesPerGroup}
         slideToClickedSlide={true}
         coverflowEffect={{
           rotate: 0,

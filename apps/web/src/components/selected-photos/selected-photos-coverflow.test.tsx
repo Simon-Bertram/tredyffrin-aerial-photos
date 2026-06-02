@@ -6,6 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SelectedPhotosCoverflow } from "./selected-photos-coverflow";
 
 vi.mock("@/components/ui/skiper-ui/skiper47", () => ({
+  defaultCarousel001SlidesPerView: 1.1,
+  defaultCarousel001SlidesPerGroup: 1,
+  buildDefaultCarousel001Breakpoints: () => ({}),
   Carousel_001: ({ images, onSlideClick }: any) => (
     <div>
       <ul data-testid="carousel-images">
