@@ -27,9 +27,15 @@ Open [http://localhost:4321](http://localhost:4321) in your browser to see the w
 
 ## Deployment (Cloudflare via Alchemy)
 
-- Dev: cd apps/web && bun run alchemy dev
-- Deploy: cd apps/web && bun run deploy
-- Destroy: cd apps/web && bun run destroy
+Use **Bun 1.3.12** (see [`.bun-version`](.bun-version)). Copy
+[`packages/infra/.env.example`](packages/infra/.env.example) to `packages/infra/.env`
+and set `PUBLIC_SERVER_URL`, `ALCHEMY_STAGE`, and Cloudflare credentials.
+
+- Preflight: `bun run deploy:preflight`
+- Deploy (with prerender checks): `bun run deploy:safe`
+- Deploy only: `bun run deploy`
+- Infra dev: `bun run dev:infra`
+- Destroy: `bun run destroy`
 
 For more details, see the guide on [Deploying to Cloudflare with Alchemy](https://www.better-t-stack.dev/docs/guides/cloudflare-alchemy).
 

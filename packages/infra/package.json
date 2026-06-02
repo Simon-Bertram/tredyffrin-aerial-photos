@@ -6,7 +6,7 @@
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
-    "preflight:cloudflare": "bun run ./scripts/preflight-cloudflare.ts",
+    "preflight:cloudflare": "$HOME/.bun/bin/bun run ./scripts/assert-bun-version.ts && PATH=\"$HOME/.bun/bin:$PATH\" bun run ./scripts/preflight-cloudflare.ts",
     "check-types": "echo \"No dedicated tsconfig for @tredyffrin-aerial-photos/infra\"",
     "test": "echo \"No tests configured for @tredyffrin-aerial-photos/infra\""
   },

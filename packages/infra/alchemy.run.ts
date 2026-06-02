@@ -9,7 +9,9 @@ if (!process.env.CLOUDFLARE_COMPATIBILITY_DATE) {
 	process.env.CLOUDFLARE_COMPATIBILITY_DATE = "2026-04-22";
 }
 
-const app = await alchemy("tredyffrin-aerial-photos");
+const app = await alchemy("tredyffrin-aerial-photos", {
+	stage: process.env.ALCHEMY_STAGE ?? "production",
+});
 
 export const web = await Astro("web", {
 	cwd: "../../apps/web",
