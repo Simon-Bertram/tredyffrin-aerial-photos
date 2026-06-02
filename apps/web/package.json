@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@astrojs/cloudflare": "13.6.0",
-    "@cloudflare/workers-types": "^4.20260501.1",
+    "@cloudflare/workers-types": "^4.20260602.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.4",
     "@tredyffrin-aerial-photos/config": "workspace:*",

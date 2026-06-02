@@ -1,4 +1,4 @@
-import { useEffect, useRef, type MutableRefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type MapLibreGL from "maplibre-gl";
 
 import type { MapTerrainConfig } from "@/components/map/map-types";
@@ -13,7 +13,7 @@ type UseMapTerrainArgs = {
    * leave MapLibre's painter without the terrain-depth program and
    * crash on the next render frame.
    */
-  pendingStyleChangeRef?: MutableRefObject<boolean>;
+  pendingStyleChangeRef?: RefObject<boolean>;
 };
 
 const DEFAULT_SOURCE_ID = "terrain-dem";
