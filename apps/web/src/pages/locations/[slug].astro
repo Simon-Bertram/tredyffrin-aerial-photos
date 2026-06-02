@@ -47,6 +47,12 @@ const initialPhotoId =
   displayPhotos.some((photo) => photo.id === highlightPhotoParam)
     ? highlightPhotoParam
     : undefined;
+if (highlightPhotoParam != null && initialPhotoId == null) {
+  console.warn("[locations/[slug]] Ignoring invalid photo query param", {
+    slug: slug ?? "unknown",
+    photo: highlightPhotoParam,
+  });
+}
 
 const isUnavailable = Astro.response.status === 503;
 

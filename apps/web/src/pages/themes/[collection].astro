@@ -33,6 +33,12 @@ const initialPhotoId =
 	photos.some((photo) => photo.id === highlightPhotoParam)
 		? highlightPhotoParam
 		: undefined
+if (highlightPhotoParam != null && initialPhotoId == null) {
+	console.warn('[themes/[collection]] Ignoring invalid photo query param', {
+		collection: isValidCollection ? collection : 'invalid',
+		photo: highlightPhotoParam,
+	})
+}
 
 const pageTitle = themeTitle
 	? `${themeTitle} — Tredyffrin Aerial Photos`

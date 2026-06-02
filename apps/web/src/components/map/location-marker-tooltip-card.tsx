@@ -49,12 +49,18 @@ export function LocationMarkerTooltipCard({
   const goToNextPhoto = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    if (location.photos.length === 0) {
+      return;
+    }
     setCurrentPhotoIndex((prev) => (prev + 1) % location.photos.length);
   };
 
   const goToPrevPhoto = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
+    if (location.photos.length === 0) {
+      return;
+    }
     setCurrentPhotoIndex(
       (prev) => (prev - 1 + location.photos.length) % location.photos.length,
     );

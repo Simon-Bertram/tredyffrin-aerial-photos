@@ -2,6 +2,9 @@
 import { SELECTED_PHOTO_COLLECTIONS } from '@/lib/selected-photo-collections'
 
 const selectId = 'photo-collection'
+const allowedCollectionValues = SELECTED_PHOTO_COLLECTIONS.map(
+	(collection) => collection.value,
+)
 ---
 
 <div class="w-full md:w-auto md:min-w-56 md:max-w-xs">
@@ -45,8 +48,9 @@ const selectId = 'photo-collection'
 	</div>
 </div>
 
-<script>
+<script define:vars={{ allowedCollectionValues }}>
 	const select = document.getElementById('photo-collection')
+	const allowedValues = new Set(allowedCollectionValues)
 
 	select?.addEventListener('change', (event) => {
 		const target = event.target
@@ -54,6 +58,7 @@ const selectId = 'photo-collection'
 
 		const { value } = target
 		if (!value) return
+		if (!allowedValues.has(value)) return
 
 		window.location.assign(`/themes/${value}`)
 	})

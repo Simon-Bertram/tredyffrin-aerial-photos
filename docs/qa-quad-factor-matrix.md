@@ -247,3 +247,26 @@ The repository layer was split into focused support modules:
   theme pages.
 - Cleaner repository internals for future Sanity query evolution and telemetry
   extension.
+
+## Follow-up Refactors (Completed)
+
+These items complete the remaining code-level refactors from the review pass.
+
+- **Collection taxonomy hardening**
+  - `apps/web/src/lib/selected-photo-collections.ts` now defines
+    `SELECTED_PHOTO_COLLECTIONS` as an immutable `as const` source and validates
+    with a precomputed `Set` for tighter runtime checks.
+
+- **Client-side collection navigation guardrail**
+  - `apps/web/src/components/selected-photos/collection-dropdown.astro` now
+    checks selected values against an allowlist before navigating to
+    `/themes/<collection>`.
+
+- **Map tooltip carousel edge-case safety**
+  - `apps/web/src/components/map/location-marker-tooltip-card.tsx` now guards
+    prev/next handlers against zero-length photo arrays before modulo math.
+
+- **Route-level query-param observability**
+  - `apps/web/src/pages/locations/[slug].astro` and
+    `apps/web/src/pages/themes/[collection].astro` now emit structured warnings
+    when invalid `?photo=` params are ignored.
