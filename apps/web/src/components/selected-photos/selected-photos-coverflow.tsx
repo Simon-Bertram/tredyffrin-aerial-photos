@@ -71,16 +71,6 @@ export function SelectedPhotosCoverflow({
     return photos.filter((photo) => photo.selectedCollection === activeCollection);
   }, [activeCollection, photos]);
 
-  if (visiblePhotos.length === 0) {
-    return (
-      <div className="w-full">
-        <p className="font-display italic text-on-surface-variant">
-          The plate drawers await their first photograph.
-        </p>
-      </div>
-    );
-  }
-
   const images: Carousel001Image[] = useMemo(
     () =>
       visiblePhotos.map((p) => ({
@@ -91,6 +81,16 @@ export function SelectedPhotosCoverflow({
       })),
     [visiblePhotos],
   );
+
+  if (visiblePhotos.length === 0) {
+    return (
+      <div className="w-full">
+        <p className="font-display italic text-on-surface-variant">
+          The plate drawers await their first photograph.
+        </p>
+      </div>
+    );
+  }
 
   const handleSlideClick = (realIndex: number) => {
     const selected = visiblePhotos[realIndex];
