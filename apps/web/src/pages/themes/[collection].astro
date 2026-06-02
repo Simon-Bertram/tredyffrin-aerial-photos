@@ -4,16 +4,9 @@ import BackToMapLink from '@/components/location/back-to-map-link.astro'
 import { LocationPhotoGalleryLauncherIsland } from '@/components/location/location-photo-gallery-launcher-island'
 import { fetchThemePhotos } from '@/lib/sanity-location-repository'
 import {
-	SELECTED_PHOTO_COLLECTIONS,
 	getSelectedPhotoCollectionTitle,
 	isSelectedPhotoCollectionValue,
 } from '@/lib/selected-photo-collections'
-
-export function getStaticPaths() {
-	return SELECTED_PHOTO_COLLECTIONS.map(({ value }) => ({
-		params: { collection: value },
-	}))
-}
 
 const { collection } = Astro.params
 const isValidCollection =
