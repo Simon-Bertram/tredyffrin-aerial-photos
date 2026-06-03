@@ -22,6 +22,49 @@ export const sanityImageForUrlSchema = z.looseObject({
     }),
 });
 
+/** Plain strings or portable-text blocks from Sanity → string[]. */
+export function normalizeSanityPhotoReferences(
+  value: unknown,
+): string[] | null | undefined {
+  if (value == null) {
+    return value;
+  }
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const strings: string[] = [];
+  for (const item of value) {
+    if (typeof item === "string") {
+      const trimmed = item.trim();
+      if (trimmed.length > 0) {
+        strings.push(trimmed);
+      }
+      continue;
+    }
+    if (item == null || typeof item !== "object") {
+      continue;
+    }
+    const block = item as { _type?: string; children?: unknown[] };
+    if (block._type !== "block" || !Array.isArray(block.children)) {
+      continue;
+    }
+    const text = block.children
+      .map((child) => {
+        if (child == null || typeof child !== "object") {
+          return "";
+        }
+        const span = child as { text?: unknown };
+        return typeof span.text === "string" ? span.text : "";
+      })
+      .join("");
+    const trimmed = text.trim();
+    if (trimmed.length > 0) {
+      strings.push(trimmed);
+    }
+  }
+  return strings.length > 0 ? strings : null;
+}
+
 export const sanityLocationPhotoRawSchema = z.object({
   _key: z.string().optional(),
   title: z.string().nullable().optional(),
@@ -37,7 +80,10 @@ export const sanityLocationPhotoRawSchema = z.object({
     .enum(SELECTED_PHOTO_COLLECTION_VALUES)
     .nullable()
     .optional(),
-  references: z.array(z.string()).nullable().optional(),
+  references: z.preprocess(
+    normalizeSanityPhotoReferences,
+    z.array(z.string()).nullable().optional(),
+  ),
   ownership: z.string().nullable().optional(),
 });
 
