@@ -1,4 +1,5 @@
 // @ts-check
+import { existsSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 import alchemy from "alchemy/cloudflare/astro";
 import { defineConfig, envField } from "astro/config";
@@ -6,7 +7,9 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import react from "@astrojs/react";
 
-const wranglerConfigPath = "./wrangler.toml";
+const wranglerConfigPath = existsSync("./wrangler.toml")
+  ? "./wrangler.toml"
+  : "./wrangler.example.toml";
 
 /** Pre-bundle SSR deps in one pass — avoids deps_ssr / react-dom/server split (Astro 6 + Cloudflare). */
 const SERVER_OPTIMIZE_DEPS = [

@@ -1,0 +1,4 @@
+# Minimal Wrangler config for CI and fresh clones.
+# Alchemy overwrites wrangler.toml locally during dev/deploy.
+name = "tredyffrin-aerial-photos-web"
+compatibility_date = "2026-04-22"
