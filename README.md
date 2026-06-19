@@ -11,11 +11,17 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 
 ## Getting Started
 
+Use **Bun 1.3.12** (see [`.bun-version`](.bun-version)). Prefer the pinned
+install at `~/.bun/bin/bun`, or put it first on your `PATH`.
+
 First, install the dependencies:
 
 ```bash
 bun install
 ```
+
+After changing any `package.json`, run `bun install` again and commit the
+updated `bun.lock` in the same change. CI runs `bun install --frozen-lockfile`.
 
 Then, run the development server:
 

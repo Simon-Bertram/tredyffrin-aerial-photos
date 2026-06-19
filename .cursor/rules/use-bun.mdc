@@ -9,7 +9,12 @@ This monorepo declares **`packageManager: "bun@…"`** in the root [`package.jso
 
 ## Do
 
+- Use the pinned Bun binary: **`PATH="$HOME/.bun/bin:$PATH"`** or
+  **`~/.bun/bin/bun`** (see [`.bun-version`](.bun-version)). Do not rely on
+  Homebrew or other Bun installs that may differ from CI.
 - **`bun install`** — add or sync dependencies (not `npm install`, `pnpm i`, etc.).
+  After editing any `package.json`, run `bun install` and commit `bun.lock` in
+  the same change. CI uses `--frozen-lockfile`.
 - **`bun run <script>`** — run scripts from `package.json` (e.g. `bun run build`, `bun run dev`, `bun run check-types`). From repo root, Turbo scripts apply (e.g. `bun run build`).
 - **`bunx <package> <args>`** — one-off CLIs when a script does not exist (not `npx`).
 - In **`apps/web`**, use `bun run build`, `bun run astro`, etc., as defined in that package’s `package.json`.
