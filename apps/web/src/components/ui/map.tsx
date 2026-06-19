@@ -1078,6 +1078,8 @@ function CompassButton({ onClick }: { onClick: () => void }) {
         ref={compassRef}
         viewBox="0 0 24 24"
         className="size-5 transition-transform duration-200"
+        role="img"
+        aria-label="Reset bearing to north"
         style={{ transformStyle: "preserve-3d" }}
       >
         <path d="M12 2L16 12H12V2Z" className="fill-red-500" />
@@ -1291,7 +1293,7 @@ function MapRoute({
   }, [isLoaded, map, coordinates, sourceId]);
 
   useEffect(() => {
-    if (!isLoaded || !map || !map.getLayer(layerId)) return;
+    if (!isLoaded || !map?.getLayer(layerId)) return;
 
     map.setPaintProperty(layerId, "line-color", color);
     map.setPaintProperty(layerId, "line-width", width);
