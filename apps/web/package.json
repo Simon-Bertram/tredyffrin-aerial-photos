@@ -10,7 +10,8 @@
     "dev": "astro dev",
     "dev:bare": "astro dev",
     "check-types": "astro check",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts",
+    "lint": "biome lint src e2e"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",

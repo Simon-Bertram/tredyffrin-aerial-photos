@@ -3,6 +3,16 @@ import {
 	pickFeaturePhotos,
 	type AboutFeaturePhoto,
 } from '@/lib/about-feature-photos'
+import {
+	e2eFixtureLocationBySlug,
+	e2eFixtureLocationsForMap,
+	e2eFixtureOtherLocationPlaces,
+	e2eFixturePublishedLocationSlugs,
+	e2eFixtureThemeCollectionCounts,
+	e2eFixtureThemePhotos,
+	e2eFixtureThemeTaggedLocations,
+	isE2eFixturesEnabled,
+} from '@/lib/e2e-fixtures'
 import type {
 	LocationPhoto,
 	LocationRecord,
@@ -77,6 +87,10 @@ const ABOUT_FEATURE_IMAGE_WIDTH = 1200
 const DETAIL_IMAGE_WIDTH = 1600
 
 export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureLocationsForMap
+	}
+
 	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(locationsForMapQuery)
 	const safeRows = requireSanityRows(
@@ -132,6 +146,10 @@ export async function fetchLocationsForMap(): Promise<MapLocationRecord[]> {
 export async function fetchLocationsWithThemeTaggedPhotos(): Promise<
 	LocationRecord[]
 > {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureThemeTaggedLocations
+	}
+
 	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(locationsWithThemeTaggedPhotosQuery)
 	const safeRows = requireSanityRows(
@@ -205,6 +223,10 @@ export async function fetchAboutPageFeaturePhotos(
 }
 
 export async function fetchPublishedLocationSlugs(): Promise<string[]> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixturePublishedLocationSlugs
+	}
+
 	const { client } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown>(locationSlugsQuery)
 	const safeRows = requireSanityRows(
@@ -233,6 +255,12 @@ export async function fetchPublishedLocationSlugs(): Promise<string[]> {
 export async function fetchOtherLocationPlaces(
 	excludeSlug?: string,
 ): Promise<OtherLocationPlaceLink[]> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureOtherLocationPlaces.filter(
+			(place) => excludeSlug == null || !place.href.endsWith(`/${excludeSlug}`),
+		)
+	}
+
 	const { client } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(otherLocationPlacesQuery, {
 		tredyffrinEasttown: TREDYFFRIN_EASTTOWN_VALUE,
@@ -313,6 +341,10 @@ export async function fetchThemePlaces(
 export async function fetchThemePhotos(
 	collection: string,
 ): Promise<LocationPhoto[]> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureThemePhotos[collection] ?? []
+	}
+
 	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(themeLocationsWithPhotosQuery, {
 		collection,
@@ -358,6 +390,10 @@ export async function fetchThemePhotos(
 }
 
 export async function fetchThemeCollectionPhotoCounts(): Promise<ThemeCollectionPhotoCounts> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureThemeCollectionCounts
+	}
+
 	const { client } = getSanityRepositoryContext()
 	const row = await client.fetch<unknown>(themeCollectionPhotoCountsQuery)
 	const counts = {} as ThemeCollectionPhotoCounts
@@ -388,6 +424,10 @@ export function buildThemeCollectionLinks(
 export async function getSanityLocationRecordBySlug(
 	slug: string,
 ): Promise<LocationRecord | undefined> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureLocationBySlug[slug]
+	}
+
 	const { client, imageBuilder } = getSanityRepositoryContext()
 	const row = await client.fetch<unknown | null>(locationBySlugQuery, {
 		slug,

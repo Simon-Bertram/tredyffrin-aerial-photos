@@ -6,7 +6,9 @@ vi.mock('astro:middleware', () => ({
 }))
 
 import {
+	applySecurityHeaders,
 	isCacheableHtmlRoute,
+	SECURITY_HEADERS,
 	shouldSetHtmlCacheHeader,
 } from '@/middleware'
 
@@ -102,5 +104,40 @@ describe('shouldSetHtmlCacheHeader', () => {
 				contentType: 'application/json',
 			}),
 		).toBe(false)
+	})
+})
+
+describe('applySecurityHeaders', () => {
+	it('sets baseline security headers when absent', () => {
+		const response = new Response('ok')
+
+		applySecurityHeaders(response, false)
+
+		for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+			expect(response.headers.get(name)).toBe(value)
+		}
+		expect(response.headers.get('Strict-Transport-Security')).toBeNull()
+	})
+
+	it('sets HSTS on https responses', () => {
+		const response = new Response('ok')
+
+		applySecurityHeaders(response, true)
+
+		expect(response.headers.get('Strict-Transport-Security')).toBe(
+			'max-age=31536000; includeSubDomains',
+		)
+	})
+
+	it('does not overwrite existing header values', () => {
+		const response = new Response('ok', {
+			headers: {
+				'X-Frame-Options': 'SAMEORIGIN',
+			},
+		})
+
+		applySecurityHeaders(response, false)
+
+		expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN')
 	})
 })

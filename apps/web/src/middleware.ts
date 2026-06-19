@@ -5,6 +5,46 @@ import { defineMiddleware } from 'astro:middleware'
 export const HTML_CACHE_CONTROL =
 	'public, max-age=60, s-maxage=600, stale-while-revalidate=86400'
 
+export const CONTENT_SECURITY_POLICY = [
+	"default-src 'self'",
+	"script-src 'self' 'unsafe-inline'",
+	"style-src 'self' 'unsafe-inline'",
+	"img-src 'self' data: blob: https://cdn.sanity.io https://*.basemaps.cartocdn.com https://tiles.openstreetmap.org",
+	"font-src 'self'",
+	"connect-src 'self' https://*.cartocdn.com https://*.sanity.io https://api.sanity.io",
+	"worker-src 'self' blob:",
+	"child-src 'self' blob:",
+	"frame-ancestors 'none'",
+	"base-uri 'self'",
+	"form-action 'self'",
+].join('; ')
+
+export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
+	'Content-Security-Policy': CONTENT_SECURITY_POLICY,
+	'X-Content-Type-Options': 'nosniff',
+	'X-Frame-Options': 'DENY',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+}
+
+export function applySecurityHeaders(
+	response: Response,
+	isHttps: boolean,
+): void {
+	for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+		if (!response.headers.has(name)) {
+			response.headers.set(name, value)
+		}
+	}
+
+	if (isHttps && !response.headers.has('Strict-Transport-Security')) {
+		response.headers.set(
+			'Strict-Transport-Security',
+			'max-age=31536000; includeSubDomains',
+		)
+	}
+}
+
 const CACHEABLE_HTML_ROUTE_PATTERNS: ReadonlyArray<RegExp> = [
 	/^\/$/,
 	/^\/about$/,
@@ -50,6 +90,8 @@ export function shouldSetHtmlCacheHeader({
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const response = await next()
+
+	applySecurityHeaders(response, context.url.protocol === 'https:')
 
 	if (
 		!shouldSetHtmlCacheHeader({

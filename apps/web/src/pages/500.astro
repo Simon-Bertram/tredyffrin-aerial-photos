@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+Astro.response.status = 500
+---
+
+<Layout
+	title="Something went wrong — Tredyffrin Aerial Photos"
+	description="An unexpected error occurred while loading this page."
+	robots="noindex, nofollow"
+>
+	<main
+		id="main-content"
+		class="mx-auto max-w-7xl space-y-4 px-6 py-16 md:px-10"
+	>
+		<h1 class="font-display text-3xl font-light tracking-[-0.01em]">
+			Something went <span class="italic text-primary">wrong.</span>
+		</h1>
+		<p class="max-w-md text-sm leading-relaxed text-on-surface-variant">
+			An unexpected error occurred while loading this page. Please try again
+			shortly, or return to the archive home.
+		</p>
+		<p>
+			<a
+				href="/"
+				class="text-on-surface underline underline-offset-4 decoration-1 hover:text-primary"
+			>
+				Back to the archive
+			</a>
+		</p>
+	</main>
+</Layout>

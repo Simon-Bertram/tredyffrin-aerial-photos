@@ -18,6 +18,7 @@ const mapSanityLocationToRecordMock = vi.fn()
 vi.mock('astro:env/server', () => ({
 	PUBLIC_SANITY_PROJECT_ID: 'proj',
 	PUBLIC_SANITY_DATASET: 'dataset',
+	SANITY_E2E_FIXTURES: undefined,
 }))
 
 vi.mock('@/lib/sanity/client', () => ({

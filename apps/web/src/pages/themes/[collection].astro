@@ -19,7 +19,20 @@ if (!isValidCollection) {
 const themeTitle = isValidCollection
 	? getSelectedPhotoCollectionTitle(collection)
 	: undefined
-const photos = isValidCollection ? await fetchThemePhotos(collection) : []
+
+let photos: Awaited<ReturnType<typeof fetchThemePhotos>> = []
+let isUnavailable = false
+
+if (isValidCollection) {
+	try {
+		photos = await fetchThemePhotos(collection)
+	} catch (error) {
+		console.error('[themes/[collection]] Sanity fetch failed:', error)
+		Astro.response.status = 503
+		isUnavailable = true
+	}
+}
+
 const highlightPhotoParam = Astro.url.searchParams.get('photo')
 const initialPhotoId =
 	highlightPhotoParam != null &&
@@ -54,6 +67,15 @@ const previewPhoto = photos[0]
 		class="relative mx-auto max-w-7xl px-6 py-6 md:px-10"
 	>
 		{isValidCollection ? (
+			isUnavailable ? (
+				<section class="space-y-4">
+					<BackToMapLink />
+					<h1 class="text-2xl font-bold">Temporarily unavailable</h1>
+					<p class="text-sm text-on-surface-variant">
+						Theme data could not be loaded. Please try again shortly.
+					</p>
+				</section>
+			) : (
 			<section class="flex flex-col gap-8 md:gap-10">
 				<BackToMapLink />
 
@@ -69,7 +91,7 @@ const previewPhoto = photos[0]
 							Photos ({photos.length})
 						</h2>
 						<LocationPhotoGalleryLauncherIsland
-							client:load
+							client:visible
 							photos={photos}
 							initialPhotoId={initialPhotoId}
 						/>
@@ -80,6 +102,7 @@ const previewPhoto = photos[0]
 					</section>
 				)}
 			</section>
+			)
 		) : (
 			<section class="space-y-4">
 				<BackToMapLink />

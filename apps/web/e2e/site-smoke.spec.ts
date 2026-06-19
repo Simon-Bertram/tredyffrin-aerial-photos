@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { E2E_TEST_LOCATION_SLUG } from '../src/lib/e2e-constants'
+
 test.describe('site smoke and abuse-path checks', () => {
 	test('homepage dropdown filters selected-photos coverflow in-place', async ({
 		page,
@@ -101,6 +103,17 @@ test.describe('site smoke and abuse-path checks', () => {
 		expect(response?.status()).toBe(404)
 		await expect(page.getByRole('heading', { level: 1 })).toContainText(
 			'Location not found',
+		)
+	})
+
+	test('renders a valid location page from fixture data', async ({ page }) => {
+		const response = await page.goto(`/locations/${E2E_TEST_LOCATION_SLUG}`)
+		expect(response?.status()).toBe(200)
+		await expect(page.getByRole('heading', { level: 1 })).toContainText(
+			'E2E Test Location',
+		)
+		await expect(page.getByRole('heading', { level: 2 })).toContainText(
+			'Location Photos',
 		)
 	})
 })

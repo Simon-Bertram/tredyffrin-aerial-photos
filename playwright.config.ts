@@ -17,8 +17,14 @@ export default defineConfig({
 		command: `bun run astro dev --host 127.0.0.1 --port ${PORT}`,
 		cwd: 'apps/web',
 		url: baseURL,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: false,
 		timeout: 120000,
+		env: {
+			SANITY_E2E_FIXTURES: '1',
+			PUBLIC_SANITY_PROJECT_ID: 'e2e-fixtures',
+			PUBLIC_SANITY_DATASET: 'e2e',
+			PUBLIC_SERVER_URL: baseURL,
+		},
 	},
 	projects: [
 		{

@@ -189,7 +189,7 @@ function collapseAttributionControl(map: MapLibreGL.Map) {
   attributionControl.classList.remove("maplibregl-compact-show");
 }
 
-const Map = forwardRef<MapRef, MapProps>(function Map(
+const MapRoot = forwardRef<MapRef, MapProps>(function MapRoot(
   {
     children,
     className,
@@ -1643,7 +1643,7 @@ function MapClusterLayer<
 }
 
 export {
-  Map,
+  MapRoot as Map,
   useMap,
   MapMarker,
   MarkerContent,

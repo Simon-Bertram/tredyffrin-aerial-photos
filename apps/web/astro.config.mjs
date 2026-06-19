@@ -79,6 +79,11 @@ export default defineConfig({
         context: "server",
         optional: true,
       }),
+      SANITY_E2E_FIXTURES: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
     },
   },
 

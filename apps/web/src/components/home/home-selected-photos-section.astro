@@ -38,7 +38,7 @@ const { photos } = Astro.props;
     </div>
 
     <div class="relative min-h-[min(360px,55vh)] w-full">
-      <SelectedPhotosCoverflowIsland client:load photos={photos}>
+      <SelectedPhotosCoverflowIsland client:visible photos={photos}>
         <div slot="fallback" class="absolute inset-0">
           <LoadingDotsFallback variant="coverflow" />
         </div>

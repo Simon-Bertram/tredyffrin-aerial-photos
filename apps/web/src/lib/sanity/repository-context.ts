@@ -15,13 +15,15 @@ export interface SanityRepositoryContext {
 let cachedImageBuilder: ReturnType<typeof createSanityImageBuilder> | undefined
 
 export function getSanityRepositoryContext(): SanityRepositoryContext {
+	if (!cachedImageBuilder) {
+		cachedImageBuilder = createSanityImageBuilder(
+			PUBLIC_SANITY_PROJECT_ID,
+			PUBLIC_SANITY_DATASET,
+		)
+	}
+
 	return {
 		client: getSanityClient(),
-		imageBuilder:
-			cachedImageBuilder ??
-			(cachedImageBuilder = createSanityImageBuilder(
-				PUBLIC_SANITY_PROJECT_ID,
-				PUBLIC_SANITY_DATASET,
-			)),
+		imageBuilder: cachedImageBuilder,
 	}
 }

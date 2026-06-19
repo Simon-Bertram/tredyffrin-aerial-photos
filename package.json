@@ -19,7 +19,7 @@
     "dev": "turbo -F web dev",
     "dev:infra": "turbo -F @tredyffrin-aerial-photos/infra dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "biome lint apps/web/src apps/web/e2e packages/infra/scripts vitest.config.ts playwright.config.ts",
     "check-types": "turbo check-types",
     "test": "turbo test",
     "test:unit": "vitest run",
@@ -44,6 +44,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260619.1",
     "@playwright/test": "^1.61.0",
+    "@biomejs/biome": "^2.3.14",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@tredyffrin-aerial-photos/config": "workspace:*",
