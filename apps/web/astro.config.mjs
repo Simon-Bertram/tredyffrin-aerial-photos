@@ -55,7 +55,9 @@ function optimizeServerDeps() {
 export default defineConfig({
   output: "server",
   adapter: alchemy({
-    configPath: wranglerConfigPath,
+    platformProxy: {
+      configPath: wranglerConfigPath,
+    },
     prerenderEnvironment: "node",
   }),
 

@@ -194,6 +194,19 @@ export async function fetchLocationsWithThemeTaggedPhotos(): Promise<
 export async function fetchAboutPageFeaturePhotos(
 	max: number,
 ): Promise<AboutFeaturePhoto[]> {
+	if (isE2eFixturesEnabled()) {
+		const locations = e2eFixtureLocationsForMap.map((location) => ({
+			slug: location.slug,
+			name: location.name,
+			photos: location.photos.map((photo) => ({
+				src: photo.src,
+				alt: photo.alt,
+				photoDate: photo.photoDate,
+			})),
+		}))
+		return pickFeaturePhotos(locations, max)
+	}
+
 	const { client, imageBuilder } = getSanityRepositoryContext()
 	const rows = await client.fetch<unknown[]>(locationsForAboutFeatureQuery)
 	const safeRows = requireSanityRows(

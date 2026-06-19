@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SanityRepositoryTelemetryEvent } from '@/lib/sanity-location-repository'
 import {
+	fetchAboutPageFeaturePhotos,
 	fetchLocationsForMap,
 	fetchOtherLocationPlaces,
 	fetchPublishedLocationSlugs,
@@ -15,10 +16,16 @@ import {
 const fetchMock = vi.fn()
 const mapSanityLocationToRecordMock = vi.fn()
 
+const envMock = vi.hoisted(() => ({
+	SANITY_E2E_FIXTURES: undefined as string | undefined,
+}))
+
 vi.mock('astro:env/server', () => ({
 	PUBLIC_SANITY_PROJECT_ID: 'proj',
 	PUBLIC_SANITY_DATASET: 'dataset',
-	SANITY_E2E_FIXTURES: undefined,
+	get SANITY_E2E_FIXTURES() {
+		return envMock.SANITY_E2E_FIXTURES
+	},
 }))
 
 vi.mock('@/lib/sanity/client', () => ({
@@ -158,5 +165,22 @@ describe('sanity-location-repository drift handling', () => {
 		expect(result).toEqual([
 			{ name: 'Paoli', href: '/locations/paoli', photoCount: 3 },
 		])
+	})
+
+	it('returns fixture about-page photos without calling Sanity', async () => {
+		envMock.SANITY_E2E_FIXTURES = '1'
+
+		const result = await fetchAboutPageFeaturePhotos(5)
+
+		expect(fetchMock).not.toHaveBeenCalled()
+		expect(result.length).toBeGreaterThan(0)
+		expect(result[0]).toMatchObject({
+			slug: expect.any(String),
+			src: expect.any(String),
+			alt: expect.any(String),
+			locationName: expect.any(String),
+		})
+
+		envMock.SANITY_E2E_FIXTURES = undefined
 	})
 })
