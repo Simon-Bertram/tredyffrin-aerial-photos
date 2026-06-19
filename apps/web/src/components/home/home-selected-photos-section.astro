@@ -14,7 +14,7 @@ const { photos } = Astro.props;
 
 <section
   id="selected-photographs"
-  class="relative mx-auto max-w-7xl px-6 pb-24 md:px-10 md:pb-32"
+  class="relative mx-auto max-w-7xl px-6 md:px-10 mb-16"
 >
   <div class="flex flex-col gap-10 md:gap-16">
     <div
@@ -38,10 +38,7 @@ const { photos } = Astro.props;
     </div>
 
     <div class="relative min-h-[min(360px,55vh)] w-full">
-      <SelectedPhotosCoverflowIsland
-        client:load
-        photos={photos}
-      >
+      <SelectedPhotosCoverflowIsland client:load photos={photos}>
         <div slot="fallback" class="absolute inset-0">
           <LoadingDotsFallback variant="coverflow" />
         </div>
