@@ -7,6 +7,7 @@ vi.mock('astro:middleware', () => ({
 
 import {
 	applySecurityHeaders,
+	CONTENT_SECURITY_POLICY,
 	isCacheableHtmlRoute,
 	SECURITY_HEADERS,
 	shouldSetHtmlCacheHeader,
@@ -108,6 +109,14 @@ describe('shouldSetHtmlCacheHeader', () => {
 })
 
 describe('applySecurityHeaders', () => {
+	it('allows AWS terrain elevation tiles for map 3D terrain', () => {
+		expect(CONTENT_SECURITY_POLICY).toContain(
+			'https://s3.amazonaws.com',
+		)
+		expect(CONTENT_SECURITY_POLICY.match(/connect-src[^;]*/)?.[0]).toContain(
+			'https://s3.amazonaws.com',
+		)
+	})
 	it('sets baseline security headers when absent', () => {
 		const response = new Response('ok')
 
