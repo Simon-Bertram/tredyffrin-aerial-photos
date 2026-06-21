@@ -52,19 +52,13 @@ export function MapLocationMarker({
             "focus-visible:ring-offset-background",
           )}
         >
-          {/* Gentle beacon: a soft pulse in primary ink. */}
-          <span
-            aria-hidden
-            className={cn(
-              "absolute inset-0 animate-ping motion-reduce:animate-none",
-              "rounded-none bg-primary/20",
-            )}
-          />
           {/* The pin: a clipped, burgundy plate of ink. */}
           <span
             className={cn(
               "relative flex size-8 items-center justify-center rounded-none",
-              isDarkStyle ? "bg-surface text-primary" : "bg-primary text-primary-foreground",
+              isDarkStyle
+                ? "bg-surface text-primary"
+                : "bg-primary text-primary-foreground",
               "shadow-[0_8px_20px_color-mix(in_srgb,var(--primary)_35%,transparent)]",
               "ring-1 ring-inset ring-[color-mix(in_srgb,white_18%,transparent)]",
               "transition-transform duration-200 group-hover:scale-[1.08]",
