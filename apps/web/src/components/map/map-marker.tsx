@@ -47,7 +47,8 @@ export function MapLocationMarker({
           type="button"
           aria-label={markerLinkLabel}
           className={cn(
-            "group relative cursor-pointer rounded-none outline-none",
+            "group relative flex size-12 items-center justify-center",
+            "cursor-pointer rounded-none outline-none",
             "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "focus-visible:ring-offset-background",
           )}
