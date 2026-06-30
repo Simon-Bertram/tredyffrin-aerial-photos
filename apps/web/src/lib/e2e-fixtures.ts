@@ -4,10 +4,12 @@ import type {
 	MapLocationRecord,
 } from '@/lib/locations'
 import type {
+	GalleryNavPlaceItem,
 	OtherLocationPlaceLink,
 	ThemeCollectionPhotoCounts,
 } from '@/lib/sanity-location-repository'
 import type { SelectedPhotoCollectionValue } from '@/lib/selected-photo-collections'
+import { TREDYFFRIN_EASTTOWN_VALUE } from '@/lib/place-collections'
 import { SANITY_E2E_FIXTURES } from 'astro:env/server'
 
 import { E2E_TEST_LOCATION_SLUG } from '@/lib/e2e-constants'
@@ -98,6 +100,18 @@ export const e2eFixtureOtherLocationPlaces: OtherLocationPlaceLink[] = [
 		name: 'E2E Test Location',
 		href: `/locations/${E2E_TEST_LOCATION_SLUG}`,
 		photoCount: 1,
+	},
+]
+
+export const e2eFixtureGalleryNavItems: GalleryNavPlaceItem[] = [
+	{
+		name: 'E2E Test Location',
+		slug: E2E_TEST_LOCATION_SLUG,
+		placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+	},
+	{
+		name: 'E2E Airfield Site',
+		slug: 'e2e-airfield-site',
 	},
 ]
 

@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SanityRepositoryTelemetryEvent } from '@/lib/sanity-location-repository'
 import {
+	buildGalleryNavGroups,
 	fetchAboutPageFeaturePhotos,
+	fetchGalleryNavItems,
 	fetchLocationsForMap,
 	fetchOtherLocationPlaces,
 	fetchPublishedLocationSlugs,
@@ -50,6 +52,8 @@ vi.mock('@/lib/sanity/map-location', () => ({
 	mapSanityLocationToRecord: (...args: unknown[]) =>
 		mapSanityLocationToRecordMock(...args),
 }))
+
+import { TREDYFFRIN_EASTTOWN_VALUE } from '@/lib/place-collections'
 
 describe('sanity-location-repository drift handling', () => {
 	const telemetryEvents: SanityRepositoryTelemetryEvent[] = []
@@ -182,5 +186,94 @@ describe('sanity-location-repository drift handling', () => {
 		})
 
 		envMock.SANITY_E2E_FIXTURES = undefined
+	})
+
+	it('skips malformed gallery nav rows while preserving valid rows', async () => {
+		fetchMock.mockResolvedValueOnce([
+			{
+				name: 'Paoli',
+				slug: 'paoli',
+				placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+			},
+			{ name: '', slug: 'bad-row' },
+			{ name: 'Berwyn', slug: 'berwyn' },
+		])
+
+		const result = await fetchGalleryNavItems()
+
+		expect(result).toEqual([
+			{
+				name: 'Paoli',
+				slug: 'paoli',
+				placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+			},
+			{ name: 'Berwyn', slug: 'berwyn' },
+		])
+		expect(telemetryEvents.some((event) => event.eventName === 'skip')).toBe(true)
+	})
+
+	it('groups gallery nav items by placeCollection and appends themed links', () => {
+		const groups = buildGalleryNavGroups(
+			[
+				{
+					name: 'Paoli',
+					slug: 'paoli',
+					placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+				},
+				{ name: 'Berwyn', slug: 'berwyn' },
+			],
+			{
+				airfields: 2,
+				bridges: 0,
+				railroads: 1,
+				'philadelphia-art-museum': 0,
+			},
+		)
+
+		expect(groups).toEqual([
+			{
+				label: 'Tredyffrin Easttown',
+				items: [{ name: 'Paoli', href: '/locations/paoli' }],
+			},
+			{
+				label: 'Other Locations',
+				items: [{ name: 'Berwyn', href: '/locations/berwyn' }],
+			},
+			{
+				label: 'Themed Collections',
+				items: [
+					{ name: 'Airfields (2)', href: '/themes/airfields' },
+					{ name: 'Bridges (0)', href: '/themes/bridges' },
+					{ name: 'Railroads (1)', href: '/themes/railroads' },
+					{
+						name: 'Philadelphia Art Museum (0)',
+						href: '/themes/philadelphia-art-museum',
+					},
+				],
+			},
+		])
+	})
+
+	it('omits empty gallery nav groups', () => {
+		const groups = buildGalleryNavGroups(
+			[
+				{
+					name: 'Paoli',
+					slug: 'paoli',
+					placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+				},
+			],
+			{
+				airfields: 0,
+				bridges: 0,
+				railroads: 0,
+				'philadelphia-art-museum': 0,
+			},
+		)
+
+		expect(groups.map((group) => group.label)).toEqual([
+			'Tredyffrin Easttown',
+			'Themed Collections',
+		])
 	})
 })

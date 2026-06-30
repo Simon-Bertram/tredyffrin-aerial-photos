@@ -1,0 +1,61 @@
+---
+import type { GalleryNavGroup } from '@/lib/locations'
+
+interface Props {
+	groups: GalleryNavGroup[]
+	currentPath?: string
+	class?: string
+}
+
+const { groups, currentPath = '', class: className } = Astro.props
+const selectId = 'gallery-picker'
+const hasCurrentSelection = groups.some((group) =>
+	group.items.some((item) => item.href === currentPath),
+)
+---
+
+<div class:list={['w-full md:w-auto md:min-w-56 md:max-w-xs', className]}>
+	<label for={selectId} class="sr-only">Choose a gallery</label>
+	<div class="relative">
+		<select
+			id={selectId}
+			name="gallery"
+			class="w-full min-h-11 cursor-pointer appearance-none rounded border border-border bg-secondary-wash py-2.5 pl-3 pr-10 font-sans text-sm text-on-surface transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+			onchange="if (this.value) window.location.href = this.value"
+		>
+			<option value="" selected={!hasCurrentSelection}>Browse galleries…</option>
+			{
+				groups.map((group) => (
+					<optgroup label={group.label}>
+						{group.items.map((item) => (
+							<option
+								value={item.href}
+								selected={currentPath === item.href}
+							>
+								{item.name}
+							</option>
+						))}
+					</optgroup>
+				))
+			}
+		</select>
+		<span
+			class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-on-surface-variant"
+			aria-hidden="true"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="m6 9 6 6 6-6" />
+			</svg>
+		</span>
+	</div>
+</div>
