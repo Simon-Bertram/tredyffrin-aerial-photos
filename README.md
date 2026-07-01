@@ -11,7 +11,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 
 ## Getting Started
 
-Use **Bun 1.3.12** (see [`.bun-version`](.bun-version)). Prefer the pinned
+Use **Bun 1.3.14** (see [`.bun-version`](.bun-version)). Prefer the pinned
 install at `~/.bun/bin/bun`, or put it first on your `PATH`.
 
 First, install the dependencies:
@@ -33,7 +33,7 @@ Open [http://localhost:4321](http://localhost:4321) in your browser to see the w
 
 ## Deployment (Cloudflare via Alchemy)
 
-Use **Bun 1.3.12** (see [`.bun-version`](.bun-version)). Copy
+Use **Bun 1.3.14** (see [`.bun-version`](.bun-version)). Copy
 [`packages/infra/.env.example`](packages/infra/.env.example) to `packages/infra/.env`
 and set `PUBLIC_SERVER_URL`, `ALCHEMY_STAGE`, and Cloudflare credentials.
 

@@ -36,7 +36,7 @@ if (runtimeVersion !== expected) {
 		console.error('  export PATH="$HOME/.bun/bin:$PATH"   # add to ~/.zshrc')
 	} else {
 		console.error('Install the pinned version, e.g.:')
-		console.error('  curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.12"')
+		console.error(`  curl -fsSL https://bun.sh/install | bash -s "bun-v${expected}"`)
 	}
 	process.exit(1)
 }
