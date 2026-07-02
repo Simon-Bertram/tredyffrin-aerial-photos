@@ -1,7 +1,6 @@
 "use client";
 
 import MapLibreGL, { type PopupOptions, type MarkerOptions } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
 import {
   createContext,
   forwardRef,
@@ -18,6 +17,7 @@ import {
 import { createPortal } from "react-dom";
 import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 
+import { loadMapLibreCss } from "@/lib/load-maplibre-css";
 import { cn } from "@/lib/utils";
 import type { MapTerrainConfig } from "@/components/map/map-types";
 import {
@@ -248,26 +248,11 @@ const MapRoot = forwardRef<MapRef, MapProps>(function MapRoot(
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const initialStyle =
-      resolvedTheme === "dark" ? mapStyles.dark : mapStyles.light;
-    currentStyleRef.current = initialStyle;
-
-    const map = new MapLibreGL.Map({
-      container: containerRef.current,
-      style: initialStyle,
-      renderWorldCopies: false,
-      attributionControl: {
-        compact: true,
-      },
-      ...props,
-      ...viewport,
-      canvasContextAttributes: {
-        ...props.canvasContextAttributes,
-        ...(antialias !== undefined ? { antialias } : {}),
-      },
-    });
+    let cancelled = false;
+    let map: MapLibreGL.Map | null = null;
 
     const removeStyleIdleListener = () => {
+      if (!map) return;
       const handler = styleIdleHandlerRef.current;
       if (handler) {
         map.off("idle", handler);
@@ -275,61 +260,86 @@ const MapRoot = forwardRef<MapRef, MapProps>(function MapRoot(
       }
     };
 
-    const finishStyleReady = () => {
-      if (!map.isStyleLoaded()) {
-        return false;
-      }
-      collapseAttributionControl(map);
-      pendingStyleChangeRef.current = false;
-      setIsStyleLoaded(true);
-      if (projection) {
-        map.setProjection(projection);
-      }
-      return true;
-    };
+    void (async () => {
+      await loadMapLibreCss();
+      if (cancelled || !containerRef.current) return;
 
-    const styleDataHandler = () => {
-      clearStyleTimeout();
-      removeStyleIdleListener();
-      // Delay to ensure style is fully processed before allowing layer operations
-      // This is a workaround to avoid race conditions with the style loading
-      // else we have to force update every layer on setStyle change
-      styleTimeoutRef.current = setTimeout(() => {
-        if (finishStyleReady()) {
-          return;
+      const initialStyle =
+        resolvedTheme === "dark" ? mapStyles.dark : mapStyles.light;
+      currentStyleRef.current = initialStyle;
+
+      map = new MapLibreGL.Map({
+        container: containerRef.current,
+        style: initialStyle,
+        renderWorldCopies: false,
+        attributionControl: {
+          compact: true,
+        },
+        ...props,
+        ...viewport,
+        canvasContextAttributes: {
+          ...props.canvasContextAttributes,
+          ...(antialias !== undefined ? { antialias } : {}),
+        },
+      });
+
+      const finishStyleReady = () => {
+        if (!map?.isStyleLoaded()) {
+          return false;
         }
-        const onIdle = () => {
+        collapseAttributionControl(map);
+        pendingStyleChangeRef.current = false;
+        setIsStyleLoaded(true);
+        if (projection) {
+          map.setProjection(projection);
+        }
+        return true;
+      };
+
+      const styleDataHandler = () => {
+        clearStyleTimeout();
+        removeStyleIdleListener();
+        // Delay to ensure style is fully processed before allowing layer operations
+        // This is a workaround to avoid race conditions with the style loading
+        // else we have to force update every layer on setStyle change
+        styleTimeoutRef.current = setTimeout(() => {
           if (finishStyleReady()) {
-            removeStyleIdleListener();
+            return;
           }
-        };
-        styleIdleHandlerRef.current = onIdle;
-        map.on("idle", onIdle);
-      }, 100);
-    };
-    const loadHandler = () => {
-      collapseAttributionControl(map);
-      setIsLoaded(true);
-    };
+          const onIdle = () => {
+            if (finishStyleReady()) {
+              removeStyleIdleListener();
+            }
+          };
+          styleIdleHandlerRef.current = onIdle;
+          map?.on("idle", onIdle);
+        }, 100);
+      };
+      const loadHandler = () => {
+        if (!map) return;
+        collapseAttributionControl(map);
+        setIsLoaded(true);
+      };
 
-    // Viewport change handler - skip if triggered by internal update
-    const handleMove = () => {
-      if (internalUpdateRef.current) return;
-      onViewportChangeRef.current?.(getViewport(map));
-    };
+      // Viewport change handler - skip if triggered by internal update
+      const handleMove = () => {
+        if (!map || internalUpdateRef.current) return;
+        onViewportChangeRef.current?.(getViewport(map));
+      };
 
-    map.on("load", loadHandler);
-    map.on("styledata", styleDataHandler);
-    map.on("move", handleMove);
-    setMapInstance(map);
+      map.on("load", loadHandler);
+      map.on("styledata", styleDataHandler);
+      map.on("move", handleMove);
+      setMapInstance(map);
+    })();
 
     return () => {
+      cancelled = true;
       clearStyleTimeout();
       removeStyleIdleListener();
-      map.off("load", loadHandler);
-      map.off("styledata", styleDataHandler);
-      map.off("move", handleMove);
-      map.remove();
+      if (map) {
+        map.remove();
+      }
       setIsLoaded(false);
       setIsStyleLoaded(false);
       setMapInstance(null);
