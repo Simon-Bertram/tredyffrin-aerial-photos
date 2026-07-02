@@ -2,9 +2,6 @@
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/newsreader";
-@import "@fontsource-variable/newsreader/wght-italic.css";
-@import "@fontsource-variable/public-sans";
 @plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
@@ -41,10 +38,10 @@
   --color-outline-variant: var(--outline-variant);
 
   /* Typography — Newsreader (display) + Public Sans (utility) */
-  --font-display: "Newsreader Variable", ui-serif, Georgia, serif;
-  --font-serif: "Newsreader Variable", ui-serif, Georgia, serif;
-  --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Newsreader Variable", ui-serif, Georgia, serif;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-newsreader), ui-serif, Georgia, serif;
 
   --text-display-lg: 3.5rem;
   --text-display-lg--line-height: 1.02;

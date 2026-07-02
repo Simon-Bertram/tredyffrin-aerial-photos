@@ -2,7 +2,7 @@
 import { existsSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 import alchemy from "alchemy/cloudflare/astro";
-import { defineConfig, envField } from "astro/config";
+import { defineConfig, envField, fontProviders } from "astro/config";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import react from "@astrojs/react";
@@ -131,4 +131,25 @@ export default defineConfig({
   },
 
   integrations: [react()],
+
+  fonts: [
+    {
+      name: "Newsreader",
+      cssVariable: "--font-newsreader",
+      provider: fontProviders.fontsource(),
+      weights: ["200 800"],
+      styles: ["normal", "italic"],
+      subsets: ["latin"],
+      fallbacks: ["ui-serif", "Georgia", "serif"],
+    },
+    {
+      name: "Public Sans",
+      cssVariable: "--font-public-sans",
+      provider: fontProviders.fontsource(),
+      weights: ["100 900"],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["ui-sans-serif", "system-ui", "sans-serif"],
+    },
+  ],
 });

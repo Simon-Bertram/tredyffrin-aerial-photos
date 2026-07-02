@@ -1,7 +1,6 @@
 ---
 import "../styles/global.css";
-import newsreaderLatinItalicWoff2 from "@fontsource-variable/newsreader/files/newsreader-latin-wght-italic.woff2?url";
-import newsreaderLatinWoff2 from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import { getSiteOrigin, toAbsoluteUrl } from "@/lib/site-url";
 import Footer from "@/components/Footer.astro";
@@ -51,20 +50,8 @@ function safeJsonLd(value: Record<string, unknown>): string {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="preload"
-      href={newsreaderLatinWoff2}
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href={newsreaderLatinItalicWoff2}
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <Font cssVariable="--font-newsreader" preload />
+    <Font cssVariable="--font-public-sans" />
     <meta name="description" content={description} />
     {robots ? <meta name="robots" content={robots} /> : null}
     <link rel="canonical" href={canonicalUrl} />
