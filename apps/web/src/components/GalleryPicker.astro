@@ -64,7 +64,7 @@ const triggerClasses =
           >
             <p
               class:list={[
-                "px-3 pb-1 text-sm text-on-secondary-container",
+                "px-3 pb-1 font-sans text-[11px] uppercase tracking-[0.14em] text-on-surface-variant",
                 groupIndex === 0 ? "pt-2" : "pt-3",
               ]}
             >
@@ -76,7 +76,7 @@ const triggerClasses =
                   <a
                     href={item.href}
                     role="menuitem"
-                    class="block px-3 py-1.5 font-sans text-sm text-on-surface transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    class="block px-4 py-1.5 font-sans text-sm text-on-surface transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                     aria-current={
                       currentPath === item.href ? "page" : undefined
                     }
