@@ -80,3 +80,13 @@ export interface LocationRecord {
 export type MapLocationRecord = LocationRecord & {
 	coordinates: NonNullable<LocationRecord['coordinates']>
 }
+
+export interface GalleryNavItem {
+	name: string
+	href: string
+}
+
+export interface GalleryNavGroup {
+	label: string
+	items: GalleryNavItem[]
+}

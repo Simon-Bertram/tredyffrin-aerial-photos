@@ -5,6 +5,7 @@ import {
 } from '@/lib/about-feature-photos'
 import {
 	e2eFixtureLocationBySlug,
+	e2eFixtureGalleryNavItems,
 	e2eFixtureLocationsForMap,
 	e2eFixtureOtherLocationPlaces,
 	e2eFixturePublishedLocationSlugs,
@@ -14,6 +15,8 @@ import {
 	isE2eFixturesEnabled,
 } from '@/lib/e2e-fixtures'
 import type {
+	GalleryNavGroup,
+	GalleryNavItem,
 	LocationPhoto,
 	LocationRecord,
 	MapLocationRecord,
@@ -21,6 +24,7 @@ import type {
 import { getSanityRepositoryContext } from '@/lib/sanity/repository-context'
 import {
 	getRowSlug,
+	parseGalleryNavRow,
 	parsePlaceLinkRow,
 	requireSanityRows,
 } from '@/lib/sanity/repository-row-guards'
@@ -40,6 +44,7 @@ import {
 } from '@/lib/selected-photo-collections'
 import {
 	locationBySlugQuery,
+	locationNavOptionsQuery,
 	locationSlugsQuery,
 	locationsForAboutFeatureQuery,
 	locationsForMapQuery,
@@ -79,6 +84,12 @@ export type ThemeCollectionPhotoCounts = Record<
 	SelectedPhotoCollectionValue,
 	number
 >
+
+export interface GalleryNavPlaceItem {
+	name: string
+	slug: string
+	placeCollection?: string
+}
 
 const MAP_IMAGE_WIDTH = 1200
 /** Map marker tooltip previews (`h-60`); primary `src` stays `MAP_IMAGE_WIDTH`. */
@@ -310,6 +321,87 @@ export async function fetchOtherLocationPlaces(
 		})
 	}
 	return out
+}
+
+export async function fetchGalleryNavItems(): Promise<GalleryNavPlaceItem[]> {
+	if (isE2eFixturesEnabled()) {
+		return e2eFixtureGalleryNavItems
+	}
+
+	const { client } = getSanityRepositoryContext()
+	const rows = await client.fetch<unknown[]>(locationNavOptionsQuery)
+	const safeRows = requireSanityRows(
+		rows,
+		'fetchGalleryNavItems',
+		'locationNavOptions',
+	)
+	if (safeRows == null) {
+		return []
+	}
+
+	const out: GalleryNavPlaceItem[] = []
+	for (const row of safeRows) {
+		const parsed = parseGalleryNavRow(row)
+		if (parsed == null) {
+			emitSanityRepositorySkip(
+				'fetchGalleryNavItems',
+				'locationNavOptions',
+				getRowSlug(row),
+				'missing name or slug',
+			)
+			continue
+		}
+		out.push(parsed)
+	}
+	return out
+}
+
+function toLocationNavItem(item: GalleryNavPlaceItem): GalleryNavItem {
+	return {
+		name: item.name,
+		href: `/locations/${item.slug}`,
+	}
+}
+
+export function buildGalleryNavGroups(
+	items: GalleryNavPlaceItem[],
+	themeCounts: ThemeCollectionPhotoCounts,
+): GalleryNavGroup[] {
+	const tredyffrin = items.filter(
+		(item) => item.placeCollection === TREDYFFRIN_EASTTOWN_VALUE,
+	)
+	const other = items.filter(
+		(item) => item.placeCollection !== TREDYFFRIN_EASTTOWN_VALUE,
+	)
+
+	const groups: GalleryNavGroup[] = []
+
+	if (tredyffrin.length > 0) {
+		groups.push({
+			label: 'Tredyffrin Easttown',
+			items: tredyffrin.map(toLocationNavItem),
+		})
+	}
+
+	if (other.length > 0) {
+		groups.push({
+			label: 'Other Locations',
+			items: other.map(toLocationNavItem),
+		})
+	}
+
+	const themeLinks = buildThemeCollectionLinks(themeCounts)
+	if (themeLinks.length > 0) {
+		groups.push({
+			label: 'Themed Collections',
+			items: themeLinks.map((theme) => ({
+				name: `${theme.title} (${theme.photoCount})`,
+				href: theme.href,
+			})),
+		})
+	}
+
+	return groups
 }
 
 function mapThemePlaceRows(

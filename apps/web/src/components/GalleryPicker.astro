@@ -1,0 +1,165 @@
+---
+import type { GalleryNavGroup } from "@/lib/locations";
+
+interface Props {
+  groups: GalleryNavGroup[];
+  currentPath?: string;
+  class?: string;
+}
+
+const { groups, currentPath = "", class: className } = Astro.props;
+const pickerId = "gallery-picker";
+const panelId = "gallery-picker-panel";
+const selectedItem = groups
+  .flatMap((group) => group.items)
+  .find((item) => item.href === currentPath);
+const triggerLabel = selectedItem?.name ?? "Browse galleries…";
+const triggerClasses =
+  "w-full min-h-11 cursor-pointer rounded border border-border bg-secondary-wash py-2.5 pl-3 pr-10 text-left font-sans text-sm text-on-surface transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+---
+
+<div class:list={["w-full md:w-auto md:min-w-56 md:max-w-xs", className]}>
+  <label for={pickerId} class="sr-only">Choose a gallery</label>
+  <div class="relative" data-gallery-picker>
+    <button
+      type="button"
+      id={pickerId}
+      class={triggerClasses}
+      aria-haspopup="menu"
+      aria-expanded="false"
+      aria-controls={panelId}
+    >
+      {triggerLabel}
+    </button>
+    <span
+      class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-on-surface-variant"
+      aria-hidden="true"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </span>
+    <div
+      id={panelId}
+      role="menu"
+      hidden
+      class="absolute top-full right-0 z-50 mt-1 max-h-[min(24rem,calc(100dvh-6rem))] min-w-full overflow-y-auto rounded border border-border bg-surface-container-lowest py-1 shadow-md"
+    >
+      {
+        groups.map((group, groupIndex) => (
+          <div
+            role="group"
+            aria-label={group.label}
+            class:list={[groupIndex > 0 && "mt-1 border-t border-border/60"]}
+          >
+            <p
+              class:list={[
+                "px-3 pb-1 text-sm text-on-secondary-container",
+                groupIndex === 0 ? "pt-2" : "pt-3",
+              ]}
+            >
+              {group.label}
+            </p>
+            <ul class="list-none pb-1">
+              {group.items.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    role="menuitem"
+                    class="block px-3 py-1.5 font-sans text-sm text-on-surface transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    aria-current={
+                      currentPath === item.href ? "page" : undefined
+                    }
+                  >
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  const pickerRoots = document.querySelectorAll("[data-gallery-picker]");
+
+  for (const root of pickerRoots) {
+    const trigger = root.querySelector("button");
+    const panel = root.querySelector('[role="menu"]');
+
+    if (!(trigger instanceof HTMLButtonElement)) continue;
+    if (!(panel instanceof HTMLElement)) continue;
+
+    const closePanel = () => {
+      panel.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+    };
+
+    const openPanel = () => {
+      panel.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+    };
+
+    const togglePanel = () => {
+      if (panel.hidden) {
+        openPanel();
+        return;
+      }
+      closePanel();
+    };
+
+    trigger.addEventListener("click", () => {
+      togglePanel();
+    });
+
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowDown") return;
+      event.preventDefault();
+      openPanel();
+      const firstItem = panel.querySelector('[role="menuitem"]');
+      if (firstItem instanceof HTMLElement) {
+        firstItem.focus();
+      }
+    });
+
+    panel.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePanel();
+        trigger.focus();
+      }
+    });
+
+    panel.addEventListener("click", (event) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLAnchorElement &&
+        target.closest('[role="menu"]') === panel
+      ) {
+        closePanel();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (panel.hidden) return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!root.contains(target)) {
+        closePanel();
+      }
+    });
+  }
+</script>

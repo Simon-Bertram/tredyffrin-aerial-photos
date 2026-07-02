@@ -90,6 +90,16 @@ export const locationSlugsQuery = /* groq */ `
     | order(name asc) {"slug": slug.current}
 `;
 
+/** Lightweight nav rows for gallery picker (no photos or coordinates). */
+export const locationNavOptionsQuery = /* groq */ `
+  *[_type == "location" && defined(slug.current)]
+    | order(name asc) {
+      "slug": slug.current,
+      name,
+      placeCollection
+    }
+`;
+
 /** Studio “Other locations” sidebar — places outside Tredyffrin Easttown. */
 export const otherLocationPlacesQuery = /* groq */ `
   *[

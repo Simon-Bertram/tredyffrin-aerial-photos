@@ -8,6 +8,7 @@ export type SanityRepositoryQueryKind =
 	| 'themeLocationsWithPhotos'
 	| 'themeCollectionPhotoCounts'
 	| 'locationBySlug'
+	| 'locationNavOptions'
 
 export interface SanityRepositoryTelemetryEvent {
 	eventName: 'skip' | 'unexpectedShape'

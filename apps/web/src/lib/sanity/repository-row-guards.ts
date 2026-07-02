@@ -1,3 +1,4 @@
+import { sanityLocationNavRawSchema } from '@/lib/sanity/schemas'
 import type { SanityRepositoryQueryKind } from '@/lib/sanity/repository-telemetry'
 import { emitSanityRepositoryUnexpectedShape } from '@/lib/sanity/repository-telemetry'
 
@@ -49,4 +50,30 @@ export function parsePlaceLinkRow(row: unknown): PlaceLinkFields | null {
 			? row.photoCount
 			: 0
 	return { name, slug, photoCount }
+}
+
+export interface GalleryNavPlaceFields {
+	name: string
+	slug: string
+	placeCollection?: string
+}
+
+export function parseGalleryNavRow(row: unknown): GalleryNavPlaceFields | null {
+	const parsed = sanityLocationNavRawSchema.safeParse(row)
+	if (!parsed.success) {
+		return null
+	}
+
+	const name = parsed.data.name.trim()
+	const slug = parsed.data.slug.trim()
+	if (name === '' || slug === '') {
+		return null
+	}
+
+	const placeCollection = parsed.data.placeCollection?.trim()
+	return {
+		name,
+		slug,
+		...(placeCollection ? { placeCollection } : {}),
+	}
 }

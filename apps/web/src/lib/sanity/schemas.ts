@@ -105,7 +105,14 @@ export const sanityLocationAboutFeatureRawSchema = z.object({
   photos: z.array(z.unknown()).nullable().optional(),
 });
 
+export const sanityLocationNavRawSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  placeCollection: z.string().nullable().optional(),
+});
+
 export type SanityLocationRaw = z.infer<typeof sanityLocationRawSchema>;
 export type SanityLocationPhotoRaw = z.infer<
   typeof sanityLocationPhotoRawSchema
 >;
+export type SanityLocationNavRaw = z.infer<typeof sanityLocationNavRawSchema>;
