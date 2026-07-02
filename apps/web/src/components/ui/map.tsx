@@ -896,10 +896,10 @@ type MapControlsProps = {
 };
 
 const positionClasses = {
-  "top-left": "top-2 left-2",
-  "top-right": "top-2 right-2",
-  "bottom-left": "bottom-2 left-2",
-  "bottom-right": "bottom-10 right-2",
+  "top-left": "top-2 left-2 sm:top-3 sm:left-3",
+  "top-right": "top-2 right-2 sm:top-3 sm:right-3",
+  "bottom-left": "bottom-2 left-2 sm:bottom-3 sm:left-3",
+  "bottom-right": "bottom-8 right-2 sm:bottom-10 sm:right-3",
 };
 
 function ControlGroup({ children }: { children: React.ReactNode }) {
@@ -927,7 +927,7 @@ function ControlButton({
       aria-label={label}
       type="button"
       className={cn(
-        "hover:bg-accent dark:hover:bg-accent/40 flex size-8 items-center justify-center transition-colors",
+        "hover:bg-accent dark:hover:bg-accent/40 flex size-7 items-center justify-center transition-colors sm:size-8",
         disabled && "pointer-events-none cursor-not-allowed opacity-50",
       )}
       disabled={disabled}

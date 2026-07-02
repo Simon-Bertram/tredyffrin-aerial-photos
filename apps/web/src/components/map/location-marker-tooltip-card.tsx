@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Camera, ChevronLeft, ChevronRight } from "lucide-react";
 
 import type { MapLocationRecord } from "@/lib/locations";
@@ -29,24 +29,16 @@ export function LocationMarkerTooltipCard({
     setCurrentPhotoIndex((prev) => Math.min(prev, maxPhotoIndex));
   }, [maxPhotoIndex]);
 
-  const navigateToDetail = () => {
-    if (onNavigate) {
-      onNavigate(detailPath);
+  const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!onNavigate) {
       return;
     }
 
-    if (typeof window !== "undefined") {
-      window.location.assign(detailPath);
-    }
-  };
-
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    navigateToDetail();
+    onNavigate(detailPath);
   };
 
-  const goToNextPhoto = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const goToNextPhoto = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (location.photos.length === 0) {
@@ -55,7 +47,7 @@ export function LocationMarkerTooltipCard({
     setCurrentPhotoIndex((prev) => (prev + 1) % location.photos.length);
   };
 
-  const goToPrevPhoto = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const goToPrevPhoto = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (location.photos.length === 0) {
@@ -74,21 +66,25 @@ export function LocationMarkerTooltipCard({
   const activePhotoDate = activePhoto?.photoDate ?? "Date unknown";
   return (
     <article
-      role="link"
-      tabIndex={0}
-      onClick={navigateToDetail}
-      onKeyDown={handleCardKeyDown}
-      aria-label={`Open details for ${location.name}`}
       data-testid="location-preview-card"
       className={cn(
-        "bg-surface-container-lowest overflow-hidden cursor-pointer",
+        "bg-surface-container-lowest relative overflow-hidden",
         "ring-1 ring-inset ring-[color-mix(in_srgb,var(--outline-variant)_20%,transparent)]",
         "shadow-[0_32px_48px_color-mix(in_srgb,var(--on-surface)_6%,transparent)]",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        "focus-visible:ring-offset-background outline-none",
+        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+        "focus-within:ring-offset-background",
       )}
     >
-      <div className="relative h-60 bg-surface-dim">
+      <a
+        href={detailPath}
+        onClick={handleLinkClick}
+        aria-label={`Open details for ${location.name}`}
+        className="absolute inset-0 z-10 outline-none"
+      >
+        <span className="sr-only">Open details for {location.name}</span>
+      </a>
+
+      <div className="relative h-52 bg-surface-dim sm:h-60">
         {multiplePhotos ? (
           <>
             <img
@@ -103,7 +99,7 @@ export function LocationMarkerTooltipCard({
               data-testid="slider-prev-button"
               onClick={goToPrevPhoto}
               className={cn(
-                "absolute left-2 top-1/2 -translate-y-1/2 rounded-none p-1.5",
+                "absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-none p-1.5",
                 "bg-on-surface/75 text-surface",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "focus-visible:ring-offset-background outline-none",
@@ -117,7 +113,7 @@ export function LocationMarkerTooltipCard({
               data-testid="slider-next-button"
               onClick={goToNextPhoto}
               className={cn(
-                "absolute right-2 top-1/2 -translate-y-1/2 rounded-none p-1.5",
+                "absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-none p-1.5",
                 "bg-on-surface/75 text-surface",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "focus-visible:ring-offset-background outline-none",
@@ -153,7 +149,7 @@ export function LocationMarkerTooltipCard({
 
         <div
           className={cn(
-            "mt-3 flex items-center gap-2 font-sans text-[11px] tracking-[0.02em]",
+            "mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[10px] tracking-[0.02em] sm:text-[11px]",
             isOnImagery
               ? cn(
                   "bg-on-surface/88 text-surface",

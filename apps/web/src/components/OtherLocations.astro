@@ -27,12 +27,12 @@ const { places, themes } = Astro.props;
             Here are some other locations that you may be interested in.
           </p>
         </div>
-        <ul class="columns-1 gap-2 sm:columns-2 lg:columns-3">
+        <ul class="grid gap-y-3 md:grid-cols-2 md:gap-x-8 lg:grid-cols-3">
           {places.map((place) => (
-            <li class="break-inside-avoid">
+            <li>
               <a
                 href={place.href}
-                class="text-foreground underline-offset-4 hover:text-primary hover:underline"
+                class="inline-block py-1 text-foreground underline-offset-4 hover:text-primary hover:underline"
               >
                 {place.name} ({place.photoCount})
               </a>
@@ -56,12 +56,12 @@ const { places, themes } = Astro.props;
   <p class="mt-4 max-w-xs text-sm leading-relaxed text-on-surface-variant">
     Here are some themes that you may be interested in.
   </p>
-  <ul class="mt-8">
+  <ul class="mt-8 space-y-3">
     {themes.map((theme) => (
       <li>
         <a
           href={theme.href}
-          class="text-foreground underline-offset-4 hover:text-primary hover:underline"
+          class="inline-block py-1 text-foreground underline-offset-4 hover:text-primary hover:underline"
         >
           {theme.title} ({theme.photoCount})
         </a>

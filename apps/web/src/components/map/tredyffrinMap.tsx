@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { MapVisualStyleControls } from "@/components/map/map-controls";
 import { MapLocationMarker } from "@/components/map/map-marker";
-import { Map, MapControls } from "@/components/ui/map";
+import { Map as MapRoot, MapControls } from "@/components/ui/map";
 import {
   getMapStylesForVisualStyle,
   getTerrainForVisualStyle,
@@ -24,8 +24,8 @@ export function TredyffrinMap({ locations }: MapProps) {
   const terrain3d = getTerrainForVisualStyle(selectedStyle);
 
   return (
-    <Map
-      className="min-h-[320px] h-[75vh]"
+    <MapRoot
+      className="min-h-[320px] h-[55vh] max-h-128 sm:h-[60vh] md:h-[75vh] md:max-h-none"
       center={TREDDYFFRIN_CENTER}
       zoom={11}
       styles={mapStyles}
@@ -44,6 +44,6 @@ export function TredyffrinMap({ locations }: MapProps) {
           mapVisualStyle={selectedStyle}
         />
       ))}
-    </Map>
+    </MapRoot>
   );
 }

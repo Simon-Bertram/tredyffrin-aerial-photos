@@ -38,7 +38,7 @@ export function HomeMapIsland({ locations }: HomeMapIslandProps) {
       <Suspense
         fallback={
           <div
-            className="flex min-h-[320px] h-[75vh] items-center justify-center"
+            className="flex min-h-[320px] h-[55vh] max-h-128 items-center justify-center sm:h-[60vh] md:h-[75vh] md:max-h-none"
             aria-hidden
           >
             <div className="flex gap-1">

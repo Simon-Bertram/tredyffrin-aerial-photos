@@ -9,10 +9,10 @@ import type { MapStyleControlProps } from "@/components/map/map-types";
 import { useMap } from "@/components/ui/map";
 
 const positionClasses = {
-  "top-left": "top-3 left-3",
-  "top-right": "top-3 right-3",
-  "bottom-left": "bottom-3 left-3",
-  "bottom-right": "bottom-12 right-3",
+  "top-left": "top-2 left-2 sm:top-3 sm:left-3",
+  "top-right": "top-2 right-2 sm:top-3 sm:right-3",
+  "bottom-left": "bottom-2 left-2 sm:bottom-3 sm:left-3",
+  "bottom-right": "bottom-10 right-2 sm:bottom-12 sm:right-3",
 };
 
 function MapStyleControls({
@@ -33,15 +33,13 @@ function MapStyleControls({
   return (
     <div
       className={cn(
-        "absolute z-20 flex items-center gap-1 p-1.5",
+        "absolute z-20 flex items-center gap-1 p-1 sm:gap-1.5 sm:p-1.5",
         "bg-surface/80 backdrop-blur-xl",
         "ring-1 ring-inset ring-[color-mix(in_srgb,var(--outline-variant)_20%,transparent)]",
         "shadow-[0_18px_36px_color-mix(in_srgb,var(--on-surface)_6%,transparent)]",
         positionClasses[position],
         className,
       )}
-      role="group"
-      aria-label="Map visual style"
     >
       {options.map((option) => {
         const isActive = selectedStyle === option.id;
@@ -51,7 +49,7 @@ function MapStyleControls({
             type="button"
             onClick={() => onStyleChange(option.id)}
             className={cn(
-              "px-2.5 py-1 font-sans text-[11px] font-semibold uppercase tracking-[0.14em]",
+              "px-2 py-1 text-[10px] font-sans font-semibold uppercase tracking-[0.14em] sm:px-2.5 sm:text-[11px]",
               "transition-colors duration-150",
               isActive
                 ? "bg-primary text-primary-foreground"
@@ -74,13 +72,13 @@ function MapStyleControls({
         type="button"
         onClick={handleResetView}
         className={cn(
-          "p-1.5 transition-colors duration-150",
+          "p-1 transition-colors duration-150 sm:p-1.5",
           "text-on-surface-variant",
           "hover:bg-surface-container hover:text-on-surface",
         )}
         aria-label="Reset map view"
       >
-        <RotateCcw className="size-3.5" strokeWidth={1.75} />
+        <RotateCcw className="size-3 sm:size-3.5" strokeWidth={1.75} />
       </button>
     </div>
   );

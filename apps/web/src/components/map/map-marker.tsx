@@ -85,7 +85,7 @@ export function MapLocationMarker({
         </button>
       </MarkerContent>
 
-      <MarkerTooltip className="w-108 p-0">
+      <MarkerTooltip className="w-[min(22rem,calc(100vw-2rem))] p-0 sm:w-108">
         <ErrorBoundary
           fallback={
             <article className="bg-surface-container-lowest p-4">
