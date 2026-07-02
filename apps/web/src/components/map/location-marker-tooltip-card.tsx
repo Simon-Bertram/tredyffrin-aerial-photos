@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { Camera, ChevronLeft, ChevronRight } from "lucide-react";
 
 import type { MapLocationRecord } from "@/lib/locations";
@@ -38,6 +38,15 @@ export function LocationMarkerTooltipCard({
     onNavigate(detailPath);
   };
 
+  const handleLinkKeyDown = (event: KeyboardEvent<HTMLAnchorElement>) => {
+    if (!onNavigate || (event.key !== "Enter" && event.key !== " ")) {
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate(detailPath);
+  };
+
   const goToNextPhoto = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -66,7 +75,6 @@ export function LocationMarkerTooltipCard({
   const activePhotoDate = activePhoto?.photoDate ?? "Date unknown";
   return (
     <article
-      data-testid="location-preview-card"
       className={cn(
         "bg-surface-container-lowest relative overflow-hidden",
         "ring-1 ring-inset ring-[color-mix(in_srgb,var(--outline-variant)_20%,transparent)]",
@@ -77,7 +85,9 @@ export function LocationMarkerTooltipCard({
     >
       <a
         href={detailPath}
+        data-testid="location-preview-card"
         onClick={handleLinkClick}
+        onKeyDown={handleLinkKeyDown}
         aria-label={`Open details for ${location.name}`}
         className="absolute inset-0 z-10 outline-none"
       >

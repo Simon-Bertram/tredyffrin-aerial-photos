@@ -2,8 +2,8 @@ import alchemy from "alchemy";
 import { Astro } from "alchemy/cloudflare";
 import { config } from "dotenv";
 
-config({ path: "./.env", override: true });
 config({ path: "../../apps/web/.env", override: true });
+config({ path: "./.env", override: true });
 
 if (!process.env.CLOUDFLARE_COMPATIBILITY_DATE) {
 	process.env.CLOUDFLARE_COMPATIBILITY_DATE = "2026-04-22";
