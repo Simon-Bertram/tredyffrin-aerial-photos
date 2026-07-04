@@ -1,5 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 
+import { ensureHeaderSanityData } from '@/lib/header-sanity-data'
+
 export const HTML_CACHE_CONTROL =
 	'public, max-age=60, s-maxage=600, stale-while-revalidate=86400'
 
@@ -87,6 +89,8 @@ export function shouldSetHtmlCacheHeader({
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+	ensureHeaderSanityData(context.locals)
+
 	const response = await next()
 
 	applySecurityHeaders(response, context.url.protocol === 'https:')

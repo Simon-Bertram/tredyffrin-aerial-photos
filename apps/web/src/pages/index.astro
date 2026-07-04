@@ -9,8 +9,8 @@ import {
   fetchLocationsForMap,
   fetchLocationsWithThemeTaggedPhotos,
   fetchOtherLocationPlaces,
-  fetchThemeCollectionPhotoCounts,
 } from "@/lib/sanity-location-repository";
+import { getHeaderSanityData } from "@/lib/header-sanity-data";
 import { buildHomepageCoverflowPhotos } from "@/lib/selected-photos-data";
 import { getSiteOrigin } from "@/lib/site-url";
 import {
@@ -20,13 +20,14 @@ import {
   getFirstPreviewPhoto,
 } from "@/lib/home-layout";
 
-const [locations, themeTaggedLocations, otherPlaces, themeCounts] =
+const [headerSanity, locations, themeTaggedLocations, otherPlaces] =
   await Promise.all([
+    getHeaderSanityData(Astro.locals),
     fetchLocationsForMap(),
     fetchLocationsWithThemeTaggedPhotos(),
     fetchOtherLocationPlaces(),
-    fetchThemeCollectionPhotoCounts(),
   ]);
+const { themeCounts } = headerSanity;
 const themes = buildThemeCollectionLinks(themeCounts);
 const coverflowPhotos = buildHomepageCoverflowPhotos(
   locations,

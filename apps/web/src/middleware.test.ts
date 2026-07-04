@@ -5,6 +5,10 @@ vi.mock('astro:middleware', () => ({
 	defineMiddleware: (handler: unknown) => handler,
 }))
 
+vi.mock('@/lib/header-sanity-data', () => ({
+	ensureHeaderSanityData: vi.fn(),
+}))
+
 import {
 	applySecurityHeaders,
 	CONTENT_SECURITY_POLICY,
