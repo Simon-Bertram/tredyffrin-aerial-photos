@@ -46,7 +46,6 @@ export function applySecurityHeaders(
 }
 
 const CACHEABLE_HTML_ROUTE_PATTERNS: ReadonlyArray<RegExp> = [
-	/^\/$/,
 	/^\/about$/,
 	/^\/locations\/[^/]+$/,
 	/^\/themes\/[^/]+$/,

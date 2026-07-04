@@ -15,13 +15,13 @@ import {
 
 describe('isCacheableHtmlRoute', () => {
 	it('returns true for known cacheable routes', () => {
-		expect(isCacheableHtmlRoute('/')).toBe(true)
 		expect(isCacheableHtmlRoute('/about')).toBe(true)
 		expect(isCacheableHtmlRoute('/locations/paoli')).toBe(true)
 		expect(isCacheableHtmlRoute('/themes/airfields')).toBe(true)
 	})
 
 	it('returns false for non-cacheable routes', () => {
+		expect(isCacheableHtmlRoute('/')).toBe(false)
 		expect(isCacheableHtmlRoute('/locations')).toBe(false)
 		expect(isCacheableHtmlRoute('/themes')).toBe(false)
 		expect(isCacheableHtmlRoute('/api/foo')).toBe(false)

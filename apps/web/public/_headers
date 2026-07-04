@@ -1,0 +1,8 @@
+/_astro/*.css
+  Content-Type: text/css; charset=utf-8
+
+/_astro/*.js
+  Content-Type: text/javascript; charset=utf-8
+
+/_astro/*.woff2
+  Content-Type: font/woff2
