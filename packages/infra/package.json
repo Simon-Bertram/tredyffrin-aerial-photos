@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "alchemy dev",
-    "deploy": "alchemy deploy",
+    "deploy": "alchemy deploy && bun run ./scripts/purge-cloudflare-cache.ts",
     "destroy": "alchemy destroy",
     "preflight:cloudflare": "$HOME/.bun/bin/bun run ./scripts/assert-bun-version.ts && PATH=\"$HOME/.bun/bin:$PATH\" bun run ./scripts/preflight-cloudflare.ts",
     "check-types": "echo \"No dedicated tsconfig for @tredyffrin-aerial-photos/infra\"",
