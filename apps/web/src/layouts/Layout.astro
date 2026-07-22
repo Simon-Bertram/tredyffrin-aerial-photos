@@ -55,7 +55,14 @@ function safeJsonLd(value: Record<string, unknown>): string {
     <meta name="description" content={description} />
     {robots ? <meta name="robots" content={robots} /> : null}
     <link rel="canonical" href={canonicalUrl} />
+    <!-- 1. The main modern scalable icon (SVG) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- 2. A 180x180px icon for iOS -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- 3. Web App Manifest (for Android/PWA install) -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- fallback favicon for browsers that don't support SVG -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
