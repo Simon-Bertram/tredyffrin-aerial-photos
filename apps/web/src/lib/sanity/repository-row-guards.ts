@@ -58,6 +58,20 @@ export interface GalleryNavPlaceFields {
 	placeCollection?: string
 }
 
+export function galleryNavSkipReason(row: unknown): string {
+	const parsed = sanityLocationNavRawSchema.safeParse(row)
+	if (!parsed.success) {
+		const issue = parsed.error.issues[0]
+		if (issue == null) {
+			return 'invalid shape'
+		}
+		const path =
+			issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+		return `${path}${issue.message}`
+	}
+	return 'missing name or slug'
+}
+
 export function parseGalleryNavRow(row: unknown): GalleryNavPlaceFields | null {
 	const parsed = sanityLocationNavRawSchema.safeParse(row)
 	if (!parsed.success) {

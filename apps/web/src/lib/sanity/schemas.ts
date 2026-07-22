@@ -67,6 +67,10 @@ export function normalizeSanityPhotoReferences(
 
 export const sanityLocationPhotoRawSchema = z.object({
   _key: z.string().optional(),
+  /** Stable unique id across places; optional until backfilled. */
+  imageIdentifier: z.string().nullable().optional(),
+  /** ISO datetime when the photo was added in Studio. */
+  addedAt: z.string().nullable().optional(),
   title: z.string().nullable().optional(),
   alt: z.string().nullable().optional(),
   caption: z.string().nullable().optional(),

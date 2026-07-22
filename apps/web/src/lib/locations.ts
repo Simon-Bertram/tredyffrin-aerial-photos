@@ -14,6 +14,8 @@ export interface LocationPhoto {
 	direction?: string
 	references?: string
 	comments?: string
+	/** ISO datetime from Sanity `addedAt` when present. */
+	addedAt?: string
 }
 
 export interface PhotoMetadataItem {

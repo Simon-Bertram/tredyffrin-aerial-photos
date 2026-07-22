@@ -7,6 +7,8 @@ export const locationForMapProjection = /* groq */ `{
   shortDescription,
   photos[]{
     _key,
+    imageIdentifier,
+    addedAt,
     title,
     alt,
     photoDate,
@@ -27,6 +29,8 @@ export const locationForDetailProjection = /* groq */ `{
   fullDescription,
   photos[]{
     _key,
+    imageIdentifier,
+    addedAt,
     title,
     alt,
     caption,
@@ -96,7 +100,7 @@ export const locationNavOptionsQuery = /* groq */ `
     | order(name asc) {
       "slug": slug.current,
       name,
-      placeCollection
+      "placeCollection": placeCollection->slug.current
     }
 `;
 
@@ -104,7 +108,7 @@ export const locationNavOptionsQuery = /* groq */ `
 export const otherLocationPlacesQuery = /* groq */ `
   *[
     _type == "location" &&
-    placeCollection != $tredyffrinEasttown &&
+    placeCollection->slug.current != $tredyffrinEasttown &&
     defined(slug.current)
   ]
   | order(name asc)
@@ -132,6 +136,8 @@ export const themeLocationsWithPhotosQuery = /* groq */ `
     fullDescription,
     "photos": photos[selectedCollection == $collection]{
       _key,
+      imageIdentifier,
+      addedAt,
       title,
       alt,
       caption,
@@ -145,6 +151,14 @@ export const themeLocationsWithPhotosQuery = /* groq */ `
       addToSelectedPhotosCollection,
       selectedCollection
     }
+  }
+`;
+
+/** Place collection document by slug (nav group labels). */
+export const placeCollectionBySlugQuery = /* groq */ `
+  *[_type == "placeCollection" && slug.current == $slug][0]{
+    title,
+    "slug": slug.current
   }
 `;
 

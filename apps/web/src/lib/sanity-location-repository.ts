@@ -24,6 +24,7 @@ import type {
 import { getSanityRepositoryContext } from '@/lib/sanity/repository-context'
 import {
 	getRowSlug,
+	galleryNavSkipReason,
 	parseGalleryNavRow,
 	parsePlaceLinkRow,
 	requireSanityRows,
@@ -37,7 +38,10 @@ import {
 	type SanityRepositoryTelemetryEvent,
 } from '@/lib/sanity/repository-telemetry'
 import { mapSanityLocationToRecord } from '@/lib/sanity/map-location'
-import { TREDYFFRIN_EASTTOWN_VALUE } from '@/lib/place-collections'
+import {
+	TREDYFFRIN_EASTTOWN_LABEL,
+	TREDYFFRIN_EASTTOWN_VALUE,
+} from '@/lib/place-collections'
 import {
 	SELECTED_PHOTO_COLLECTIONS,
 	type SelectedPhotoCollectionValue,
@@ -50,6 +54,7 @@ import {
 	locationsForMapQuery,
 	locationsWithThemeTaggedPhotosQuery,
 	otherLocationPlacesQuery,
+	placeCollectionBySlugQuery,
 	themeCollectionPhotoCountsQuery,
 	themeLocationsWithPhotosQuery,
 	themePlacesQuery,
@@ -347,13 +352,32 @@ export async function fetchGalleryNavItems(): Promise<GalleryNavPlaceItem[]> {
 				'fetchGalleryNavItems',
 				'locationNavOptions',
 				getRowSlug(row),
-				'missing name or slug',
+				galleryNavSkipReason(row),
 			)
 			continue
 		}
 		out.push(parsed)
 	}
 	return out
+}
+
+/** Title of a placeCollection document by slug, when published. */
+export async function fetchPlaceCollectionTitle(
+	slug: string,
+): Promise<string | undefined> {
+	if (isE2eFixturesEnabled()) {
+		return slug === TREDYFFRIN_EASTTOWN_VALUE
+			? TREDYFFRIN_EASTTOWN_LABEL
+			: undefined
+	}
+
+	const { client } = getSanityRepositoryContext()
+	const row = await client.fetch<{ title?: string | null } | null>(
+		placeCollectionBySlugQuery,
+		{ slug },
+	)
+	const title = typeof row?.title === 'string' ? row.title.trim() : ''
+	return title.length > 0 ? title : undefined
 }
 
 function toLocationNavItem(item: GalleryNavPlaceItem): GalleryNavItem {
@@ -363,9 +387,14 @@ function toLocationNavItem(item: GalleryNavPlaceItem): GalleryNavItem {
 	}
 }
 
+export interface BuildGalleryNavGroupsOptions {
+	tredyffrinEasttownLabel?: string
+}
+
 export function buildGalleryNavGroups(
 	items: GalleryNavPlaceItem[],
 	themeCounts: ThemeCollectionPhotoCounts,
+	options?: BuildGalleryNavGroupsOptions,
 ): GalleryNavGroup[] {
 	const tredyffrin = items.filter(
 		(item) => item.placeCollection === TREDYFFRIN_EASTTOWN_VALUE,
@@ -375,10 +404,12 @@ export function buildGalleryNavGroups(
 	)
 
 	const groups: GalleryNavGroup[] = []
+	const teLabel =
+		options?.tredyffrinEasttownLabel?.trim() || TREDYFFRIN_EASTTOWN_LABEL
 
 	if (tredyffrin.length > 0) {
 		groups.push({
-			label: 'Tredyffrin Easttown',
+			label: teLabel,
 			items: tredyffrin.map(toLocationNavItem),
 		})
 	}

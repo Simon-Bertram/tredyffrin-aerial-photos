@@ -254,6 +254,27 @@ describe('sanity-location-repository drift handling', () => {
 		])
 	})
 
+	it('uses Studio title for the Tredyffrin Easttown group label when provided', () => {
+		const groups = buildGalleryNavGroups(
+			[
+				{
+					name: 'Paoli',
+					slug: 'paoli',
+					placeCollection: TREDYFFRIN_EASTTOWN_VALUE,
+				},
+			],
+			{
+				airfields: 0,
+				bridges: 0,
+				railroads: 0,
+				'philadelphia-art-museum': 0,
+			},
+			{ tredyffrinEasttownLabel: '  Tredyffrin & Easttown  ' },
+		)
+
+		expect(groups[0]?.label).toBe('Tredyffrin & Easttown')
+	})
+
 	it('omits empty gallery nav groups', () => {
 		const groups = buildGalleryNavGroups(
 			[

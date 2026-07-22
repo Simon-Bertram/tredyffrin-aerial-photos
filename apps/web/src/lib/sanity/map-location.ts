@@ -103,8 +103,11 @@ export function mapSanityLocationToRecord(
 				) ?? undefined
 		}
 
+		const imageIdentifier = emptyToUndefined(p.imageIdentifier)
 		const id =
-			p._key && p._key.length > 0 ? p._key : `${doc.slug}-photo-${i}`
+			imageIdentifier ??
+			(p._key && p._key.length > 0 ? p._key : `${doc.slug}-photo-${i}`)
+		const addedAt = emptyToUndefined(p.addedAt)
 
 		photos.push({
 			id,
@@ -123,6 +126,7 @@ export function mapSanityLocationToRecord(
 			direction: emptyToUndefined(p.direction),
 			references: referencesToUndefined(p.references),
 			comments: emptyToUndefined(p.comments),
+			...(addedAt != null ? { addedAt } : {}),
 		})
 	}
 
