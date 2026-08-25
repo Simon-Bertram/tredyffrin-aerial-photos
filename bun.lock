@@ -36,6 +36,7 @@
         "@sanity/client": "^8.2.0",
         "@sanity/image-url": "^2.1.1",
         "@tredyffrin-aerial-photos/env": "workspace:*",
+        "@types/geojson": "^7946.0.16",
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.5",
         "astro": "7.2.6",
