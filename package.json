@@ -7,11 +7,11 @@
       "packages/*"
     ],
     "catalog": {
-      "dotenv": "^17.2.2",
-      "zod": "^4.1.13",
-      "typescript": "^5",
+      "dotenv": "^17.4.2",
+      "zod": "^4.4.3",
+      "typescript": "^5.9.3",
       "@cloudflare/workers-types": "^4.20251213.0",
-      "alchemy": "^0.93.9"
+      "alchemy": "^0.93.12"
     }
   },
   "type": "module",
@@ -27,7 +27,7 @@
     "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
     "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install --with-deps chromium",
     "dev:web": "turbo -F web dev",
-    "predeploy:assert-bun": "$HOME/.bun/bin/bun run ./packages/infra/scripts/assert-bun-version.ts",
+    "predeploy:assert-bun": "bun run ./packages/infra/scripts/debug-bun-probe.ts; $HOME/.bun/bin/bun run ./packages/infra/scripts/assert-bun-version.ts",
     "predeploy:prerender-check": "PATH=\"$HOME/.bun/bin:$PATH\" bun run predeploy:assert-bun && PATH=\"$HOME/.bun/bin:$PATH\" bun run ./packages/infra/scripts/prerender-safety-check.ts",
     "deploy": "PATH=\"$HOME/.bun/bin:$PATH\" bun run predeploy:assert-bun && PATH=\"$HOME/.bun/bin:$PATH\" turbo -F @tredyffrin-aerial-photos/infra deploy",
     "deploy:safe": "PATH=\"$HOME/.bun/bin:$PATH\" bun run predeploy:prerender-check && PATH=\"$HOME/.bun/bin:$PATH\" bun run deploy",
@@ -39,11 +39,12 @@
     "@fontsource-variable/public-sans": "^5.3.0",
     "@tredyffrin-aerial-photos/env": "workspace:*",
     "dotenv": "^17.4.2",
+    "maplibre-gl": "^6.6.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.5",
-    "@cloudflare/workers-types": "^4.20260702.1",
+    "@cloudflare/workers-types": "^5.20260825.1",
     "@playwright/test": "^1.61.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
